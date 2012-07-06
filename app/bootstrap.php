@@ -20,13 +20,13 @@ $configurator->enableDebugger(__DIR__ . '/../log');
 // Enable RobotLoader - this will load all classes automatically
 $configurator->setTempDirectory(__DIR__ . '/../tmp');
 $configurator->createRobotLoader()
-	->addDirectory(APP_DIR)
-	->addDirectory(LIBS_DIR)
-	->register();
+        ->addDirectory(APP_DIR)
+        ->addDirectory(LIBS_DIR)
+        ->register();
 
 // dibi
 $configurator->onCompile[] = function($configurator, $compiler) {
-	$compiler->addExtension('dibi', new DibiNetteExtension);
+        $compiler->addExtension('dibi', new DibiNetteExtension);
 };
 
 // Create Dependency Injection container from config.neon file
