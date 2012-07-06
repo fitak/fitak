@@ -26,5 +26,3 @@ class SearchForm extends Form
     }
 
 }
-
-?>

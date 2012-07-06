@@ -59,5 +59,3 @@ class Token extends BaseModel
     }
 
 }
-
-?>

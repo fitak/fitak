@@ -20,5 +20,3 @@ class Likes extends BaseModel
     }
 
 }
-
-?>

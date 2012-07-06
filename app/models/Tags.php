@@ -25,5 +25,3 @@ class Tags extends BaseModel
     }
 
 }
-
-?>

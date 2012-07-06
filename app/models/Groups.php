@@ -9,5 +9,3 @@ class Groups extends BaseModel
     }
 
 }
-
-?>

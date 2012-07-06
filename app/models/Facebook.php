@@ -45,5 +45,3 @@ class Facebook extends BaseModel
     }
 
 }
-
-?>

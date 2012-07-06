@@ -249,5 +249,3 @@ class Data extends BaseModel
     }
 
 }
-
-?>
