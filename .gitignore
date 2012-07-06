@@ -3,3 +3,4 @@
 /app/config/product.neon
 /log/
 /tmp/
+/nbproject/
