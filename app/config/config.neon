@@ -1,0 +1,57 @@
+common:
+	includes:		
+		- fbparams.neon
+
+	php:
+		date.timezone: Europe/Prague
+	
+
+	nette:
+		session:
+			autoStart: smart
+			expiration: +14 days
+
+		debugger:
+			strictMode: true
+
+		application:
+			errorPresenter: 'Error'
+		
+		security:
+			debugger: true
+
+	dibi:
+		driver: mysqli
+		host: localhost
+		charset: utf8
+		lazy: true
+		profiler: true
+
+	services:
+		data:
+			class: Data(@dibi.connection)
+		
+		groups:
+			class: Groups(@dibi.connection)
+		
+		likes:
+			class: Likes(@dibi.connection)
+		
+		tags:
+			class: Tags(@dibi.connection)
+		
+		token:
+			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%)
+
+
+production < common:
+	includes:
+		- product.neon
+
+	nette:
+		application:
+			catchExceptions: true
+
+development < common:
+	includes:
+		- devel.neon

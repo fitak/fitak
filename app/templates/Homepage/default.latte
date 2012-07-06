@@ -1,0 +1,31 @@
+{block content}
+<div id="search">
+    <img src="{$basePath}/images/logo.png" alt="Fitak.cz logo" title="Fitak.cz logo" /><br />
+
+    {form searchForm}
+    <ul class="errors" n:if="$form->hasErrors()">
+	<li n:foreach="$form->errors as $error">{$error}</li>
+    </ul>
+
+    {input s}  <span id="options"><a href="#"><small>více</small></a></span> <br />
+    <div id="incComments" style="text-align:center; display:none">
+	{input includeComments} {label includeComments /}
+    </div>
+    {input send}
+
+    {/form}
+
+    <script type="text/javascript">
+ 
+	$(document).ready(function(){
+
+	    $('#options').click(function(){
+		 $("#incComments").slideToggle();
+	    });
+
+	});
+ 
+    </script>
+
+</div>
+{/block}

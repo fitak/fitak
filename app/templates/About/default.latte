@@ -1,0 +1,104 @@
+{block content}
+<div id="content">
+	<h1>O projektu</h1>
+        <p>
+            Tento projekt vznikl za účelem archivace školních facebook skupin 
+            <a href="http://fit.cvut.cz">Fakulty informačních technologií</a> 
+            <a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze, 
+            které obsahují velké
+            množství informací. Bohužel tyto znalosti velmi rychle zapadnou a vyhledávání v nich je 
+            poměrně obtížné. V současné době totiž tito studenti napsali 
+            <strong>{$count} příspěvků</strong>!
+            To už je pořádná dávka informací.
+        </p>
+        
+        <p>
+            <strong>Nyní jsou indexovány tyto skupiny:</strong>
+            <ul>
+		{foreach $groups as $group}
+		<li><a href="https://www.facebook.com/groups/{$group->id}/">{$group->name}</a></li>
+                {/foreach}
+            </ul>    
+        </p>
+        
+        <p>
+            Pokud vám tu nějaká chybí, stačí <a href="mailto: admin@fitak.cz">napsat</a>. Všechny skupiny jsou veřejně přístupné, neděje se tu tudíž žádné vynášení informací ven a není
+            tak nutné vyžadovat verifikaci. Nicméně pokud přidáte příspěvek, který se následně rozhodnete
+            smazat, bude zde už pravděpodobně zvěčněn (což má i svoji pozitivní stránku).
+        </p>
+        <p>
+            Indexace probíhá zcela automaticky a to v krátkém intervalu. Zároveň se z příspěvků vytahují 
+            tagy. Tag (prefix) je značka na začátku příspěvku v hranatých závorkách, 
+            např.: <i>[BI-PA2] Příspěvek</i>. Lze použít i více tagů, např.: <i>[BI-PA2][Úkol1] Dotaz</i>.
+            Ve skupinách na facebooku slouží pro zpřehlednění feedu a zároveň také usnadňují vyhledávání.
+            Jedním z cílů fiťáka je tuto myšlenku podpořit a pracovat s tagy o trochu chytřeji. Například
+            se slučují dohromady: <i>[ Semestrálka ]</i>, <i>[semestrálka]</i> a 
+            <i>[SEMESTRALKA]</i> jsou brány jako jeden tag - <i>[semestralka]</i>. 
+        </p>
+        
+        <h2>Další verze?</h2>
+        <p>V první verzi běží pouze indexace a jednoduché vyhledávání bez dalších funkcí. Na diagramy a use-case
+           modely zatím nebyl čas. :(
+        </p>
+        
+        <strong>Na čem se pracuje?</strong>
+        <ul>
+            <li><strong>Přidání makra <i>tag: nejaky_tag</i>, které při vložení na začátek vyhledávacího dotazu
+                způsobí, že budou prohledávány pouze příspěvky, který tento tag obsahují. Půjde zadávat
+                i více tagů zároveň např.: <i>tag: nejaky_tag1, nejaky_tag2, nejaky_tag3</i></strong><br />
+            </li>
+            <li>
+                Na hlavní stránce přibude tabulka, která bude zachycovat trendy. Jinými slovy, budou v ní
+                tagy, které se v posledních dnech/týdnech používaly nejčastěji. Budou poskytovat představu
+                co studenti aktuálně nejvíce řeší.
+            </li>
+            <li>
+                Výpisy feedů jednotlivých skupin (suplování facebooku) + výpis do společného feedu.
+            </li>
+            <li>
+                Lehčí optimalizace pro mobilní telefony.
+            </li>
+        </ul>
+        
+        <strong>Co se plánuje?</strong>
+        <ul>
+	    <li>Pokročilejší filtrace a řazení výsledků vyhledávání.</li>
+            <li>Zohlednit do řazení výsledů i počet "líbí se mi".</li>
+            <li>Žebříčky - kdo zakládá nejvíce vláken, kdo nejvíce komentuje, kdo nejvíce používá
+            "líbí se mi", kdo nejvíce "hejtuje" javu a androida atd.</li>
+        </ul>
+        
+        <strong>Sci-fi</strong>
+        <ul>
+            <li>Zahrnout do vyhledávání i další zdroje. Například školní fórum, stránky či fit-wiki.</li>
+            <li>Jakmile facebook spustí real-time api i pro skupiny, dávalo by smysl přidat podporu pro
+            přímé psaní příspěvků rovnou na této stránce.</li>
+	    <li>Nasadit <a href="http://sphinxsearch.com/">http://sphinxsearch.com/</a>
+	    místo (směšného) MySQL fulltextu, na to je však potřeba vlastní server.
+	    </li>
+        </ul>
+	
+	<h2>Společný vývoj?</h2>
+	<p>Abych rozprášil obavy o budoucnosti tohoto nástroje, dávám ho všanc světu
+	   open-source a každý z vás se tak může (nejen) do vývoje aktivně zapojit. 
+	   <br /><br />
+	   <strong>Git repositář je k dispozici na:</strong><br /> 
+	   <a href="https://github.com/tajo/fitak">https://github.com/tajo/fitak</a><br /><br />
+	   Budu rád pokud tam budete i ohlašovat bugy, či posílat návrhy na vylepšení. Samozřejmě
+	   můžete použít i <a href="mailto: admin@fitak.cz">email</a>.
+	</p>
+        
+        <h2>Pozadí</h2>
+        <p>Projekt jsem vytvořil hlavně ze 2 důvodů: 1) Řeší problém s "utápěním" informací na facebooku. 2)
+        Chtěl jsem si ozkoušet facebook api. :)<br />
+        Web běží na PHP + Nette + MySQL.
+        </p>
+        
+        
+        <h2>Kontakt</h2>
+        <p>Vojtěch Mikšů - <a href="mailto: admin@fitak.cz">email</a>
+        </p>
+        
+        <p style="text-align:right"><i>Poslední aktualizace této stránky: 6.7.2012</i></p>
+</div>
+{/block}

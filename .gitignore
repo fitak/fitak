@@ -1,0 +1,5 @@
+/app/config/devel.neon
+/app/config/fbparams.neon
+/app/config/product.neon
+/log/
+/tmp/

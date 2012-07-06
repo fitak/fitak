@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/@layout.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Search/default.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/SearchPresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/CrawlerPresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/fitak.cz/css/screen.css</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/components/visualpaginator/VisualPaginator.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/About/default.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Facebook.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Groups.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Likes.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Tags.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Token.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/AboutPresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/BasePresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/ErrorPresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/presenters/HomepagePresenter.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/BaseModel.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/models/Data.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/bootstrap.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/403.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/404.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/405.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/410.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/4xx.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Error/500.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/templates/Homepage/default.latte</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/fitak.cz/index.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/forms/SearchForm.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/components/visualpaginator/VisualPaginator.php</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/config/product.neon</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/fitak.cz/.htaccess</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/config/config.neon</file>
+        <file>file:/Users/Vojta/Documents/web/Fitak/app/config/devel.neon</file>
+    </open-files>
+</project-private>

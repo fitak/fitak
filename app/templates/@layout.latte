@@ -1,0 +1,96 @@
+{**
+ * My Application layout template.
+ *
+ * @copyright  Copyright (c) 2012 Vojtech Miksu
+ * @package    Fitak.cz
+ *
+ * @param string   $basePath web base path
+ * @param string   $robots   tell robots how to index the content of a page (optional)
+ * @param array    $flashes  flash messages
+ *}
+
+<!DOCTYPE html>
+<html>
+    <head itemscope itemtype="http://schema.org/Organization">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="description" content="Fitak.cz archivátor facebook skupin">
+        <meta name="robots" content="{$robots}" n:ifset="$robots">
+	<meta itemprop="name" content="Fiťák.cz">
+	<meta itemprop="description" content="Archivace školních facebook skupin pro studenty FIT ČVUT.">
+
+        <title>Fiťák.cz</title>
+
+        <link rel="stylesheet" media="screen,projection,tv" href="{$basePath}/css/screen.css" type="text/css">
+        <link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+        <script type="text/javascript" src="{$basePath}/js/netteForms.js"></script>
+	<script type="text/javascript" src="{$basePath}/js/highlight.min.js"></script>
+	{block head}{/block}
+	<script type="text/javascript">
+	    var _gaq = _gaq || [];
+	    _gaq.push(['_setAccount', 'UA-33198159-1']);
+	    _gaq.push(['_trackPageview']);
+
+	    (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	    })();
+	</script>
+    </head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script>
+          window.fbAsyncInit = function() {
+                FB.init({
+                appId      : '105567419586340', // App ID
+                channelUrl : '//www.fitak.cz/channel.php', // Channel File
+                status     : true, // check login status
+                cookie     : true, // enable cookies to allow the server to access the session
+                xfbml      : true  // parse XFBML
+                });
+
+                // Additional initialization code here
+            };  
+            
+          (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/cs_CZ/all.js#xfbml=1&appId=105567419586340";
+            fjs.parentNode.insertBefore(js, fjs);
+         }(document, 'script', 'facebook-jssdk'));
+        
+        </script>
+        <script> document.body.className+=' js' </script>
+        <div id="menu">
+	    <div id="menu-text-left">
+		<!-- Place this tag where you want the +1 button to render -->
+		<g:plusone size="small"></g:plusone>
+
+		<!-- Place this render call where appropriate -->
+		<script type="text/javascript">
+		window.___gcfg = { lang: 'cs' };
+
+		(function() {
+		    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		    po.src = 'https://apis.google.com/js/plusone.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+		})();
+		</script>
+                <div class="fb-like" data-href="http://www.fitak.cz" data-send="false" data-layout="button_count" data-width="115" data-show-faces="true"></div>
+
+	    </div>
+            <div id="menu-text">
+                <a n:href="about:">O projektu</a> | <a n:href="homepage:">Fiťák.cz</a> 2012 
+		
+            </div>
+        </div>
+
+        <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+
+	{include #content}
+    </body>
+</html>
