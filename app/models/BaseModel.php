@@ -11,7 +11,7 @@ abstract class BaseModel extends Nette\Object
 
     public function __construct( DibiConnection $connection )
     {
-	$this->db = $connection;
+        $this->db = $connection;
     }
 
 }
