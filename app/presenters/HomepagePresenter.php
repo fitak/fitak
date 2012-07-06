@@ -13,14 +13,14 @@ class HomepagePresenter extends BasePresenter
 
     public function renderDefault()
     {
-	
+        
     }
 
     protected function createComponentSearchForm()
     {
-	$form = new SearchForm();
-	$form->onSuccess[] = callback( $form, 'submitted' );
-	return $form;
+        $form = new SearchForm();
+        $form->onSuccess[] = callback( $form, 'submitted' );
+        return $form;
     }
 
 }
