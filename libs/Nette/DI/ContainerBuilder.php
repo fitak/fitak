@@ -259,7 +259,7 @@ class ContainerBuilder extends Nette\Object
 					return;
 				}
 			}
-			$factory = callback($factory);
+			$factory = new Nette\Callback($factory);
 			if (!$factory->isCallable()) {
 				throw new Nette\InvalidStateException("Factory '$factory' is not callable.");
 			}
@@ -469,7 +469,7 @@ class ContainerBuilder extends Nette\Object
 			return $this->formatPhp("$entity[1](?*)", array($arguments), $self);
 
 		} elseif (Strings::contains($entity[1], '$')) { // property setter
-			Validators::assert($arguments, 'list:1', "setup arguments for '" . callback($entity) . "'");
+			Validators::assert($arguments, 'list:1', "setup arguments for '" . Nette\Callback::create($entity) . "'");
 			if ($this->getServiceName($entity[0], $self)) {
 				return $this->formatPhp('?->? = ?', array($entity[0], substr($entity[1], 1), $arguments[0]), $self);
 			} else {
@@ -508,7 +508,7 @@ class ContainerBuilder extends Nette\Object
 
 			} elseif ($service = $that->getServiceName($val, $self)) {
 				$val = $service === $self ? '$service' : $that->formatStatement(new Statement($val));
-				$val = new PhpLiteral($val, $self);
+				$val = new PhpLiteral($val);
 			}
 		});
 		return PhpHelpers::formatArgs($statement, $args);

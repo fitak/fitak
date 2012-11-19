@@ -57,7 +57,7 @@ class RequestFactory extends Nette\Object
 	{
 		// DETECTS URI, base path and script path of the request.
 		$url = new UrlScript;
-		$url->scheme = isset($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'off') ? 'https' : 'http';
+		$url->scheme = !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'off') ? 'https' : 'http';
 		$url->user = isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : '';
 		$url->password = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
 
@@ -181,7 +181,7 @@ class RequestFactory extends Nette\Object
 		}
 
 
-		// FILES and create HttpUploadedFile objects
+		// FILES and create FileUpload objects
 		$files = array();
 		$list = array();
 		if (!empty($_FILES)) {

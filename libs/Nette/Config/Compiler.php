@@ -113,13 +113,13 @@ class Compiler extends Nette\Object
 
 	public function processExtensions()
 	{
+		for ($i = 0; $slice = array_slice($this->extensions, $i, 1); $i++) {
+			reset($slice)->loadConfiguration();
+		}
+
 		if ($extra = array_diff_key($this->config, self::$reserved, $this->extensions)) {
 			$extra = implode("', '", array_keys($extra));
 			throw new Nette\InvalidStateException("Found sections '$extra' in configuration, but corresponding extensions are missing.");
-		}
-
-		foreach ($this->extensions as $name => $extension) {
-			$extension->loadConfiguration();
 		}
 	}
 
@@ -156,6 +156,7 @@ class Compiler extends Nette\Object
 	{
 		foreach ($this->extensions as $extension) {
 			$extension->beforeCompile();
+			$this->container->addDependency(Nette\Reflection\ClassType::from($extension)->getFileName());
 		}
 
 		$classes[] = $class = $this->container->generateClass($parentName);
@@ -176,6 +177,9 @@ class Compiler extends Nette\Object
 				$class->documents = preg_replace("#\S+(?= \\$$name$)#", $def->class, $class->documents);
 				$classes[] = $accessor = new Nette\Utils\PhpGenerator\ClassType($def->class);
 				foreach ($found as $item) {
+					if ($defs[$item]->internal) {
+						continue;
+					}
 					$short = substr($item, strlen($name)  + 1);
 					$accessor->addDocument($defs[$item]->shared
 						? "@property {$defs[$item]->class} \$$short"
@@ -220,7 +224,7 @@ class Compiler extends Nette\Object
 				$definition = $container->addDefinition($name);
 				if ($parent !== Helpers::OVERWRITE) {
 					foreach ($container->getDefinition($parent) as $k => $v) {
-						$definition->$k = $v;
+						$definition->$k = unserialize(serialize($v)); // deep clone
 					}
 				}
 			} elseif ($container->hasDefinition($name)) {

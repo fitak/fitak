@@ -22,7 +22,9 @@ use Nette;
  */
 interface ISupplementalDriver
 {
-	const META = 'meta';
+	const SUPPORT_COLUMNS_META = 'meta',
+		SUPPORT_SEQUENCE = 'sequence',
+		SUPPORT_SELECT_UNGROUPED_COLUMNS = 'ungrouped_cols';
 
 	/**
 	 * Delimites identifier for use in a SQL statement.
@@ -93,5 +95,11 @@ interface ISupplementalDriver
 	 * @return array
 	 */
 	function getForeignKeys($table);
+
+	/**
+	 * Cheks if driver supports specific property
+	 * @return bool
+	 */
+	function isSupported($item);
 
 }

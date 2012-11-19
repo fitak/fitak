@@ -13,7 +13,7 @@ class SearchPresenter extends BasePresenter
     private $searchQuery, $includeComments, $vp;
     private $itemsCount = NULL;
 
-    public function renderDefault( $s, $comments )
+    public function renderDefault($s, $comments )
     {
         $this->searchQuery = $s;
         $this->includeComments = $comments;

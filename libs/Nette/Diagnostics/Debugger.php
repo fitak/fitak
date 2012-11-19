@@ -155,7 +155,7 @@ final class Debugger
 	 */
 	public static function _init()
 	{
-		self::$time = microtime(TRUE);
+		self::$time = isset($_SERVER['REQUEST_TIME_FLOAT']) ? $_SERVER['REQUEST_TIME_FLOAT'] : microtime(TRUE);
 		self::$consoleMode = PHP_SAPI === 'cli';
 		self::$productionMode = self::DETECT;
 		if (self::$consoleMode) {
@@ -231,17 +231,19 @@ final class Debugger
 			self::$productionMode = $mode;
 
 		} elseif ($mode !== self::DETECT || self::$productionMode === NULL) { // IP addresses or computer names whitelist detection
-			$mode = is_string($mode) ? preg_split('#[,\s]+#', $mode) : (array) $mode;
-			$mode[] = '127.0.0.1';
-			$mode[] = '::1';
-			self::$productionMode = !in_array(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : php_uname('n'), $mode, TRUE);
+			$list = is_string($mode) ? preg_split('#[,\s]+#', $mode) : (array) $mode;
+			if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+				$list[] = '127.0.0.1';
+				$list[] = '::1';
+			}
+			self::$productionMode = !in_array(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : php_uname('n'), $list, TRUE);
 		}
 
 		// logging configuration
 		if (is_string($logDirectory)) {
 			self::$logDirectory = realpath($logDirectory);
 			if (self::$logDirectory === FALSE) {
-				throw new Nette\DirectoryNotFoundException("Directory '$logDirectory' is not found.");
+				die(__METHOD__ . "() error: Log directory is not found or is not directory.");
 			}
 		} elseif ($logDirectory === FALSE) {
 			self::$logDirectory = FALSE;
@@ -260,12 +262,12 @@ final class Debugger
 			ini_set('log_errors', FALSE);
 
 		} elseif (ini_get('display_errors') != !self::$productionMode && ini_get('display_errors') !== (self::$productionMode ? 'stderr' : 'stdout')) { // intentionally ==
-			throw new Nette\NotSupportedException('Function ini_set() must be enabled.');
+			die(__METHOD__ . "() error: Unable to set 'display_errors' because function ini_set() is disabled.");
 		}
 
 		if ($email) {
 			if (!is_string($email)) {
-				throw new Nette\InvalidArgumentException('Email address must be a string.');
+				die(__METHOD__ . '() error: Email address must be a string.');
 			}
 			self::$email = $email;
 		}
@@ -480,6 +482,10 @@ final class Debugger
 		}
 
 		if ($severity === E_RECOVERABLE_ERROR || $severity === E_USER_ERROR) {
+			if (Helpers::findTrace(debug_backtrace(FALSE), '*::__toString')) {
+				$previous = isset($context['e']) && $context['e'] instanceof \Exception ? $context['e'] : NULL;
+				self::_exceptionHandler(new Nette\FatalErrorException($message, 0, $severity, $file, $line, $context, $previous));
+			}
 			throw new Nette\FatalErrorException($message, 0, $severity, $file, $line, $context);
 
 		} elseif (($severity & error_reporting()) !== $severity) {
@@ -587,26 +593,26 @@ final class Debugger
 
 		if (!$return) {
 			$trace = debug_backtrace(FALSE);
-			$i = Helpers::findTrace($trace, 'dump') ? 1 : 0;
-			if (isset($trace[$i]['file'], $trace[$i]['line']) && is_file($trace[$i]['file'])) {
-				$lines = file($trace[$i]['file']);
-				preg_match('#dump\((.*)\)#', $lines[$trace[$i]['line'] - 1], $m);
+			$item = Helpers::findTrace($trace, 'dump') ?: Helpers::findTrace($trace, __CLASS__ . '::dump');
+			if (isset($item['file'], $item['line']) && is_file($item['file'])) {
+				$lines = file($item['file']);
+				preg_match('#dump\((.*)\)#', $lines[$item['line'] - 1], $m);
 				$output = substr_replace(
 					$output,
-					' title="' . htmlspecialchars((isset($m[0]) ? "$m[0] \n" : '') . "in file {$trace[$i]['file']} on line {$trace[$i]['line']}") . '"',
+					' title="' . htmlspecialchars((isset($m[0]) ? "$m[0] \n" : '') . "in file {$item['file']} on line {$item['line']}") . '"',
 					4, 0);
 
 				if (self::$showLocation) {
 					$output = substr_replace(
 						$output,
-						' <small>in ' . Helpers::editorLink($trace[$i]['file'], $trace[$i]['line']) . ":{$trace[$i]['line']}</small>",
+						' <small>in ' . Helpers::editorLink($item['file'], $item['line']) . ":{$item['line']}</small>",
 						-8, 0);
 				}
 			}
 		}
 
 		if (self::$consoleMode) {
-			if (self::$consoleColors && substr(PHP_OS, 0, 3) !== 'WIN') {
+			if (self::$consoleColors && substr(getenv('TERM'), 0, 5) === 'xterm') {
 				$output = preg_replace_callback('#<span class="php-(\w+)">|</span>#', function($m) {
 					return "\033[" . (isset($m[1], Debugger::$consoleColors[$m[1]]) ? Debugger::$consoleColors[$m[1]] : '0') . "m";
 				}, $output);

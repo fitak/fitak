@@ -143,9 +143,9 @@ class StaticClassException extends \LogicException
 class FatalErrorException extends \ErrorException
 {
 
-	public function __construct($message, $code, $severity, $file, $line, $context)
+	public function __construct($message, $code, $severity, $file, $line, $context, \Exception $previous = NULL)
 	{
-		parent::__construct($message, $code, $severity, $file, $line);
+		parent::__construct($message, $code, $severity, $file, $line, $previous);
 		$this->context = $context;
 	}
 

@@ -48,9 +48,8 @@ class PresenterComponentReflection extends Nette\Reflection\ClassType
 		}
 		$params = array();
 		if (is_subclass_of($class, 'Nette\Application\UI\PresenterComponent')) {
-			// $class::getPersistentParams() in PHP 5.3
 			$defaults = get_class_vars($class);
-			foreach (call_user_func(array($class, 'getPersistentParams'), $class) as $name => $meta) {
+			foreach ($class::getPersistentParams()as $name => $meta) {
 				if (is_string($meta)) {
 					$name = $meta;
 				}
@@ -86,8 +85,7 @@ class PresenterComponentReflection extends Nette\Reflection\ClassType
 		}
 		$components = array();
 		if (is_subclass_of($class, 'Nette\Application\UI\Presenter')) {
-			// $class::getPersistentComponents() in PHP 5.3
-			foreach (call_user_func(array($class, 'getPersistentComponents'), $class) as $name => $meta) {
+			foreach ($class::getPersistentComponents()as $name => $meta) {
 				if (is_string($meta)) {
 					$name = $meta;
 				}
@@ -130,37 +128,47 @@ class PresenterComponentReflection extends Nette\Reflection\ClassType
 		$i = 0;
 		foreach ($method->getParameters() as $param) {
 			$name = $param->getName();
-			$def = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : NULL;
-
-			if (!isset($args[$name])) { // NULL treats as none value
-				if ($param->isArray() && !$param->allowsNull()) {
-					$def = (array) $def;
+			if (isset($args[$name])) { // NULLs are ignored
+				$res[$i++] = $args[$name];
+				$type = $param->isArray() ? 'array' : ($param->isDefaultValueAvailable() && $param->isOptional() ? gettype($param->getDefaultValue()) : 'NULL');
+				if (!self::convertType($res[$i-1], $type)) {
+				    $mName = $method instanceof \ReflectionMethod ? $method->getDeclaringClass()->getName() . '::' . $method->getName() : $method->getName();
+					throw new BadRequestException("Invalid value for parameter '$name' in method $mName(), expected " . ($type === 'NULL' ? 'scalar' : $type) . ".");
 				}
-				$res[$i++] = $def;
-
 			} else {
-				$val = $args[$name];
-				if ($param->isArray() || is_array($def)) {
-					if (!is_array($val)) {
-						throw new BadRequestException("Invalid value for parameter '$name', expected array.");
-					}
-				} elseif ($param->getClass() || is_object($val)) {
-					// ignore
-				} else {
-					if (!is_scalar($val)) {
-						throw new BadRequestException("Invalid value for parameter '$name', expected scalar.");
-					}
-					if ($def !== NULL) {
-						settype($val, gettype($def));
-						if (($val === FALSE ? '0' : (string) $val) !== (string) $args[$name]) {
-							throw new BadRequestException("Invalid value for parameter '$name', expected ".gettype($def).".");
-						}
-					}
-				}
-				$res[$i++] = $val;
+				$res[$i++] = $param->isDefaultValueAvailable() && $param->isOptional() ? $param->getDefaultValue() : ($param->isArray() ? array() : NULL);
 			}
 		}
 		return $res;
+	}
+
+
+
+	/**
+	 * Non data-loss type conversion.
+	 * @param  mixed
+	 * @param  string
+	 * @return bool
+	 */
+	public static function convertType(& $val, $type)
+	{
+		if ($val === NULL || is_object($val)) {
+			// ignore
+		} elseif ($type === 'array') {
+			if (!is_array($val)) {
+				return FALSE;
+			}
+		} elseif (!is_scalar($val)) {
+			return FALSE;
+
+		} elseif ($type !== 'NULL') {
+			$old = $val = ($val === FALSE ? '0' : (string) $val);
+			settype($val, $type);
+			if ($old !== ($val === FALSE ? '0' : (string) $val)) {
+				return FALSE; // data-loss occurs
+			}
+		}
+		return TRUE;
 	}
 
 }

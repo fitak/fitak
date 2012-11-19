@@ -199,7 +199,8 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroUse(MacroNode $node, PhpWriter $writer)
 	{
-		callback($node->tokenizer->fetchWord(), 'install')->invoke($this->getCompiler())
+		Nette\Callback::create($node->tokenizer->fetchWord(), 'install')
+			->invoke($this->getCompiler())
 			->initialize();
 	}
 
@@ -388,8 +389,6 @@ class CoreMacros extends MacroSet
 
 	/**
 	 * Initializes local & global storage in template.
-	 * @param
-	 * @param  string
 	 * @return \stdClass
 	 */
 	public static function initRuntime(Nette\Templating\ITemplate $template, $templateId)

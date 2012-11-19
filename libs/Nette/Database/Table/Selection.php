@@ -12,6 +12,7 @@
 namespace Nette\Database\Table;
 
 use Nette,
+	Nette\Database\ISupplementalDriver,
 	PDO;
 
 
@@ -30,11 +31,17 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	/** @var Nette\Database\Connection */
 	protected $connection;
 
+	/** @var SqlBuilder */
+	protected $sqlBuilder;
+
 	/** @var string table name */
 	protected $name;
 
 	/** @var string primary key field name */
 	protected $primary;
+
+	/** @var string|bool primary column sequence name, FALSE for autodetection */
+	protected $primarySequence = FALSE;
 
 	/** @var ActiveRow[] data read from database in [primary key => ActiveRow] format */
 	protected $rows;
@@ -42,41 +49,17 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	/** @var ActiveRow[] modifiable data in [primary key => ActiveRow] format */
 	protected $data;
 
-	/** @var array of column to select */
-	protected $select = array();
-
-	/** @var array of where conditions */
-	protected $where = array();
-
-	/** @var array of where conditions for caching */
-	protected $conditions = array();
-
-	/** @var array of parameters passed to where conditions */
-	protected $parameters = array();
-
-	/** @var array or columns to order by */
-	protected $order = array();
-
-	/** @var int number of rows to fetch */
-	protected $limit = NULL;
-
-	/** @var int first row to fetch */
-	protected $offset = NULL;
-
-	/** @var string columns to grouping */
-	protected $group = '';
-
-	/** @var string grouping condition */
-	protected $having = '';
-
-	/** @var bool recheck referencing keys */
-	protected $checkReferenceNewKeys = FALSE;
-
 	/** @var Selection[] */
 	protected $referenced = array();
 
-	/** @var GroupedSelection[] */
+	/** @var array of [sqlQuery-hash => grouped data]; used by GroupedSelection */
 	protected $referencing = array();
+
+	/** @var GroupedSelection[] cached array of GroupedSelection prototypes */
+	protected $referencingPrototype = array();
+
+	/** @var array of [conditions => [key => ActiveRow]]; used by GroupedSelection */
+	protected $aggregation = array();
 
 	/** @var array of touched columns */
 	protected $accessed;
@@ -84,38 +67,43 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	/** @var array of earlier touched columns */
 	protected $prevAccessed;
 
+	/** @var bool should instance observe accessed columns caching */
+	protected $observeCache = FALSE;
+
+	/** @var bool recheck referencing keys */
+	protected $checkReferenced = FALSE;
+
 	/** @var array of primary key values */
 	protected $keys = array();
 
-	/** @var string */
-	protected $delimitedName;
-
-	/** @var string */
-	protected $delimitedPrimary;
 
 
-
+	/**
+	 * Creates filtered table representation.
+	 * @param  string  database table name
+	 * @param  Nette\Database\Connection
+	 */
 	public function __construct($table, Nette\Database\Connection $connection)
 	{
 		$this->name = $table;
 		$this->connection = $connection;
 		$this->primary = $connection->getDatabaseReflection()->getPrimary($table);
-		$this->delimitedName = $this->tryDelimite($this->name);
-		$this->delimitedPrimary = $connection->getSupplementalDriver()->delimite($this->primary);
+		$this->sqlBuilder = new SqlBuilder($this);
 	}
 
 
 
-	/**
-	 * Saves data to cache and empty result.
-	 */
 	public function __destruct()
 	{
-		$cache = $this->connection->getCache();
-		if ($cache && !$this->select && $this->rows !== NULL) {
-			$cache->save(array(__CLASS__, $this->name, $this->conditions), $this->accessed);
-		}
-		$this->rows = NULL;
+		$this->saveCacheState();
+	}
+
+
+
+	public function __clone()
+	{
+		$this->sqlBuilder = clone $this->sqlBuilder;
+		$this->sqlBuilder->setSelection($this);
 	}
 
 
@@ -151,17 +139,129 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 
 
 	/**
+	 * @return string
+	 */
+	public function getPrimarySequence()
+	{
+		if ($this->primarySequence === FALSE) {
+			$this->primarySequence = NULL;
+
+			$driver = $this->connection->getSupplementalDriver();
+			if ($driver->isSupported(ISupplementalDriver::SUPPORT_SEQUENCE)) {
+				foreach ($driver->getColumns($this->name) as $column) {
+					if ($column['name'] === $this->primary) {
+						$this->primarySequence = $column['vendor']['sequence'];
+						break;
+					}
+				}
+			}
+		}
+
+		return $this->primarySequence;
+	}
+
+
+
+	/**
+	 * @param  string
+	 * @return Selection provides a fluent interface
+	 */
+	public function setPrimarySequence($sequence)
+	{
+		$this->primarySequence = $sequence;
+		return $this;
+	}
+
+
+
+	/**
+	 * @return string
+	 */
+	public function getSql()
+	{
+		return $this->sqlBuilder->buildSelectQuery();
+	}
+
+
+
+	/**
+	 * Loads cache of previous accessed columns and returns it.
+	 * @internal
+	 * @return array|false
+	 */
+	public function getPreviousAccessed()
+	{
+		$cache = $this->connection->getCache();
+		if ($this->rows === NULL && $cache && !is_string($this->prevAccessed)) {
+			$this->accessed = $this->prevAccessed = $cache->load(array(__CLASS__, $this->name, $this->sqlBuilder->getConditions()));
+		}
+
+		return $this->prevAccessed;
+	}
+
+
+
+	/**
+	 * @internal
+	 * @return SqlBuilder
+	 */
+	public function getSqlBuilder()
+	{
+		return $this->sqlBuilder;
+	}
+
+
+
+	/********************* quick access ****************d*g**/
+
+
+
+	/**
 	 * Returns row specified by primary key.
-	 * @param  mixed
+	 * @param  mixed primary key
 	 * @return ActiveRow or FALSE if there is no such row
 	 */
 	public function get($key)
 	{
-		// can also use array_pop($this->where) instead of clone to save memory
 		$clone = clone $this;
-		$clone->where($this->delimitedPrimary, $key);
+		$clone->where($this->primary, $key);
 		return $clone->fetch();
 	}
+
+
+
+	/**
+	 * Returns next row of result.
+	 * @return ActiveRow or FALSE if there is no row
+	 */
+	public function fetch()
+	{
+		$this->execute();
+		$return = current($this->data);
+		next($this->data);
+		return $return;
+	}
+
+
+
+	/**
+	 * Returns all rows as associative array.
+	 * @param  string
+	 * @param  string column name used for an array value or NULL for the whole row
+	 * @return array
+	 */
+	public function fetchPairs($key, $value = NULL)
+	{
+		$return = array();
+		foreach ($this as $row) {
+			$return[is_object($row[$key]) ? (string) $row[$key] : $row[$key]] = ($value ? $row[$value] : $row);
+		}
+		return $return;
+	}
+
+
+
+	/********************* sql selectors ****************d*g**/
 
 
 
@@ -172,8 +272,8 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function select($columns)
 	{
-		$this->__destruct();
-		$this->select[] = $columns;
+		$this->emptyResultSet();
+		$this->sqlBuilder->addSelect($columns);
 		return $this;
 	}
 
@@ -186,7 +286,7 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function find($key)
 	{
-		return $this->where($this->delimitedPrimary, $key);
+		return $this->where($this->primary, $key);
 	}
 
 
@@ -211,58 +311,11 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 			return $this;
 		}
 
-		$hash = md5(json_encode(func_get_args()));
-		if (isset($this->conditions[$hash])) {
-			return $this;
+		$args = func_get_args();
+		if (call_user_func_array(array($this->sqlBuilder, 'addWhere'), $args)) {
+			$this->emptyResultSet();
 		}
 
-		$this->__destruct();
-
-		$this->conditions[$hash] = $condition;
-		$condition = $this->removeExtraTables($condition);
-		$condition = $this->tryDelimite($condition);
-
-		$args = func_num_args();
-		if ($args !== 2 || strpbrk($condition, '?:')) { // where('column < ? OR column > ?', array(1, 2))
-			if ($args !== 2 || !is_array($parameters)) { // where('column < ? OR column > ?', 1, 2)
-				$parameters = func_get_args();
-				array_shift($parameters);
-			}
-			$this->parameters = array_merge($this->parameters, $parameters);
-
-		} elseif ($parameters === NULL) { // where('column', NULL)
-			$condition .= ' IS NULL';
-
-		} elseif ($parameters instanceof Selection) { // where('column', $db->$table())
-			$clone = clone $parameters;
-			if (!$clone->select) {
-				$clone->select = array($clone->primary);
-			}
-			if ($this->connection->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'mysql') {
-				$condition .= ' IN (' . $clone->getSql() . ')';
-			} else {
-				$in = array();
-				foreach ($clone as $row) {
-					$this->parameters[] = array_values(iterator_to_array($row));
-					$in[] = (count($row) === 1 ? '?' : '(?)');
-				}
-				$condition .= ' IN (' . ($in ? implode(', ', $in) : 'NULL') . ')';
-			}
-
-		} elseif (!is_array($parameters)) { // where('column', 'x')
-			$condition .= ' = ?';
-			$this->parameters[] = $parameters;
-
-		} else { // where('column', array(1, 2))
-			if ($parameters) {
-				$condition .= " IN (?)";
-				$this->parameters[] = $parameters;
-			} else {
-				$condition .= " IN (NULL)";
-			}
-		}
-
-		$this->where[] = $condition;
 		return $this;
 	}
 
@@ -275,8 +328,8 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function order($columns)
 	{
-		$this->rows = NULL;
-		$this->order[] = $columns;
+		$this->emptyResultSet();
+		$this->sqlBuilder->addOrder($columns);
 		return $this;
 	}
 
@@ -290,9 +343,8 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function limit($limit, $offset = NULL)
 	{
-		$this->rows = NULL;
-		$this->limit = $limit;
-		$this->offset = $offset;
+		$this->emptyResultSet();
+		$this->sqlBuilder->setLimit($limit, $offset);
 		return $this;
 	}
 
@@ -306,10 +358,7 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function page($page, $itemsPerPage)
 	{
-		$this->rows = NULL;
-		$this->limit = $itemsPerPage;
-		$this->offset = ($page - 1) * $itemsPerPage;
-		return $this;
+		return $this->limit($itemsPerPage, ($page - 1) * $itemsPerPage);
 	}
 
 
@@ -320,30 +369,29 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 * @param  string
 	 * @return Selection provides a fluent interface
 	 */
-	public function group($columns, $having = '')
+	public function group($columns, $having = NULL)
 	{
-		$this->__destruct();
-		$this->group = $columns;
-		$this->having = $having;
+		$this->emptyResultSet();
+		$this->sqlBuilder->setGroup($columns, $having);
 		return $this;
 	}
 
 
 
+	/********************* aggregations ****************d*g**/
+
+
+
 	/**
 	 * Executes aggregation function.
-	 * @param  string
+	 * @param  string select call in "FUNCTION(column)" format
 	 * @return string
 	 */
 	public function aggregation($function)
 	{
-		$selection = new Selection($this->name, $this->connection);
-		$selection->where = $this->where;
-		$selection->parameters = $this->parameters;
-		$selection->conditions = $this->conditions;
-
+		$selection = $this->createSelectionInstance();
+		$selection->getSqlBuilder()->importConditions($this->getSqlBuilder());
 		$selection->select($function);
-
 		foreach ($selection->fetch() as $val) {
 			return $val;
 		}
@@ -353,10 +401,10 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 
 	/**
 	 * Counts number of rows.
-	 * @param  string
+	 * @param  string  if it is not provided returns count of result rows, otherwise runs new sql counting query
 	 * @return int
 	 */
-	public function count($column = '')
+	public function count($column = NULL)
 	{
 		if (!$column) {
 			$this->execute();
@@ -403,91 +451,26 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 
 
 
-	/**
-	 * Returns SQL query.
-	 * @return string
-	 */
-	public function getSql()
-	{
-		$join = $this->createJoins(implode(',', $this->conditions), TRUE)
-			+ $this->createJoins(implode(',', $this->select) . ",$this->group,$this->having," . implode(',', $this->order));
-
-		$cache = $this->connection->getCache();
-		if ($this->rows === NULL && $cache && !is_string($this->prevAccessed)) {
-			$this->accessed = $this->prevAccessed = $cache->load(array(__CLASS__, $this->name, $this->conditions));
-		}
-
-		$prefix = $join ? "$this->delimitedName." : '';
-		if ($this->select) {
-			$cols = $this->tryDelimite($this->removeExtraTables(implode(', ', $this->select)));
-
-		} elseif ($this->prevAccessed) {
-			$cols = array_map(array($this->connection->getSupplementalDriver(), 'delimite'), array_keys(array_filter($this->prevAccessed)));
-			$cols = $prefix . implode(', ' . $prefix, $cols);
-
-		} else {
-			$cols = $prefix . '*';
-		}
-
-		return "SELECT{$this->topString()} $cols FROM $this->delimitedName" . implode($join) . $this->whereString();
-	}
+	/********************* internal ****************d*g**/
 
 
 
-	protected function createJoins($val, $inner = FALSE)
-	{
-		$driver = $this->connection->getSupplementalDriver();
-		$reflection = $this->connection->getDatabaseReflection();
-		$joins = array();
-		preg_match_all('~\\b([a-z][\\w.:]*[.:])([a-z]\\w*|\*)(\\s+IS\\b|\\s*<=>)?~i', $val, $matches);
-		foreach ($matches[1] as $names) {
-			$parent = $this->name;
-			if ($names !== "$parent.") { // case-sensitive
-				preg_match_all('~\\b([a-z][\\w]*|\*)([.:])~i', $names, $matches, PREG_SET_ORDER);
-				foreach ($matches as $match) {
-					list(, $name, $delimiter) = $match;
-
-					if ($delimiter === ':') {
-						list($table, $primary) = $reflection->getHasManyReference($parent, $name);
-						$column = $reflection->getPrimary($parent);
-					} else {
-						list($table, $column) = $reflection->getBelongsToReference($parent, $name);
-						$primary = $reflection->getPrimary($table);
-					}
-
-					$joins[$name] = ' '
-						. (!isset($joins[$name]) && $inner && !isset($match[3]) ? 'INNER' : 'LEFT')
-						. ' JOIN ' . $driver->delimite($table) . ($table !== $name ? ' AS ' . $driver->delimite($name) : '')
-						. ' ON ' . $driver->delimite($parent) . '.' . $driver->delimite($column)
-						. ' = ' . $driver->delimite($name) . '.' . $driver->delimite($primary);
-
-					$parent = $name;
-				}
-			}
-		}
-		return $joins;
-	}
-
-
-
-	/**
-	 * Executes built query.
-	 * @return NULL
-	 */
 	protected function execute()
 	{
 		if ($this->rows !== NULL) {
 			return;
 		}
 
+		$this->observeCache = TRUE;
+
 		try {
-			$result = $this->query($this->getSql());
+			$result = $this->query($this->sqlBuilder->buildSelectQuery());
 
 		} catch (\PDOException $exception) {
-			if (!$this->select && $this->prevAccessed) {
+			if (!$this->sqlBuilder->getSelect() && $this->prevAccessed) {
 				$this->prevAccessed = '';
 				$this->accessed = array();
-				$result = $this->query($this->getSql());
+				$result = $this->query($this->sqlBuilder->buildSelectQuery());
 			} else {
 				throw $exception;
 			}
@@ -515,75 +498,63 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 
 
 
-	protected function whereString()
+	protected function createSelectionInstance($table = NULL)
 	{
-		$return = '';
-		$driver = $this->connection->getAttribute(PDO::ATTR_DRIVER_NAME);
-		$where = $this->where;
-		if ($this->limit !== NULL && $driver === 'oci') {
-			$where[] = ($this->offset ? "rownum > $this->offset AND " : '') . 'rownum <= ' . ($this->limit + $this->offset);
-		}
-		if ($where) {
-			$return .= ' WHERE (' . implode(') AND (', $where) . ')';
-		}
-		if ($this->group) {
-			$return .= ' GROUP BY '. $this->tryDelimite($this->removeExtraTables($this->group));
-		}
-		if ($this->having) {
-			$return .= ' HAVING '. $this->tryDelimite($this->removeExtraTables($this->having));
-		}
-		if ($this->order) {
-			$return .= ' ORDER BY ' . $this->tryDelimite($this->removeExtraTables(implode(', ', $this->order)));
-		}
-		if ($this->limit !== NULL && $driver !== 'oci' && $driver !== 'dblib') {
-			$return .= " LIMIT $this->limit";
-			if ($this->offset !== NULL) {
-				$return .= " OFFSET $this->offset";
-			}
-		}
-		return $return;
+		return new Selection($table ?: $this->name, $this->connection);
 	}
 
 
 
-	protected function topString()
+	protected function createGroupedSelectionInstance($table, $column)
 	{
-		if ($this->limit !== NULL && $this->connection->getAttribute(PDO::ATTR_DRIVER_NAME) === 'dblib') {
-			return " TOP ($this->limit)"; //! offset is not supported
-		}
-		return '';
-	}
-
-
-
-	protected function tryDelimite($s)
-	{
-		$driver = $this->connection->getSupplementalDriver();
-		return preg_replace_callback('#(?<=[^\w`"\[]|^)[a-z_][a-z0-9_]*(?=[^\w`"(\]]|$)#i', function($m) use ($driver) {
-			return strtoupper($m[0]) === $m[0] ? $m[0] : $driver->delimite($m[0]);
-		}, $s);
-	}
-
-
-
-	protected function removeExtraTables($expression)
-	{
-		return preg_replace('~(?:\\b[a-z_][a-z0-9_.:]*[.:])?([a-z_][a-z0-9_]*)[.:]([a-z_*])~i', '\\1.\\2', $expression); // rewrite tab1.tab2.col
+		return new GroupedSelection($this, $table, $column);
 	}
 
 
 
 	protected function query($query)
 	{
-		return $this->connection->queryArgs($query, $this->parameters);
+		return $this->connection->queryArgs($query, $this->sqlBuilder->getParameters());
+	}
+
+
+
+	protected function emptyResultSet()
+	{
+		if ($this->rows === NULL) {
+			return;
+		}
+
+		$this->rows = NULL;
+		$this->saveCacheState();
+	}
+
+
+
+	protected function saveCacheState()
+	{
+		if ($this->observeCache && ($cache = $this->connection->getCache()) && !$this->sqlBuilder->getSelect() && $this->accessed != $this->prevAccessed) {
+			$cache->save(array(__CLASS__, $this->name, $this->sqlBuilder->getConditions()), $this->accessed);
+		}
+	}
+
+
+
+	/**
+	 * Returns Selection parent for caching.
+	 * @return Selection
+	 */
+	protected function getRefTable(& $refPath)
+	{
+		return $this;
 	}
 
 
 
 	/**
 	 * @internal
-	 * @param  string        column name
-	 * @param  bool|NULL     TRUE - cache, FALSE - don't cache, NULL - remove
+	 * @param  string column name
+	 * @param  bool|NULL TRUE - cache, FALSE - don't cache, NULL - remove
 	 * @return bool
 	 */
 	public function access($key, $cache = TRUE)
@@ -602,11 +573,12 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 			$this->accessed[$key] = $cache;
 		}
 
-		if ($cache && !$this->select && $this->prevAccessed && ($key === NULL || !isset($this->prevAccessed[$key]))) {
+		if ($cache && !$this->sqlBuilder->getSelect() && $this->prevAccessed && ($key === NULL || !isset($this->prevAccessed[$key]))) {
 			$this->prevAccessed = '';
-			$this->__destruct();
+			$this->emptyResultSet();
 			return TRUE;
 		}
+
 		return FALSE;
 	}
 
@@ -630,20 +602,19 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 			$data = iterator_to_array($data);
 		}
 
-		$return = $this->connection->query("INSERT INTO $this->delimitedName", $data);
+		$return = $this->connection->query($this->sqlBuilder->buildInsertQuery(), $data);
+		$this->checkReferenced = TRUE;
 
 		if (!is_array($data)) {
 			return $return->rowCount();
 		}
 
-		$this->checkReferenceNewKeys = TRUE;
-
-		if (!isset($data[$this->primary]) && ($id = $this->connection->lastInsertId())) {
+		if (!isset($data[$this->primary]) && ($id = $this->connection->lastInsertId($this->getPrimarySequence()))) {
 			$data[$this->primary] = $id;
-			return $this->rows[$id] = new ActiveRow($data, $this);
+			return $this->rows[$id] = $this->createRow($data);
 
 		} else {
-			return new ActiveRow($data, $this);
+			return $this->createRow($data);
 
 		}
 	}
@@ -652,6 +623,7 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 
 	/**
 	 * Updates all rows in result set.
+	 * Joins in UPDATE are supported only in MySQL
 	 * @param  array|\Traversable ($column => $value)
 	 * @return int number of affected rows or FALSE in case of an error
 	 */
@@ -667,10 +639,10 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 		if (!$data) {
 			return 0;
 		}
-		// joins in UPDATE are supported only in MySQL
+
 		return $this->connection->queryArgs(
-			'UPDATE' . $this->topString() . " $this->delimitedName SET ?" . $this->whereString(),
-			array_merge(array($data), $this->parameters)
+			$this->sqlBuilder->buildUpdateQuery(),
+			array_merge(array($data), $this->sqlBuilder->getParameters())
 		)->rowCount();
 	}
 
@@ -682,9 +654,7 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 */
 	public function delete()
 	{
-		return $this->query(
-			'DELETE' . $this->topString() . " FROM $this->delimitedName" . $this->whereString()
-		)->rowCount();
+		return $this->query($this->sqlBuilder->buildDeleteQuery())->rowCount();
 	}
 
 
@@ -700,10 +670,12 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 * @param  bool  checks if rows contains the same primary value relations
 	 * @return Selection or array() if the row does not exist
 	 */
-	public function getReferencedTable($table, $column, $checkReferenceNewKeys = FALSE)
+	public function getReferencedTable($table, $column, $checkReferenced = FALSE)
 	{
-		$referenced = & $this->referenced["$table.$column"];
-		if ($referenced === NULL || $checkReferenceNewKeys || $this->checkReferenceNewKeys) {
+		$referenced = & $this->getRefTable($refPath)->referenced[$refPath . "$table.$column"];
+		if ($referenced === NULL || $checkReferenced || $this->checkReferenced) {
+			$this->execute();
+			$this->checkReferenced = FALSE;
 			$keys = array();
 			foreach ($this->rows as $row) {
 				if ($row[$column] === NULL)
@@ -713,14 +685,13 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 				$keys[$key] = TRUE;
 			}
 
-			if ($referenced !== NULL && $keys === array_keys($this->rows)) {
-				$this->checkReferenceNewKeys = FALSE;
+			if ($referenced !== NULL && array_keys($keys) === array_keys($referenced->rows)) {
 				return $referenced;
 			}
 
 			if ($keys) {
-				$referenced = new Selection($table, $this->connection);
-				$referenced->where($table . '.' . $referenced->primary, array_keys($keys));
+				$referenced = $this->createSelectionInstance($table);
+				$referenced->where($referenced->primary, array_keys($keys));
 			} else {
 				$referenced = array();
 			}
@@ -735,19 +706,20 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	 * Returns referencing rows.
 	 * @param  string
 	 * @param  string
-	 * @param  int  primary key
-	 * @param  bool force new instance
+	 * @param  int primary key
 	 * @return GroupedSelection
 	 */
-	public function getReferencingTable($table, $column, $active = NULL, $forceNewInstance = FALSE)
+	public function getReferencingTable($table, $column, $active = NULL)
 	{
-		$referencing = & $this->referencing["$table:$column"];
-		if (!$referencing || $forceNewInstance) {
-			$referencing = new GroupedSelection($table, $this, $column);
-			$referencing->where("$table.$column", array_keys((array) $this->rows)); // (array) - is NULL after insert
+		$prototype = & $this->getRefTable($refPath)->referencingPrototype[$refPath . "$table.$column"];
+		if (!$prototype) {
+			$prototype = $this->createGroupedSelectionInstance($table, $column);
+			$prototype->where("$table.$column", array_keys((array) $this->rows));
 		}
 
-		return $referencing->setActive($active);
+		$clone = clone $prototype;
+		$clone->setActive($active);
+		return $clone;
 	}
 
 
@@ -850,38 +822,6 @@ class Selection extends Nette\Object implements \Iterator, \ArrayAccess, \Counta
 	{
 		$this->execute();
 		unset($this->data[$key]);
-	}
-
-
-
-	/**
-	 * Returns next row of result.
-	 * @return ActiveRow or FALSE if there is no row
-	 */
-	public function fetch()
-	{
-		$this->execute();
-		$return = current($this->data);
-		next($this->data);
-		return $return;
-	}
-
-
-
-	/**
-	 * Returns all rows as associative array.
-	 * @param  string
-	 * @param  string column name used for an array value or an empty string for the whole row
-	 * @return array
-	 */
-	public function fetchPairs($key, $value = '')
-	{
-		$return = array();
-		// no $clone->select = array($key, $value) to allow efficient caching with repetitive calls with different parameters
-		foreach ($this as $row) {
-			$return[is_object($row[$key]) ? (string) $row[$key] : $row[$key]] = ($value !== '' ? $row[$value] : $row);
-		}
-		return $return;
 	}
 
 }

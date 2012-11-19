@@ -160,7 +160,6 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 
 
 	/**
-	 * @param  ControlGroup
 	 * @return Container  provides a fluent interface
 	 */
 	public function setCurrentGroup(ControlGroup $group = NULL)
@@ -183,7 +182,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 
 
 	/**
-	 * Adds the specified component to the IComponentContainer.
+	 * Adds the specified component to the IContainer.
 	 * @param  IComponent
 	 * @param  string
 	 * @param  string

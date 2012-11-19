@@ -29,16 +29,11 @@ class RecursiveFilter extends \FilterIterator implements \RecursiveIterator
 	private $childrenCallback;
 
 
-	/**
-	 * Constructs a filter around another iterator.
-	 * @param
-	 * @param  callable
-	 */
 	public function __construct(\RecursiveIterator $iterator, $callback, $childrenCallback = NULL)
 	{
 		parent::__construct($iterator);
-		$this->callback = $callback === NULL ? NULL : callback($callback);
-		$this->childrenCallback = $childrenCallback === NULL ? NULL : callback($childrenCallback);
+		$this->callback = $callback === NULL ? NULL : new Nette\Callback($callback);
+		$this->childrenCallback = $childrenCallback === NULL ? NULL : new Nette\Callback($childrenCallback);
 	}
 
 

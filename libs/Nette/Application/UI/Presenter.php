@@ -108,15 +108,15 @@ abstract class Presenter extends Control implements Application\IPresenter
 	/** @var array */
 	private $lastCreatedRequestFlag;
 
-	/** @var Nette\DI\Container */
+	/** @var \SystemContainer|Nette\DI\Container */
 	private $context;
 
 
 
-	public function __construct(Nette\DI\Container $context)
+	public function __construct(Nette\DI\Container $context = NULL)
 	{
 		$this->context = $context;
-		if ($this->invalidLinkMode === NULL) {
+		if ($context && $this->invalidLinkMode === NULL) {
 			$this->invalidLinkMode = $context->parameters['productionMode'] ? self::INVALID_LINK_SILENT : self::INVALID_LINK_WARNING;
 		}
 	}
@@ -160,7 +160,6 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 
 	/**
-	 * @param  Nette\Application\Request
 	 * @return Nette\Application\IResponse
 	 */
 	public function run(Application\Request $request)
@@ -266,7 +265,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 
 	/**
-	 * @param  Nette\Application\IResponse  optional catched exception
+	 * @param  Nette\Application\IResponse
 	 * @return void
 	 */
 	protected function shutdown($response)
@@ -508,7 +507,8 @@ abstract class Presenter extends Control implements Application\IPresenter
 		$name = $this->getName();
 		$presenter = substr($name, strrpos(':' . $name, ':'));
 		$layout = $this->layout ? $this->layout : 'layout';
-		$dir = dirname(dirname($this->getReflection()->getFileName()));
+		$dir = dirname($this->getReflection()->getFileName());
+		$dir = is_dir("$dir/templates") ? $dir : dirname($dir);
 		$list = array(
 			"$dir/templates/$presenter/@$layout.latte",
 			"$dir/templates/$presenter.@$layout.latte",
@@ -533,7 +533,8 @@ abstract class Presenter extends Control implements Application\IPresenter
 	{
 		$name = $this->getName();
 		$presenter = substr($name, strrpos(':' . $name, ':'));
-		$dir = dirname(dirname($this->getReflection()->getFileName()));
+		$dir = dirname($this->getReflection()->getFileName());
+		$dir = is_dir("$dir/templates") ? $dir : dirname($dir);
 		return array(
 			"$dir/templates/$presenter/$this->view.latte",
 			"$dir/templates/$presenter.$this->view.latte",
@@ -614,7 +615,6 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Sends response and terminates presenter.
-	 * @param  Nette\Application\IResponse
 	 * @return void
 	 * @throws Nette\Application\AbortException
 	 */
@@ -965,7 +965,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 			if ($current && $args) {
 				$tmp = $globalState + $this->params;
 				foreach ($args as $key => $val) {
-					if ((string) $val !== (isset($tmp[$key]) ? (string) $tmp[$key] : '')) {
+					if (http_build_query(array($val)) !== (isset($tmp[$key]) ? http_build_query(array($tmp[$key])) : '')) {
 						$current = FALSE;
 						break;
 					}
@@ -1048,33 +1048,17 @@ abstract class Presenter extends Control implements Application\IPresenter
 				continue;
 			}
 
-
-			$def = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : NULL;
-			$val = $args[$name];
-			if ($val === NULL) {
+			if ($args[$name] === NULL) {
 				continue;
-			} elseif ($param->isArray() || is_array($def)) {
-				if (!is_array($val)) {
-					throw new InvalidLinkException("Invalid value for parameter '$name', expected array.");
-				}
-			} elseif ($param->getClass() || is_object($val)) {
-				// ignore
-			} elseif (!is_scalar($val)) {
-				throw new InvalidLinkException("Invalid value for parameter '$name', expected scalar.");
-
-			} elseif ($def === NULL) {
-				if ((string) $val === '') {
-					$args[$name] = NULL; // value transmit is unnecessary
-				}
-				continue;
-			} else {
-				settype($args[$name], gettype($def));
-				if ((string) $args[$name] !== (string) $val) {
-					throw new InvalidLinkException("Invalid value for parameter '$name', expected ".gettype($def).".");
-				}
 			}
 
-			if ($args[$name] === $def) {
+			$def = $param->isDefaultValueAvailable() && $param->isOptional() ? $param->getDefaultValue() : NULL; // see PHP bug #62988
+			$type = $param->isArray() ? 'array' : gettype($def);
+			if (!PresenterComponentReflection::convertType($args[$name], $type)) {
+				throw new InvalidLinkException("Invalid value for parameter '$name' in method $class::$method(), expected " . ($type === 'NULL' ? 'scalar' : $type) . ".");
+			}
+
+			if ($args[$name] === $def || ($def === NULL && is_scalar($args[$name]) && (string) $args[$name] === '')) {
 				$args[$name] = NULL; // value transmit is unnecessary
 			}
 		}
@@ -1089,11 +1073,10 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Invalid link handler. Descendant can override this method to change default behaviour.
-	 * @param  InvalidLinkException
 	 * @return string
 	 * @throws InvalidLinkException
 	 */
-	protected function handleInvalidLink($e)
+	protected function handleInvalidLink(InvalidLinkException $e)
 	{
 		if ($this->invalidLinkMode === self::INVALID_LINK_SILENT) {
 			return '#';
@@ -1190,8 +1173,8 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 			if ($sinces === NULL) {
 				$sinces = array();
-				foreach ($this->getReflection()->getPersistentParams() as $nm => $meta) {
-					$sinces[$nm] = $meta['since'];
+				foreach ($this->getReflection()->getPersistentParams() as $name => $meta) {
+					$sinces[$name] = $meta['since'];
 				}
 			}
 
@@ -1361,6 +1344,16 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 
 	/********************* services ****************d*g**/
+
+
+
+	/**
+	 * @return void
+	 */
+	final public function injectPrimary(Nette\DI\Container $context)
+	{
+		$this->context = $context;
+	}
 
 
 

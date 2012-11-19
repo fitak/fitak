@@ -60,15 +60,9 @@ class SqlPreprocessor extends Nette\Object
 		$this->params = $params;
 		$this->counter = 0;
 		$this->remaining = array();
+		$this->arrayMode = 'assoc';
 
-		$cmd = strtoupper(substr(ltrim($sql), 0, 6)); // detect array mode
-		$this->arrayMode = $cmd === 'INSERT' || $cmd === 'REPLAC' ? 'values' : 'assoc';
-
-		/*~
-			\'.*?\'|".*?"|   ## string
-			\?               ## placeholder
-		~xs*/
-		$sql = Nette\Utils\Strings::replace($sql, '~\'.*?\'|".*?"|\?~s', array($this, 'callback'));
+		$sql = Nette\Utils\Strings::replace($sql, '~\'.*?\'|".*?"|\?|\b(?:INSERT|REPLACE|UPDATE)\b~si', array($this, 'callback'));
 
 		while ($this->counter < count($params)) {
 			$sql .= ' ' . $this->formatValue($params[$this->counter++]);
@@ -86,8 +80,12 @@ class SqlPreprocessor extends Nette\Object
 		if ($m[0] === "'" || $m[0] === '"') { // string
 			return $m;
 
-		} else { // placeholder
+		} elseif ($m === '?') { // placeholder
 			return $this->formatValue($this->params[$this->counter++]);
+
+		} else { // INSERT, REPLACE, UPDATE
+			$this->arrayMode = strtoupper($m) === 'UPDATE' ? 'assoc' : 'values';
+			return $m;
 		}
 	}
 
@@ -111,8 +109,7 @@ class SqlPreprocessor extends Nette\Object
 			return rtrim(rtrim(number_format($value, 10, '.', ''), '0'), '.');
 
 		} elseif (is_bool($value)) {
-			$this->remaining[] = $value;
-			return '?';
+			return $this->driver->formatBool($value);
 
 		} elseif ($value === NULL) {
 			return 'NULL';

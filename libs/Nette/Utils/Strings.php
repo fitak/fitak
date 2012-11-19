@@ -55,9 +55,15 @@ class Strings
 	 */
 	public static function fixEncoding($s, $encoding = 'UTF-8')
 	{
-		// removes xD800-xDFFF, xFEFF, xFFFF, x110000 and higher
-		$s = @iconv('UTF-16', $encoding . '//IGNORE', iconv($encoding, 'UTF-16//IGNORE', $s)); // intentionally @
-		return str_replace("\xEF\xBB\xBF", '', $s); // remove UTF-8 BOM
+		// removes xD800-xDFFF, xFEFF, x110000 and higher
+		if (strcasecmp($encoding, 'UTF-8') === 0) {
+			$s = str_replace("\xEF\xBB\xBF", '', $s); // remove UTF-8 BOM
+		}
+		if (PHP_VERSION_ID >= 50400) {
+			ini_set('mbstring.substitute_character', 'none');
+			return mb_convert_encoding($s, $encoding, $encoding);
+		}
+		return @iconv('UTF-16', $encoding . '//IGNORE', iconv($encoding, 'UTF-16//IGNORE', $s)); // intentionally @
 	}
 
 
@@ -163,7 +169,7 @@ class Strings
 	 */
 	public static function toAscii($s)
 	{
-		$s = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{10FFFF}]#u', '', $s);
+		$s = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $s);
 		$s = strtr($s, '`\'"^~', "\x01\x02\x03\x04\x05");
 		if (ICONV_IMPL === 'glibc') {
 			$s = @iconv('UTF-8', 'WINDOWS-1250//TRANSLIT', $s); // intentionally @

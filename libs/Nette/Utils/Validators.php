@@ -255,9 +255,10 @@ class Validators extends Nette\Object
 	{
 		$atom = "[-a-z0-9!#$%&'*+/=?^_`{|}~]"; // RFC 5322 unquoted characters in local-part
 		$localPart = "(?:\"(?:[ !\\x23-\\x5B\\x5D-\\x7E]*|\\\\[ -~])+\"|$atom+(?:\\.$atom+)*)"; // quoted or unquoted
-		$chars = "a-z0-9\x80-\xFF"; // superset of IDN
-		$domain = "[$chars](?:[-$chars]{0,61}[$chars])"; // RFC 1034 one domain component
-		return (bool) preg_match("(^$localPart@(?:$domain?\\.)+[-$chars]{2,19}\\z)i", $value);
+		$alpha = "a-z\x80-\xFF"; // superset of IDN
+		$domain = "[0-9$alpha](?:[-0-9$alpha]{0,61}[0-9$alpha])?"; // RFC 1034 one domain component
+		$topDomain = "[$alpha][-0-9$alpha]{0,17}[$alpha]";
+		return (bool) preg_match("(^$localPart@(?:$domain\\.)+$topDomain\\z)i", $value);
 	}
 
 
@@ -269,8 +270,10 @@ class Validators extends Nette\Object
 	 */
 	public static function isUrl($value)
 	{
-		$chars = "a-z0-9\x80-\xFF";
-		return (bool) preg_match("#^https?://(?:[$chars](?:[-$chars]{0,61}[$chars])?\\.)+[-$chars]{2,19}(/\S*)?$#i", $value);
+		$alpha = "a-z\x80-\xFF";
+		$domain = "[0-9$alpha](?:[-0-9$alpha]{0,61}[0-9$alpha])?";
+		$topDomain = "[$alpha][-0-9$alpha]{0,17}[$alpha]";
+		return (bool) preg_match("(^https?://(?:(?:$domain\\.)*$topDomain|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d{1,5})?(/\S*)?\\z)i", $value);
 	}
 
 }

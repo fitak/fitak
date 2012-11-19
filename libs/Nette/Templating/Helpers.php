@@ -61,7 +61,7 @@ final class Helpers
 	public static function loader($helper)
 	{
 		if (method_exists(__CLASS__, $helper)) {
-			return callback(__CLASS__, $helper);
+			return new Nette\Callback(__CLASS__, $helper);
 		} elseif (isset(self::$helpers[$helper])) {
 			return self::$helpers[$helper];
 		}
@@ -272,7 +272,7 @@ final class Helpers
 	public static function dataStream($data, $type = NULL)
 	{
 		if ($type === NULL) {
-			$type = Nette\Utils\MimeTypeDetector::fromString($data, NULL);
+			$type = Nette\Utils\MimeTypeDetector::fromString($data);
 		}
 		return 'data:' . ($type ? "$type;" : '') . 'base64,' . base64_encode($data);
 	}

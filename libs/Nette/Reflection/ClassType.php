@@ -22,11 +22,11 @@ use Nette,
  * @author     David Grudl
  * @property-read Method $constructor
  * @property-read Extension $extension
- * @property-read array $interfaces
- * @property-read array $methods
+ * @property-read ClassType[] $interfaces
+ * @property-read Method[] $methods
  * @property-read ClassType $parentClass
- * @property-read array $properties
- * @property-read array $annotations
+ * @property-read Property[] $properties
+ * @property-read IAnnotation[][] $annotations
  * @property-read string $description
  * @property-read string $name
  * @property-read bool $internal
@@ -36,8 +36,8 @@ use Nette,
  * @property-read int $startLine
  * @property-read int $endLine
  * @property-read string $docComment
- * @property-read array $constants
- * @property-read array $interfaceNames
+ * @property-read mixed[] $constants
+ * @property-read string[] $interfaceNames
  * @property-read bool $interface
  * @property-read bool $abstract
  * @property-read bool $final
@@ -98,7 +98,7 @@ class ClassType extends \ReflectionClass
 	public function setExtensionMethod($name, $callback)
 	{
 		$l = & self::$extMethods[strtolower($name)];
-		$l[strtolower($this->getName())] = callback($callback);
+		$l[strtolower($this->getName())] = new Nette\Callback($callback);
 		$l[''] = NULL;
 		return $this;
 	}
@@ -156,7 +156,7 @@ class ClassType extends \ReflectionClass
 
 
 	/**
-	 * @return Method
+	 * @return Method|NULL
 	 */
 	public function getConstructor()
 	{
@@ -166,7 +166,7 @@ class ClassType extends \ReflectionClass
 
 
 	/**
-	 * @return Extension
+	 * @return Extension|NULL
 	 */
 	public function getExtension()
 	{
@@ -175,6 +175,9 @@ class ClassType extends \ReflectionClass
 
 
 
+	/**
+	 * @return ClassType[]
+	 */
 	public function getInterfaces()
 	{
 		$res = array();
@@ -196,6 +199,9 @@ class ClassType extends \ReflectionClass
 
 
 
+	/**
+	 * @return Method[]
+	 */
 	public function getMethods($filter = -1)
 	{
 		foreach ($res = parent::getMethods($filter) as $key => $val) {
@@ -207,7 +213,7 @@ class ClassType extends \ReflectionClass
 
 
 	/**
-	 * @return ClassType
+	 * @return ClassType|NULL
 	 */
 	public function getParentClass()
 	{
@@ -216,6 +222,9 @@ class ClassType extends \ReflectionClass
 
 
 
+	/**
+	 * @return Property[]
+	 */
 	public function getProperties($filter = -1)
 	{
 		foreach ($res = parent::getProperties($filter) as $key => $val) {
@@ -268,7 +277,7 @@ class ClassType extends \ReflectionClass
 
 	/**
 	 * Returns all annotations.
-	 * @return array
+	 * @return IAnnotation[][]
 	 */
 	public function getAnnotations()
 	{

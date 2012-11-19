@@ -62,7 +62,7 @@ class Route extends Nette\Object implements Application\IRouter
 		'#' => array( // default style for path parameters
 			self::PATTERN => '[^/]+',
 			self::FILTER_IN => 'rawurldecode',
-			self::FILTER_OUT => 'rawurlencode',
+			self::FILTER_OUT => array(__CLASS__, 'param2path'),
 		),
 		'?#' => array( // default style for query parameters
 		),
@@ -143,7 +143,6 @@ class Route extends Nette\Object implements Application\IRouter
 
 	/**
 	 * Maps HTTP request to a Request object.
-	 * @param  Nette\Http\IRequest
 	 * @return Nette\Application\Request|NULL
 	 */
 	public function match(Nette\Http\IRequest $httpRequest)
@@ -258,8 +257,6 @@ class Route extends Nette\Object implements Application\IRouter
 
 	/**
 	 * Constructs absolute URL from Request object.
-	 * @param  Nette\Application\Request
-	 * @param  Nette\Http\Url
 	 * @return string|NULL
 	 */
 	public function constructUrl(Application\Request $appRequest, Nette\Http\Url $refUrl)
@@ -762,6 +759,18 @@ class Route extends Nette\Object implements Application\IRouter
 		$s = str_replace('. ', ':', $s);
 		$s = str_replace('- ', '', $s);
 		return $s;
+	}
+
+
+
+	/**
+	 * Url encode.
+	 * @param  string
+	 * @return string
+	 */
+	private static function param2path($s)
+	{
+		return str_replace('%2F', '/', rawurlencode($s));
 	}
 
 

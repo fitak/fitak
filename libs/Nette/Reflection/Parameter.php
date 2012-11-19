@@ -83,13 +83,31 @@ class Parameter extends \ReflectionParameter
 
 
 	/**
-	 * @return Method | FunctionReflection
+	 * @return Method|GlobalFunction
 	 */
 	public function getDeclaringFunction()
 	{
 		return is_array($this->function)
 			? new Method($this->function[0], $this->function[1])
 			: new GlobalFunction($this->function);
+	}
+
+
+
+	/**
+	 * @return bool
+	 */
+	public function isDefaultValueAvailable()
+	{
+		if (PHP_VERSION_ID === 50316) { // PHP bug #62988
+			try {
+				$this->getDefaultValue();
+				return TRUE;
+			} catch (\ReflectionException $e) {
+				return FALSE;
+			}
+		}
+		return parent::isDefaultValueAvailable();
 	}
 
 

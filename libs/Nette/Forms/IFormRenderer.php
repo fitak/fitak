@@ -16,7 +16,7 @@ use Nette;
 
 
 /**
- * Defines method that must implement form rendered.
+ * Defines method that must implement form renderer.
  *
  * @author     David Grudl
  */
@@ -25,7 +25,6 @@ interface IFormRenderer
 
 	/**
 	 * Provides complete form rendering.
-	 * @param  Form
 	 * @return string
 	 */
 	function render(Form $form);

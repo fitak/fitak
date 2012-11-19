@@ -89,7 +89,7 @@ class Container extends Nette\FreezableObject implements IContainer
 			return $this;
 
 		} elseif (!is_string($service) || strpos($service, ':') !== FALSE) { // callable
-			$service = callback($service);
+			$service = new Nette\Callback($service);
 		}
 
 		$this->factories[$name] = array($service);
@@ -258,13 +258,13 @@ class Container extends Nette\FreezableObject implements IContainer
 	{
 		$rc = Nette\Reflection\ClassType::from($class);
 		if (!$rc->isInstantiable()) {
-			throw new Nette\InvalidArgumentException("Class $class is not instantiable.");
+			throw new ServiceCreationException("Class $class is not instantiable.");
 
 		} elseif ($constructor = $rc->getConstructor()) {
 			return $rc->newInstanceArgs(Helpers::autowireArguments($constructor, $args, $this));
 
 		} elseif ($args) {
-			throw new Nette\InvalidArgumentException("Unable to pass arguments, class $class has no constructor.");
+			throw new ServiceCreationException("Unable to pass arguments, class $class has no constructor.");
 		}
 		return new $class;
 	}
@@ -279,7 +279,7 @@ class Container extends Nette\FreezableObject implements IContainer
 	 */
 	public function callMethod($function, array $args = array())
 	{
-		$callback = callback($function);
+		$callback = new Nette\Callback($function);
 		return $callback->invokeArgs(Helpers::autowireArguments($callback->toReflection(), $args, $this));
 	}
 

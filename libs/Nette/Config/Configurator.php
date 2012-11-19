@@ -187,7 +187,7 @@ class Configurator extends Nette\Object
 			if (!$cached) {
 				$code = $this->buildContainer($dependencies);
 				$cache->save($cacheKey, $code, array(
-					Cache::FILES => $this->parameters['productionMode'] ? NULL : $dependencies,
+					Cache::FILES => $dependencies,
 				));
 				$cached = $cache->load($cacheKey);
 			}
@@ -239,7 +239,7 @@ class Configurator extends Nette\Object
 			$this->parameters['container']['class'],
 			$config['parameters']['container']['parent']
 		);
-		$dependencies = array_merge($loader->getDependencies(), $compiler->getContainerBuilder()->getDependencies());
+		$dependencies = array_merge($loader->getDependencies(), $this->isDebugMode() ? $compiler->getContainerBuilder()->getDependencies() : array());
 		return $code;
 	}
 
@@ -307,12 +307,13 @@ class Configurator extends Nette\Object
 	 */
 	public static function detectDebugMode($list = NULL)
 	{
-		$list = is_string($list) ? preg_split('#[,\s]+#', $list) : $list;
-		$list[] = '127.0.0.1';
-		$list[] = '::1';
+		$list = is_string($list) ? preg_split('#[,\s]+#', $list) : (array) $list;
+		if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$list[] = '127.0.0.1';
+			$list[] = '::1';
+		}
 		return in_array(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : php_uname('n'), $list, TRUE);
 	}
-
 
 
 

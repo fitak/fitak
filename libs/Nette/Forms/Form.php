@@ -314,7 +314,6 @@ class Form extends Container
 
 	/**
 	 * Sets translate adapter.
-	 * @param  Nette\Localization\ITranslator
 	 * @return Form  provides a fluent interface
 	 */
 	public function setTranslator(Nette\Localization\ITranslator $translator = NULL)
@@ -379,7 +378,6 @@ class Form extends Container
 
 	/**
 	 * Sets the submittor control.
-	 * @param  ISubmitterControl
 	 * @return Form  provides a fluent interface
 	 */
 	public function setSubmittedBy(ISubmitterControl $by = NULL)
@@ -560,7 +558,6 @@ class Form extends Container
 
 	/**
 	 * Sets form renderer.
-	 * @param  IFormRenderer
 	 * @return Form  provides a fluent interface
 	 */
 	public function setRenderer(IFormRenderer $renderer)
@@ -612,7 +609,7 @@ class Form extends Container
 			if (func_get_args() && func_get_arg(0)) {
 				throw $e;
 			} else {
-				Nette\Diagnostics\Debugger::toStringException($e);
+				trigger_error("Exception in " . __METHOD__ . "(): {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}", E_USER_ERROR);
 			}
 		}
 	}

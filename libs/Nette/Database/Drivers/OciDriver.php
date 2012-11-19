@@ -54,6 +54,16 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 
 
 	/**
+	 * Formats boolean for use in a SQL statement.
+	 */
+	public function formatBool($value)
+	{
+		return $value ? '1' : '0';
+	}
+
+
+
+	/**
 	 * Formats date-time for use in a SQL statement.
 	 */
 	public function formatDateTime(\DateTime $value)
@@ -111,7 +121,7 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 	public function getTables()
 	{
 		$tables = array();
-		foreach ($this->connection->query('SELECT * FROM cat', \PDO::FETCH_NUM) as $row) {
+		foreach ($this->connection->query('SELECT * FROM cat') as $row) {
 			if ($row[1] === 'TABLE' || $row[1] === 'VIEW') {
 				$tables[] = array(
 					'name' => $row[0],
@@ -159,7 +169,7 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 	 */
 	public function isSupported($item)
 	{
-		return $item === self::META;
+		return $item === self::SUPPORT_COLUMNS_META || $item === self::SUPPORT_SEQUENCE;
 	}
 
 }

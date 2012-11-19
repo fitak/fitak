@@ -7,7 +7,7 @@ use Nette,
 	Nette\Diagnostics\Debugger;
 
 ?>
-<style>#nette-debug .nette-RoutingPanel table{font:9pt/1.5 Consolas,monospace}#nette-debug .nette-RoutingPanel .yes td{color:green}#nette-debug .nette-RoutingPanel .may td{color:#67F}#nette-debug .nette-RoutingPanel pre,#nette-debug .nette-RoutingPanel code{display:inline}</style>
+<style>#nette-debug .nette-RoutingPanel table{font:9pt/1.5 Consolas,monospace}#nette-debug .nette-RoutingPanel .yes td{color:green}#nette-debug .nette-RoutingPanel .may td{color:#67F}#nette-debug .nette-RoutingPanel pre,#nette-debug .nette-RoutingPanel code{display:inline}#nette-debug .nette-RoutingPanel code .nette-collapsed{display:none}</style>
 
 <div class="nette-RoutingPanel">
 <h1>
@@ -74,7 +74,7 @@ use Nette,
 
 		<td><code>
 		<?php foreach ($router['defaults'] as $key => $value): ?>
-			<?php echo htmlSpecialChars($key), "&nbsp;=&nbsp;", is_string($value) ? htmlSpecialChars($value) : str_replace("\n</pre", '</pre', Debugger::dump($value, TRUE)) ?><br />
+			<?php echo htmlSpecialChars($key), "&nbsp;=&nbsp;", is_string($value) ? htmlSpecialChars($value) : str_replace("\n</pre", '</pre', Nette\Diagnostics\Helpers::clickableDump($value, TRUE)) ?><br />
 		<?php endforeach ?>
 		</code></td>
 
@@ -85,7 +85,7 @@ use Nette,
 		<strong><?php echo htmlSpecialChars($router['request']->getPresenterName() . ':' . (isset($params[Presenter::ACTION_KEY]) ? $params[Presenter::ACTION_KEY] : Presenter::DEFAULT_ACTION)) ?></strong><br />
 		<?php unset($params[Presenter::ACTION_KEY]) ?>
 		<?php foreach ($params as $key => $value): ?>
-			<?php echo htmlSpecialChars($key), "&nbsp;=&nbsp;", is_string($value) ? htmlSpecialChars($value) : str_replace("\n</pre", '</pre', Debugger::dump($value, TRUE)) ?><br />
+			<?php echo htmlSpecialChars($key), "&nbsp;=&nbsp;", is_string($value) ? htmlSpecialChars($value) : str_replace("\n</pre", '</pre', Nette\Diagnostics\Helpers::clickableDump($value, TRUE)) ?><br />
 		<?php endforeach ?>
 		</code><?php endif ?></td>
 	</tr>
