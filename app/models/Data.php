@@ -1,4 +1,5 @@
 <?php
+use Nette\Utils\Strings;
 
 class Data extends BaseModel
 {
@@ -83,32 +84,36 @@ class Data extends BaseModel
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     // comments - true = search in the comments too, false = search only in the topics
-    public function search( $query, $comments, $length, $offset )
+    public function search( $query, $tags, $comments, $length, $offset )
     {
-        $where = "";
-        if( !$comments )
-            $where = " AND main.parent_id = 0";
-
-        $result = $this->db->query( "
-            SELECT main.*, groups.name,
+        $result = $this->db->select("main.*, groups.name,
                    data.message as parentMessage,
                    data.created_time as parentCreated_time,
                    data.updated_time as parentUpdated_time,
                    data.comments as comments,
                    data.likes as parentLikes,
                    data.from_name as parentFrom_name,
-                   data.from_id as parentFrom_id
-            FROM data as main
-            JOIN groups ON main.group_id = groups.id
-            LEFT JOIN data ON main.parent_id = data.id
-            WHERE MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)
-                  $where
-            ORDER BY main.created_time DESC
-            LIMIT %i, %i
-            ", $query, $offset, $length
-        );
+                   data.from_id as parentFrom_id")
+                ->from("data as main")
+                ->join("groups")
+                ->on("main.group_id = groups.id")
+                ->leftJoin("data")
+                ->on("main.parent_id = data.id")
+                ->orderBy("main.created_time DESC")
+                ->limit($length)
+                ->offset($offset);
+        if( !$comments ){
+            $result = $result->where("main.parent_id = 0");
+        }
+        if ( $query != ""){
+             $result = $result->where("MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query);
+        }
+        if ( count($tags) ){
+            $result = $result->join("data_tags")
+                             ->on("data.id = data_tags.data_id")
+                             ->where("data_tags.tags_id IN (%i)", $this->getTagsId($tags));
+        }
         $result = $result->fetchAll();
-
 
         // there are two scenarios:
         // 1) we find our keyword in a topic -> now we get likes and comments
@@ -145,22 +150,34 @@ class Data extends BaseModel
         }
         return $result;
     }
+    
+    public function getTagsId( $tags )
+    {
+        $result = $this->db->select("id")
+                ->from("tags")
+                ->where("name IN (%s)", $tags)
+                ->fetchPairs();
+        
+        return $result;
+    }
 
     // number of results by search
-    public function searchCount( $query, $comments )
+    public function searchCount( $query, $tags, $comments )
     {
-        $where = "";
-        if( !$comments )
-            $where = " AND parent_id = 0";
-
-        $result = $this->db->query( "
-            SELECT count(*)
-            FROM data
-            WHERE MATCH(message) AGAINST (%s IN BOOLEAN MODE)
-                  $where
-            ", $query
-        );
-        return $result->fetchSingle();
+        $result = $this->db->select("count(*)")
+                ->from("data");
+        if( !$comments ){
+            $result = $result->where("data.parent_id = 0");
+        }
+        if ( $query != ""){
+             $result = $result->where("MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query);
+        }
+        if ( count($tags) ){
+            $result = $result->join("data_tags")
+                             ->on("data.id = data_tags.data_id")
+                             ->where("data_tags.tags_id IN (%i)", $this->getTagsId($tags));
+        }
+        return $result->fetchSingle();   
     }
 
     // sum of all topics and comments
@@ -246,6 +263,74 @@ class Data extends BaseModel
         {
             return $inText;
         }
+    }
+    
+    // return array of variations for input word
+    public function getWordVariations( $word )
+    {
+        $highlightKeywords[] = $word;
+        $highlightKeywords[] = $sNoBrackets = preg_replace( "/[\[\](){}]/", "", $word );
+        foreach( explode( "-", $sNoBrackets ) as $subword )
+        {
+            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
+                $highlightKeywords[] = $subword;
+        }
+        foreach( explode( "_", $sNoBrackets ) as $subword )
+        {
+            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
+                $highlightKeywords[] = $subword;
+        }
+        foreach( explode( " ", $sNoBrackets ) as $subword )
+        {
+            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
+                $highlightKeywords[] = $subword;
+        }
+        return $highlightKeywords;
+    }
+    
+    // parse search query and return Array
+    // 1. item: tags array from macro tag (tag: tag1, tag2 ... search query)
+    // 2. item: search query (rest of input)
+    public function parseQuery( $input ){
+        $tags = Array();
+        $input = strtolower( Strings::trim( $input ) );
+        $pos = strpos($input, "tag:");
+        if ($pos === false || $pos != 0){
+            $tags[] = $input;
+            return $tags;
+        }
+        $tag = Array();
+        $spaces = 0;
+        $inputLen = strlen($input);
+        for ($i = 4; $i < $inputLen; $i++){
+            if ($input[$i] == " "){
+                if ($spaces){
+                    $tags[] = Strings::webalize( implode( $tag ));
+                    return Array($tags, trim(substr($input, $i, $inputLen - $i)));
+                }
+                if ($input[$i-1] != "," && $input[$i-1] != ":"){
+                    if ($input[$i+1] == ","){
+                        continue;
+                    }
+                    $tags[] = Strings::webalize( implode( $tag ));
+                    return Array($tags, trim(substr($input, $i, $inputLen - $i)));
+                    return $tags;
+                }
+                $spaces++;
+                continue;
+            }
+            
+            if ($input[$i] == ","){
+                $tags[] = Strings::webalize( implode( $tag ));
+                $tag = Array();
+                $spaces = 0;
+                continue;
+            }
+            
+            $tag[] = $input[$i];
+        }
+        $tags[] = Strings::webalize( implode( $tag ));
+        return Array($tags, "");
     }
 
 }

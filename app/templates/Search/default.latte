@@ -4,9 +4,17 @@
 <h1>Vyhledávání</h1>
 <p>
     {form searchForm}
-	 {input s} {input send} {input includeComments} <span style="font-size:0.7em">{label includeComments /}</span>
+	 {input s} {input send} <br /> {input includeComments} <span style="font-size:0.7em">{label includeComments /}</span>
     {/form}
-	<small>Počet výsledků: {$itemsCount}</small>
+	<small><strong>Počet výsledků:</strong> {$itemsCount}
+        {if count($tags)}
+        <span style="padding-left:10px;padding-right:10px">|</span>
+        <strong>Filtruji tagy:</strong> 
+        {foreach $tags as $tag}
+            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep}|| {/sep}
+        {/foreach}
+        {/if}
+        </small>
 </p>
 
 
@@ -101,9 +109,11 @@
     {control vp}
     
     <script type="text/javascript">
+        {if isSet($highlightKeywords)}
 	{foreach $highlightKeywords as $kw}
 	    $('.message').highlight({$kw});
 	{/foreach}
+        {/if}
 	    
 	$(document).ready(function(){
 	    $('.showcomm').click(function(){
