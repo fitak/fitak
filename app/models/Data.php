@@ -84,7 +84,7 @@ class Data extends BaseModel
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     // comments - true = search in the comments too, false = search only in the topics
-    public function search( $query, $tags, $comments, $length, $offset )
+    public function search( $query, $tags, $length, $offset )
     {
         $result = $this->db->select("main.*, groups.name,
                    data.message as parentMessage,
@@ -102,16 +102,15 @@ class Data extends BaseModel
                 ->orderBy("main.created_time DESC")
                 ->limit($length)
                 ->offset($offset);
-        if( !$comments ){
-            $result = $result->where("main.parent_id = 0");
-        }
+
         if ( $query != ""){
              $result = $result->where("MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query);
+             
         }
+
         if ( count($tags) ){
-            $result = $result->join("data_tags")
-                             ->on("data.id = data_tags.data_id")
-                             ->where("data_tags.tags_id IN (%i)", $this->getTagsId($tags));
+             $result = $result->where("main.id IN (%i)", $this->getMatchedIdByTags($tags));
+
         }
         $result = $result->fetchAll();
 
@@ -141,6 +140,7 @@ class Data extends BaseModel
                     }
                 }
                 $item->parentMessage = $this->cleanMessage( $item->parentMessage );
+                
                 $item->parentFrom_name = stripslashes( $item->parentFrom_name );
                 // scenario 1)
             } else
@@ -151,31 +151,27 @@ class Data extends BaseModel
         return $result;
     }
     
-    public function getTagsId( $tags )
+    public function getMatchedIdByTags( $tags )
     {
-        $result = $this->db->select("id")
-                ->from("tags")
-                ->where("name IN (%s)", $tags)
+        return $this->db->select("DISTINCT data_id")
+                ->from("data_tags")
+                ->innerJoin("tags")
+                ->on("data_tags.tags_id = tags.id")
+                ->where("tags.name IN (%s)", $tags)
                 ->fetchPairs();
-        
-        return $result;
     }
 
     // number of results by search
-    public function searchCount( $query, $tags, $comments )
+    public function searchCount( $query, $tags )
     {
         $result = $this->db->select("count(*)")
                 ->from("data");
-        if( !$comments ){
-            $result = $result->where("data.parent_id = 0");
-        }
+       
         if ( $query != ""){
              $result = $result->where("MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query);
         }
         if ( count($tags) ){
-            $result = $result->join("data_tags")
-                             ->on("data.id = data_tags.data_id")
-                             ->where("data_tags.tags_id IN (%i)", $this->getTagsId($tags));
+            $result = $result->where("id IN (%i)", $this->getMatchedIdByTags($tags));
         }
         return $result->fetchSingle();   
     }

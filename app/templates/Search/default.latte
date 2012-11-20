@@ -4,7 +4,7 @@
 <h1>Vyhledávání</h1>
 <p>
     {form searchForm}
-	 {input s} {input send} <br /> {input includeComments} <span style="font-size:0.7em">{label includeComments /}</span>
+	 {input s} {input send} <br />
     {/form}
 	<small><strong>Počet výsledků:</strong> {$itemsCount}
         {if count($tags)}
@@ -18,7 +18,7 @@
 </p>
 
 
-<div style="width:650px;">
+<div style="width:740px;">
     {control vp}
     {foreach $data as $item}
     {if $item->parent_id == 0}
@@ -26,18 +26,18 @@
 	<div class="header">
 	    <strong>Od:</strong> <a href="https://www.facebook.com/profile.php?id={$item->from_id}">{$item->from_name}</a>
 	    <strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$item->group_id}/permalink/{$item->id}">{$item->created_time|date: "j.n.Y G:i:s"}</a>
-	    <span class="context" title='{foreach $item->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$item->likes ? $item->likes : 0}x</span>
-	    <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$item->group_id}" title="{$item->name}">{$item->name|truncate:35}</a>
+	    {*<span class="context" title='{foreach $item->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$item->likes ? $item->likes : 0}x</span>*}
+	    <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$item->group_id}" title="{$item->name}">{$item->name|truncate:55}</a>
 	</div>
 	<div class="message">
-	    {!$item->message}
+	    {!$item->message|tagToUrl}
 	    <div style="display:none" id="comments-{!$item->id}">
 	    {foreach $item->commentsData as $comment}
 		<div class="comment">
 		    <div class="header">
 			<strong>Od:</strong> <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
 			<strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-			<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x 
+			{*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
 		    </div>
 		    <div class="message">
 			{!$comment->message}
@@ -61,16 +61,16 @@
 	<div class="header">
 	    <strong>Od:</strong> <a href="https://www.facebook.com/profile.php?id={$item->parentFrom_id}">{$item->parentFrom_name}</a>
 	    <strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$item->group_id}/permalink/{$item->parent_id}">{$item->parentCreated_time|date: "j.n.Y G:i:s"}</a>
-	    <span class="context" title='{foreach $item->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$item->parentLikes ? $item->parentLikes : 0}x</span>
-	    <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$item->group_id}" title="{$item->name}">{$item->name|truncate:35}</a>
+	    {*<span class="context" title='{foreach $item->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$item->parentLikes ? $item->parentLikes : 0}x</span>*}
+	    <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$item->group_id}" title="{$item->name}">{$item->name|truncate:55}</a>
 	</div>
 	<div class="message">
-	    {!$item->parentMessage}
+	    {!$item->parentMessage|tagToUrl}
 	    <div class="comment" id="comment-{!$item->id}">
 		<div class="header">
 		    <strong>Od:</strong> <a href="https://www.facebook.com/profile.php?id={$item->from_id}">{$item->from_name}</a>
 		    <strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$item->group_id}/permalink/{$item->parent_id}/?comment_id={$item->id}">{$item->created_time|date: "j.n.Y G:i:s"}</a>
-		    <strong>Líbí se:</strong> {$item->likes ? $item->likes : 0}x
+		    {*<strong>Líbí se:</strong> {$item->likes ? $item->likes : 0}x*}
 		</div>
 		<div class="message">
 		    {!$item->message}
@@ -82,7 +82,7 @@
 		    <div class="header">
 			<strong>Od:</strong> <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
 			<strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-			<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x 
+			{*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
 		    </div>
 		    <div class="message">
 			    {!$comment->message}

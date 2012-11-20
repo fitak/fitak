@@ -1,5 +1,7 @@
 <?php
 
+use Nette\Utils\Strings;
+
 class Tags extends BaseModel
 {
 

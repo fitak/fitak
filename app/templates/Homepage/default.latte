@@ -7,10 +7,7 @@
 	<li n:foreach="$form->errors as $error">{$error}</li>
     </ul>
 
-    {input s}  <span id="options"><a href="#"><small>více</small></a></span> <br />
-    <div id="incComments" style="text-align:center; display:none">
-	{input includeComments} {label includeComments /}
-    </div>
+    {input s} <br />
     {input send}
 
     {/form}

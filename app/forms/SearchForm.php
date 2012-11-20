@@ -13,8 +13,6 @@ class SearchForm extends Form
         $this->addText( 's', 'dotaz', 100, 500 )
                 ->setRequired( 'Nic jste nezadali.' )
                 ->addRule( Form::MIN_LENGTH, 'Vyhledávací dotaz musí mít alespoň %d znaky', 3 );
-        $this->addCheckbox( 'includeComments', 'prohledávat i komentáře' )
-                ->setDefaultValue( TRUE );
 
         $this->addSubmit( 'send', '         Vyhledej         ' );
     }
@@ -22,7 +20,7 @@ class SearchForm extends Form
     function submitted( $form )
     {
         $values = $form->getValues();
-        $this->presenter->redirect( 'Search:', Array( $values['s'], $values['includeComments'] ) );
+        $this->presenter->redirect( 'Search:', Array( $values['s'] ) );
     }
 
 }

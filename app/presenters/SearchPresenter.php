@@ -13,10 +13,9 @@ class SearchPresenter extends BasePresenter
     private $searchQuery, $allQuery, $includeComments, $vp, $tags;
     private $itemsCount = NULL;
 
-    public function renderDefault($s, $comments )
+    public function renderDefault( $s )
     {
         $this->allQuery = $s;
-        $this->includeComments = $comments;
         $this->template->s = $s;
         
         $parsed = $this->context->data->parseQuery($s);
@@ -39,7 +38,7 @@ class SearchPresenter extends BasePresenter
         if ($this->searchQuery != ""){
             $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchQuery );
         }
-        $this->template->data = $this->context->data->search( $this->searchQuery, $this->tags, $this->includeComments, $paginator->getLength(), $paginator->getOffset() );
+        $this->template->data = $this->context->data->search( $this->searchQuery, $this->tags, $paginator->getLength(), $paginator->getOffset() );
     }
     
     public function renderTest( )
@@ -67,7 +66,7 @@ class SearchPresenter extends BasePresenter
     {
         if( $this->itemsCount == NULL )
         {
-            $this->itemsCount = $this->context->data->searchCount( $this->searchQuery, $this->tags, $this->includeComments );
+            $this->itemsCount = $this->context->data->searchCount( $this->searchQuery, $this->tags );
         }
         return $this->itemsCount;
     }
