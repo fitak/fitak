@@ -109,7 +109,11 @@ class Data extends BaseModel
         }
 
         if ( count($tags) ){
-             $result = $result->where("main.id IN (%i)", $this->getMatchedIdByTags($tags));
+             $tagedPostsId = $this->getMatchedIdByTags($tags);
+             if ( !count( $tagedPostsId )){
+                $tagedPostsId = 0;
+             }
+             $result = $result->where("main.id IN (%i)", $tagedPostsId);
 
         }
         $result = $result->fetchAll();
@@ -171,7 +175,11 @@ class Data extends BaseModel
              $result = $result->where("MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query);
         }
         if ( count($tags) ){
-            $result = $result->where("id IN (%i)", $this->getMatchedIdByTags($tags));
+            $tagedPostsId = $this->getMatchedIdByTags($tags);
+             if ( !count( $tagedPostsId )){
+                $tagedPostsId = 0;
+             }
+            $result = $result->where("id IN (%i)", $tagedPostsId);
         }
         return $result->fetchSingle();   
     }
