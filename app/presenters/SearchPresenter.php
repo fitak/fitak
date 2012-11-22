@@ -18,11 +18,14 @@ class SearchPresenter extends BasePresenter
         $this->allQuery = $s;
         $this->template->s = $s;
         
-        $parsed = $this->context->data->parseQuery($s);
-        if (count($parsed) == 1){
+        $parsed = $this->context->data->parseQuery( $s );
+        if (count($parsed) == 1)
+        {
             $this->searchQuery = $parsed[0];
             $this->tags = Array();
-        }else{
+        } 
+        else 
+        {
             $this->searchQuery = $parsed[1];
             $this->tags = $parsed[0];
         }
@@ -35,7 +38,8 @@ class SearchPresenter extends BasePresenter
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $this->getItemsCount();
         
-        if ($this->searchQuery != ""){
+        if ( $this->searchQuery != "" )
+        {
             $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchQuery );
         }
         $this->template->data = $this->context->data->search( $this->searchQuery, $this->tags, $paginator->getLength(), $paginator->getOffset() );
@@ -44,7 +48,7 @@ class SearchPresenter extends BasePresenter
 
     public function renderStream()
     {
-        $allCount = $this->context->data->getCount(TRUE);   
+        $allCount = $this->context->data->getCount( TRUE );   
         $this->template->itemsCount = $allCount;
 
         // paginator...

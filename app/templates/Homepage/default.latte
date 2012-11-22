@@ -9,16 +9,17 @@
 
     {input s} <br />
     {input send}
-
     {/form}
  
     <div class="cloud">
+    {if $trends}
     {foreach $trends as $item}
         <span style="font-size:{!$item["size"]}em"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
     {/foreach}
+    {else}
+        Žádné trendy v poslední době.
+    {/if}
     </div>
-
-    
 
     <script type="text/javascript">
  

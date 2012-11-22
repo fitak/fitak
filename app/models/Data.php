@@ -86,34 +86,37 @@ class Data extends BaseModel
     // comments - true = search in the comments too, false = search only in the topics
     public function search( $query, $tags, $length, $offset )
     {
-        $result = $this->db->select("main.*, groups.name,
+        $result = $this->db->select( "main.*, groups.name,
                    data.message as parentMessage,
                    data.created_time as parentCreated_time,
                    data.updated_time as parentUpdated_time,
                    data.comments as comments,
                    data.likes as parentLikes,
                    data.from_name as parentFrom_name,
-                   data.from_id as parentFrom_id")
-                ->from("data as main")
-                ->join("groups")
-                ->on("main.group_id = groups.id")
-                ->leftJoin("data")
-                ->on("main.parent_id = data.id")
-                ->orderBy("main.created_time DESC")
-                ->limit($length)
-                ->offset($offset);
+                   data.from_id as parentFrom_id" )
+                ->from( "data as main" )
+                ->join( "groups" )
+                ->on( "main.group_id = groups.id" )
+                ->leftJoin( "data" )
+                ->on( "main.parent_id = data.id" )
+                ->orderBy( "main.created_time DESC" )
+                ->limit( $length )
+                ->offset( $offset );
 
-        if ( $query != ""){
-             $result = $result->where("MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query);
+        if ( $query != "" )
+        {
+             $result = $result->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query );
              
         }
 
-        if ( count($tags) ){
-             $tagedPostsId = $this->getMatchedIdByTags($tags);
-             if ( !count( $tagedPostsId )){
+        if ( count( $tags ) )
+        {
+             $tagedPostsId = $this->getMatchedIdByTags( $tags );
+             if ( !count( $tagedPostsId ) )
+             {
                 $tagedPostsId = 0;
              }
-             $result = $result->where("main.id IN (%i)", $tagedPostsId);
+             $result = $result->where( "main.id IN (%i)", $tagedPostsId );
 
         }
         $result = $result->fetchAll();
@@ -155,16 +158,17 @@ class Data extends BaseModel
         return $result;
     }
 
+    // get all topics + comments
     public function getAll( $length, $offset )
     {
-        $result = $this->db->select("groups.name, data.*")
-                ->from("data")
-                ->join("groups")
-                ->on("data.group_id = groups.id")
-                ->where("data.parent_id = 0")
-                ->orderBy("data.created_time DESC")
-                ->limit($length)
-                ->offset($offset);
+        $result = $this->db->select( "groups.name, data.*" )
+                ->from( "data" )
+                ->join( "groups" )
+                ->on( "data.group_id = groups.id" )
+                ->where( "data.parent_id = 0" )
+                ->orderBy( "data.created_time DESC" )
+                ->limit( $length )
+                ->offset( $offset );
 
         $result = $result->fetchAll();
 
@@ -180,13 +184,14 @@ class Data extends BaseModel
         return $result;
     }
     
+    // get array of ids topics, which are labeled by string array of input tags
     public function getMatchedIdByTags( $tags )
     {
-        return $this->db->select("DISTINCT data_id")
-                ->from("data_tags")
-                ->innerJoin("tags")
-                ->on("data_tags.tags_id = tags.id")
-                ->where("tags.name IN (%s)", $tags)
+        return $this->db->select( "DISTINCT data_id" )
+                ->from( "data_tags" )
+                ->innerJoin( "tags" )
+                ->on( "data_tags.tags_id = tags.id" )
+                ->where( "tags.name IN (%s)", $tags )
                 ->fetchPairs();
     }
 
@@ -196,15 +201,18 @@ class Data extends BaseModel
         $result = $this->db->select("count(*)")
                 ->from("data");
        
-        if ( $query != ""){
-             $result = $result->where("MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query);
+        if ( $query != "")
+        {
+             $result = $result->where( "MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query );
         }
-        if ( count($tags) ){
-            $tagedPostsId = $this->getMatchedIdByTags($tags);
-             if ( !count( $tagedPostsId )){
+        if ( count( $tags ) )
+        {
+            $tagedPostsId = $this->getMatchedIdByTags( $tags );
+             if ( !count( $tagedPostsId ) )
+             {
                 $tagedPostsId = 0;
              }
-            $result = $result->where("id IN (%i)", $tagedPostsId);
+            $result = $result->where( "id IN (%i)", $tagedPostsId );
         }
         return $result->fetchSingle();   
     }
@@ -214,8 +222,9 @@ class Data extends BaseModel
     {
         $result = $this->db->select( "count(*)" )
                            ->from( "data" );
-        if ($justTopics){
-            $result = $result->where("parent_id = 0");
+        if ($justTopics)
+        {
+            $result = $result->where( "parent_id = 0" );
         }
         return $result->fetchSingle();
     }
@@ -327,33 +336,40 @@ class Data extends BaseModel
     public function parseQuery( $input ){
         $tags = Array();
         $input = strtolower( Strings::trim( $input ) );
-        $pos = strpos($input, "tag:");
-        if ($pos === false || $pos != 0){
+        $pos = strpos( $input, "tag:" );
+        if ( $pos === false || $pos != 0 )
+        {
             $tags[] = $input;
             return $tags;
         }
         $tag = Array();
         $spaces = 0;
-        $inputLen = strlen($input);
-        for ($i = 4; $i < $inputLen; $i++){
-            if ($input[$i] == " "){
-                if ($spaces){
-                    $tags[] = Strings::webalize( implode( $tag ));
-                    return Array($tags, trim(substr($input, $i, $inputLen - $i)));
+        $inputLen = strlen( $input );
+        for ( $i = 4; $i < $inputLen; $i++ )
+        {
+            if ( $input[$i] == " " )
+            {
+                if ( $spaces )
+                {
+                    $tags[] = Strings::webalize( implode( $tag ) );
+                    return Array( $tags, trim( substr( $input, $i, $inputLen - $i ) ) );
                 }
-                if ($input[$i-1] != "," && $input[$i-1] != ":"){
-                    if ($input[$i+1] == ","){
+                if ( $input[$i-1] != "," && $input[$i-1] != ":" )
+                {
+                    if ( $input[$i+1] == "," )
+                    {
                         continue;
                     }
-                    $tags[] = Strings::webalize( implode( $tag ));
-                    return Array($tags, trim(substr($input, $i, $inputLen - $i)));
+                    $tags[] = Strings::webalize( implode( $tag ) );
+                    return Array( $tags, trim( substr( $input, $i, $inputLen - $i ) ) );
                     return $tags;
                 }
                 $spaces++;
                 continue;
             }
             
-            if ($input[$i] == ","){
+            if ($input[$i] == ",")
+            {
                 $tags[] = Strings::webalize( implode( $tag ));
                 $tag = Array();
                 $spaces = 0;
@@ -362,8 +378,8 @@ class Data extends BaseModel
             
             $tag[] = $input[$i];
         }
-        $tags[] = Strings::webalize( implode( $tag ));
-        return Array($tags, "");
+        $tags[] = Strings::webalize( implode( $tag ) );
+        return Array( $tags, "" );
     }
 
 }

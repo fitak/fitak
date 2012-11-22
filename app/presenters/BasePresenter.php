@@ -36,9 +36,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	            $item = str_replace( "[$tag]", "[<a href=\"".$that->link('Search:default', 'tag: '.$cleanTag)."\">$cleanTag</a>]", $item );
 	        }
 
-		        //$tagAnchor = $that->link('Items:tag', "param"); //problem solved
-		       // $item = str_replace($tag, $tagAnchor, $item);
-
 		    return $item;
 
 		});
