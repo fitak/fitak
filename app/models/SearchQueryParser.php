@@ -20,7 +20,7 @@ class SearchQueryParser extends Nette\Object
         $matches = Strings::match( $input, '
             /
                 (?<=^|\s)tag:\s*
-                (?<tag_list> [\pL_-]+ (?:\s*,\s*(?&tag_list))? )
+                (?<tag_list> [\pL\d_-]+ (?:\s*,\s*(?&tag_list))? )
             /xu
         ' );
 
