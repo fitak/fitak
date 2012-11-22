@@ -1,0 +1,5 @@
+parameters:
+		
+	app_id: "APPID"
+	permissions: read_stream
+	app_secret: APPSECRET
