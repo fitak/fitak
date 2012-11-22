@@ -44,7 +44,6 @@ class SearchPresenter extends BasePresenter
         $this->template->data = $this->context->data->search( $this->searchRequest, $paginator->getLength(), $paginator->getOffset() );
     }
 
-
     public function renderStream()
     {
         $allCount = $this->context->data->getCount( TRUE );
@@ -57,11 +56,27 @@ class SearchPresenter extends BasePresenter
         $this->template->data = $this->context->data->getAll( $paginator->getLength(), $paginator->getOffset() );
 
     }
+
     protected function createComponentSearchForm()
     {
-        $form = new SearchForm($this->context->groups);
+        if ( $this->searchRequest->groups )
+        {
+            $groups = array_fill_keys( $this->searchRequest->groups, TRUE );
+        }
+        else
+        {
+            $groups = array();
+            foreach( $this->context->groups->getList() as $group )
+            {
+                $groups[$group->id] = TRUE;
+            }
+        }
+
+        $form = new SearchForm( $this->context->groups );
         $form->setDefaults( array(
-            's' => $this->getParameter('s')
+            's' => $this->getParameter( 's' ),
+            'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
+            'groups' => $groups,
         ) );
         $form->onSuccess[] = callback( $form, 'submitted' );
         return $form;

@@ -19,8 +19,7 @@ class SearchForm extends Form
         $this->addContainer( 'groups' );
         foreach( $groups->getList() as $group )
         {
-            $this['groups']->addCheckbox( $group->id, $group->name )
-                ->setDefaultValue( true );
+            $this['groups']->addCheckbox( $group->id, $group->name );
         }
 
 
