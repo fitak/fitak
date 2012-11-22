@@ -84,7 +84,7 @@ class Data extends BaseModel
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     // comments - true = search in the comments too, false = search only in the topics
-    public function search( $query, $tags, $length, $offset )
+    public function search( SearchRequest $request, $length, $offset )
     {
         $result = $this->db->select( "main.*, groups.name, groups.closed,
                    data.message as parentMessage,
@@ -103,15 +103,20 @@ class Data extends BaseModel
                 ->limit( $length )
                 ->offset( $offset );
 
-        if ( $query != "" )
+        if ( $request->query != "" )
         {
-             $result = $result->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query );
-             
+             $result = $result->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
+
         }
 
-        if ( count( $tags ) )
+        if ( $request->from != "" )
         {
-             $tagedPostsId = $this->getMatchedIdByTags( $tags );
+            $result = $result->where( "main.from_name LIKE %~like~", $request->from );
+        }
+
+        if ( count( $request->tags ) )
+        {
+             $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
              if ( !count( $tagedPostsId ) )
              {
                 $tagedPostsId = 0;
@@ -119,6 +124,12 @@ class Data extends BaseModel
              $result = $result->where( "main.id IN (%i)", $tagedPostsId );
 
         }
+
+        if ( count( $request->groups ) )
+        {
+            $result = $result->where( "main.group_id IN %in", $request->groups );
+        }
+
         $result = $result->fetchAll();
 
         // there are two scenarios:
