@@ -84,7 +84,7 @@ class Data extends BaseModel
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     // comments - true = search in the comments too, false = search only in the topics
-    public function search( $query, $tags, $length, $offset )
+    public function search( SearchRequest $request, $length, $offset )
     {
         $result = $this->db->select( "main.*, groups.name, groups.closed,
                    data.message as parentMessage,
@@ -103,22 +103,8 @@ class Data extends BaseModel
                 ->limit( $length )
                 ->offset( $offset );
 
-        if ( $query != "" )
-        {
-             $result = $result->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $query );
-             
-        }
+        $this->buildSearchCondition( $result, $request );
 
-        if ( count( $tags ) )
-        {
-             $tagedPostsId = $this->getMatchedIdByTags( $tags );
-             if ( !count( $tagedPostsId ) )
-             {
-                $tagedPostsId = 0;
-             }
-             $result = $result->where( "main.id IN (%i)", $tagedPostsId );
-
-        }
         $result = $result->fetchAll();
 
         // there are two scenarios:
@@ -147,7 +133,7 @@ class Data extends BaseModel
                     }
                 }
                 $item->parentMessage = $this->cleanMessage( $item->parentMessage );
-                
+
                 $item->parentFrom_name = stripslashes( $item->parentFrom_name );
                 // scenario 1)
             } else
@@ -183,7 +169,7 @@ class Data extends BaseModel
         }
         return $result;
     }
-    
+
     // get array of ids topics, which are labeled by string array of input tags
     public function getMatchedIdByTags( $tags )
     {
@@ -196,25 +182,43 @@ class Data extends BaseModel
     }
 
     // number of results by search
-    public function searchCount( $query, $tags )
+    public function searchCount( SearchRequest $request )
     {
         $result = $this->db->select("count(*)")
-                ->from("data");
-       
-        if ( $query != "")
+                ->from("data as main");
+
+        $this->buildSearchCondition( $result, $request );
+
+        return $result->fetchSingle();
+    }
+
+    private function buildSearchCondition( DibiFluent $sql, SearchRequest $request )
+    {
+        if ( $request->query != "" )
         {
-             $result = $result->where( "MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query );
+            $sql->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
         }
-        if ( count( $tags ) )
+
+        if ( $request->from != "" )
         {
-            $tagedPostsId = $this->getMatchedIdByTags( $tags );
-             if ( !count( $tagedPostsId ) )
-             {
+            $sql = $sql->where( "main.from_name LIKE %~like~", $request->from );
+        }
+
+        if ( count( $request->tags ) )
+        {
+            $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
+            if ( !count( $tagedPostsId ) )
+            {
                 $tagedPostsId = 0;
-             }
-            $result = $result->where( "id IN (%i)", $tagedPostsId );
+            }
+            $sql = $sql->where( "main.id IN %in", $tagedPostsId );
+
         }
-        return $result->fetchSingle();   
+
+        if ( count( $request->groups ) )
+        {
+            $sql->where( "main.group_id IN %in", $request->groups );
+        }
     }
 
     // sum of all topics and comments
@@ -306,7 +310,7 @@ class Data extends BaseModel
             return $inText;
         }
     }
-    
+
     // return array of variations for input word
     public function getWordVariations( $word )
     {
@@ -329,7 +333,7 @@ class Data extends BaseModel
         }
         return $highlightKeywords;
     }
-    
+
     // parse search query and return Array
     // 1. item: tags array from macro tag (tag: tag1, tag2 ... search query)
     // 2. item: search query (rest of input)
@@ -367,7 +371,7 @@ class Data extends BaseModel
                 $spaces++;
                 continue;
             }
-            
+
             if ($input[$i] == ",")
             {
                 $tags[] = Strings::webalize( implode( $tag ));
@@ -375,7 +379,7 @@ class Data extends BaseModel
                 $spaces = 0;
                 continue;
             }
-            
+
             $tag[] = $input[$i];
         }
         $tags[] = Strings::webalize( implode( $tag ) );

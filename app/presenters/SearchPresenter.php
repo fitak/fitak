@@ -10,71 +10,91 @@ use Nette\Diagnostics\Debugger;
 class SearchPresenter extends BasePresenter
 {
 
-    private $searchQuery, $allQuery, $includeComments, $vp, $tags;
+    /** @var SearchRequest */
+    private $searchRequest;
+
     private $itemsCount = NULL;
 
-    public function renderDefault( $s )
+    public function actionDefault( $s, $from = NULL, array $groups = NULL )
     {
-        $this->allQuery = $s;
+        $parsed = $this->context->searchQueryParser->parseQuery( $s );
+
+        $this->searchRequest = new SearchRequest();
+        $this->searchRequest->query = $parsed['query'];
+        $this->searchRequest->tags = $parsed['tags'];
+        $this->searchRequest->from = $from;
+        $this->searchRequest->groups = ( $groups ? array_map( 'strval', $groups ) : NULL );
+    }
+
+    public function renderDefault( $s, $from = NULL, array $groups = NULL )
+    {
         $this->template->s = $s;
-        
-        $parsed = $this->context->data->parseQuery( $s );
-        if (count($parsed) == 1)
-        {
-            $this->searchQuery = $parsed[0];
-            $this->tags = Array();
-        } 
-        else 
-        {
-            $this->searchQuery = $parsed[1];
-            $this->tags = $parsed[0];
-        }
-        $this->template->tags = $this->tags;
+        $this->template->tags = $this->searchRequest->tags;
         $this->template->itemsCount = $this->getItemsCount();
 
         // paginator...
-        $this->vp = new VisualPaginator( $this, 'vp' );
-        $paginator = $this->vp->getPaginator();
+        $paginator = $this['vp']->getPaginator();
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $this->getItemsCount();
-        
-        if ( $this->searchQuery != "" )
-        {
-            $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchQuery );
-        }
-        $this->template->data = $this->context->data->search( $this->searchQuery, $this->tags, $paginator->getLength(), $paginator->getOffset() );
-    }
 
+        if ( $this->searchRequest->query != "" )
+        {
+            $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchRequest->query );
+        }
+        $this->template->data = $this->context->data->search( $this->searchRequest, $paginator->getLength(), $paginator->getOffset() );
+    }
 
     public function renderStream()
     {
-        $allCount = $this->context->data->getCount( TRUE );   
+        $allCount = $this->context->data->getCount( TRUE );
         $this->template->itemsCount = $allCount;
 
         // paginator...
-        $this->vp = new VisualPaginator( $this, 'vp' );
-        $paginator = $this->vp->getPaginator();
+        $paginator = $this['vp']->getPaginator();
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $allCount;
         $this->template->data = $this->context->data->getAll( $paginator->getLength(), $paginator->getOffset() );
 
     }
+
     protected function createComponentSearchForm()
     {
-        $form = new SearchForm();
+        if ( $this->searchRequest->groups )
+        {
+            $groups = array_fill_keys( $this->searchRequest->groups, TRUE );
+        }
+        else
+        {
+            $groups = array();
+            foreach( $this->context->groups->getList() as $group )
+            {
+                $groups[$group->id] = TRUE;
+            }
+        }
+
+        $form = new SearchForm( $this->context->groups );
         $form->setDefaults( array(
-            's' => $this->allQuery,
-            'includeComments' => $this->includeComments
+            's' => $this->getParameter( 's' ),
+            'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
+            'groups' => $groups,
         ) );
         $form->onSuccess[] = callback( $form, 'submitted' );
         return $form;
+    }
+
+    /**
+     * @return VisualPaginator
+     */
+    protected function createComponentVp()
+    {
+        return new VisualPaginator();
     }
 
     protected function getItemsCount()
     {
         if( $this->itemsCount == NULL )
         {
-            $this->itemsCount = $this->context->data->searchCount( $this->searchQuery, $this->tags );
+            $this->itemsCount = $this->context->data->searchCount( $this->searchRequest );
         }
         return $this->itemsCount;
     }
