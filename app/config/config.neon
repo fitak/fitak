@@ -43,6 +43,9 @@ common:
 		token:
 			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%)
 
+		searchQueryParser:
+			class: SearchQueryParser
+
 
 production < common:
 	includes:
