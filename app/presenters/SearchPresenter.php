@@ -10,7 +10,9 @@ use Nette\Diagnostics\Debugger;
 class SearchPresenter extends BasePresenter
 {
 
-    private $searchQuery, $allQuery, $includeComments, $vp, $tags;
+    /** @var SearchRequest */
+    private $searchRequest;
+
     private $itemsCount = NULL;
 
     public function renderDefault( $s, $from = NULL, array $groups = NULL)
@@ -22,12 +24,10 @@ class SearchPresenter extends BasePresenter
         $request->from = $from;
         $request->groups = ( $groups ? array_map( 'strval', $groups ) : NULL );
 
-        $this->allQuery = $s;
-        $this->searchQuery = $request->query;
-        $this->tags = $request->tags;
+        $this->searchRequest = $request;
 
         $this->template->s = $s;
-        $this->template->tags = $this->tags;
+        $this->template->tags = $this->searchRequest->tags;
         $this->template->itemsCount = $this->getItemsCount();
 
         // paginator...
@@ -35,9 +35,9 @@ class SearchPresenter extends BasePresenter
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $this->getItemsCount();
 
-        if ( $this->searchQuery != "" )
+        if ( $this->searchRequest->query != "" )
         {
-            $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchQuery );
+            $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchRequest->query );
         }
         $this->template->data = $this->context->data->search( $request, $paginator->getLength(), $paginator->getOffset() );
     }
@@ -59,8 +59,7 @@ class SearchPresenter extends BasePresenter
     {
         $form = new SearchForm($this->context->groups);
         $form->setDefaults( array(
-            's' => $this->allQuery,
-            'includeComments' => $this->includeComments
+            's' => $this->getParameter('s')
         ) );
         $form->onSuccess[] = callback( $form, 'submitted' );
         return $form;
@@ -78,7 +77,7 @@ class SearchPresenter extends BasePresenter
     {
         if( $this->itemsCount == NULL )
         {
-            $this->itemsCount = $this->context->data->searchCount( $this->searchQuery, $this->tags );
+            $this->itemsCount = $this->context->data->searchCount( $this->searchRequest->query, $this->searchRequest->tags );
         }
         return $this->itemsCount;
     }
