@@ -31,8 +31,7 @@ class SearchPresenter extends BasePresenter
         $this->template->itemsCount = $this->getItemsCount();
 
         // paginator...
-        $this->vp = new VisualPaginator( $this, 'vp' );
-        $paginator = $this->vp->getPaginator();
+        $paginator = $this['vp']->getPaginator();
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $this->getItemsCount();
 
@@ -50,8 +49,7 @@ class SearchPresenter extends BasePresenter
         $this->template->itemsCount = $allCount;
 
         // paginator...
-        $this->vp = new VisualPaginator( $this, 'vp' );
-        $paginator = $this->vp->getPaginator();
+        $paginator = $this['vp']->getPaginator();
         $paginator->itemsPerPage = 20;
         $paginator->itemCount = $allCount;
         $this->template->data = $this->context->data->getAll( $paginator->getLength(), $paginator->getOffset() );
@@ -66,6 +64,14 @@ class SearchPresenter extends BasePresenter
         ) );
         $form->onSuccess[] = callback( $form, 'submitted' );
         return $form;
+    }
+
+    /**
+     * @return VisualPaginator
+     */
+    protected function createComponentVp()
+    {
+        return new VisualPaginator();
     }
 
     protected function getItemsCount()
