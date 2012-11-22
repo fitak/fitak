@@ -158,7 +158,7 @@ class Data extends BaseModel
                     }
                 }
                 $item->parentMessage = $this->cleanMessage( $item->parentMessage );
-                
+
                 $item->parentFrom_name = stripslashes( $item->parentFrom_name );
                 // scenario 1)
             } else
@@ -194,7 +194,7 @@ class Data extends BaseModel
         }
         return $result;
     }
-    
+
     // get array of ids topics, which are labeled by string array of input tags
     public function getMatchedIdByTags( $tags )
     {
@@ -211,7 +211,7 @@ class Data extends BaseModel
     {
         $result = $this->db->select("count(*)")
                 ->from("data");
-       
+
         if ( $query != "")
         {
              $result = $result->where( "MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query );
@@ -225,7 +225,7 @@ class Data extends BaseModel
              }
             $result = $result->where( "id IN (%i)", $tagedPostsId );
         }
-        return $result->fetchSingle();   
+        return $result->fetchSingle();
     }
 
     // sum of all topics and comments
@@ -317,7 +317,7 @@ class Data extends BaseModel
             return $inText;
         }
     }
-    
+
     // return array of variations for input word
     public function getWordVariations( $word )
     {
@@ -340,7 +340,7 @@ class Data extends BaseModel
         }
         return $highlightKeywords;
     }
-    
+
     // parse search query and return Array
     // 1. item: tags array from macro tag (tag: tag1, tag2 ... search query)
     // 2. item: search query (rest of input)
@@ -378,7 +378,7 @@ class Data extends BaseModel
                 $spaces++;
                 continue;
             }
-            
+
             if ($input[$i] == ",")
             {
                 $tags[] = Strings::webalize( implode( $tag ));
@@ -386,7 +386,7 @@ class Data extends BaseModel
                 $spaces = 0;
                 continue;
             }
-            
+
             $tag[] = $input[$i];
         }
         $tags[] = Strings::webalize( implode( $tag ) );

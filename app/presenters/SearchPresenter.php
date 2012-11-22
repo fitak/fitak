@@ -46,7 +46,7 @@ class SearchPresenter extends BasePresenter
 
     public function renderStream()
     {
-        $allCount = $this->context->data->getCount( TRUE );   
+        $allCount = $this->context->data->getCount( TRUE );
         $this->template->itemsCount = $allCount;
 
         // paginator...

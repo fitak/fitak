@@ -25,9 +25,9 @@
 	<small><strong>Počet výsledků:</strong> {$itemsCount}
         {if count($tags)}
         <span style="padding-left:10px;padding-right:10px">|</span>
-        <strong>Filtruji tagy:</strong> 
+        <strong>Filtruji tagy:</strong>
         {foreach $tags as $tag}
-            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep}|| {/sep}
+            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
         {/foreach}
         {/if}
         </small>
