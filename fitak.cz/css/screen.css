@@ -166,3 +166,7 @@ blockquote p {
     text-align:center;
     margin: 0px auto;
 }
+
+.search-advanced {
+	display: none;
+}

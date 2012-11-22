@@ -61,7 +61,7 @@ class SearchPresenter extends BasePresenter
     }
     protected function createComponentSearchForm()
     {
-        $form = new SearchForm();
+        $form = new SearchForm($this->context->groups);
         $form->setDefaults( array(
             's' => $this->allQuery,
             'includeComments' => $this->includeComments
