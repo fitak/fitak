@@ -1,4 +1,4 @@
--- Adminer 3.3.3 MySQL dump
+-- Adminer 3.6.1 MySQL dump
 
 SET NAMES utf8;
 SET foreign_key_checks = 0;
@@ -37,7 +37,8 @@ CREATE TABLE `data_tags` (
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
   `id` bigint(20) NOT NULL,
-  `name` varchar(250) COLLATE utf8_czech_ci NOT NULL
+  `name` varchar(250) COLLATE utf8_czech_ci NOT NULL,
+  `closed` tinyint(4) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 
@@ -80,4 +81,4 @@ CREATE TABLE `tokens` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 
--- 2012-07-06 00:33:44
+-- 2012-11-22 16:18:21

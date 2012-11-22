@@ -86,7 +86,7 @@ class Data extends BaseModel
     // comments - true = search in the comments too, false = search only in the topics
     public function search( $query, $tags, $length, $offset )
     {
-        $result = $this->db->select( "main.*, groups.name,
+        $result = $this->db->select( "main.*, groups.name, groups.closed,
                    data.message as parentMessage,
                    data.created_time as parentCreated_time,
                    data.updated_time as parentUpdated_time,
@@ -161,7 +161,7 @@ class Data extends BaseModel
     // get all topics + comments
     public function getAll( $length, $offset )
     {
-        $result = $this->db->select( "groups.name, data.*" )
+        $result = $this->db->select( "groups.name, groups.closed, data.*" )
                 ->from( "data" )
                 ->join( "groups" )
                 ->on( "data.group_id = groups.id" )
