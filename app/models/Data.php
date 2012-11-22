@@ -154,6 +154,31 @@ class Data extends BaseModel
         }
         return $result;
     }
+
+    public function getAll( $length, $offset )
+    {
+        $result = $this->db->select("groups.name, data.*")
+                ->from("data")
+                ->join("groups")
+                ->on("data.group_id = groups.id")
+                ->where("data.parent_id = 0")
+                ->orderBy("data.created_time DESC")
+                ->limit($length)
+                ->offset($offset);
+
+        $result = $result->fetchAll();
+
+        foreach( $result as $item )
+        {
+            // add Likes details (from_name, from_id)
+            $item->likesData = $this->getLikes( $item->id );
+            // strip slashes, \n => <br>, short URL etc...
+            $item->message = $this->cleanMessage( $item->message );
+            $item->from_name = stripslashes( $item->from_name );
+            $item->commentsData = $this->getComments( $item->id );
+        }
+        return $result;
+    }
     
     public function getMatchedIdByTags( $tags )
     {
@@ -185,9 +210,13 @@ class Data extends BaseModel
     }
 
     // sum of all topics and comments
-    public function getCount()
+    public function getCount($justTopics = FALSE)
     {
-        $result = $this->db->query( "SELECT count(*) FROM data" );
+        $result = $this->db->select( "count(*)" )
+                           ->from( "data" );
+        if ($justTopics){
+            $result = $result->where("parent_id = 0");
+        }
         return $result->fetchSingle();
     }
 

@@ -159,3 +159,10 @@ blockquote {
     background-color: #f6ebc1; }
 blockquote p {
     margin: 0; }
+
+.cloud {
+    padding:30px;
+    width:500px;
+    text-align:center;
+    margin: 0px auto;
+}

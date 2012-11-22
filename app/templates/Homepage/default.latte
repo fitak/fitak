@@ -11,6 +11,14 @@
     {input send}
 
     {/form}
+ 
+    <div class="cloud">
+    {foreach $trends as $item}
+        <span style="font-size:{!$item["size"]}em"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
+    {/foreach}
+    </div>
+
+    
 
     <script type="text/javascript">
  

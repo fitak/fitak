@@ -32,7 +32,7 @@ class SearchPresenter extends BasePresenter
         // paginator...
         $this->vp = new VisualPaginator( $this, 'vp' );
         $paginator = $this->vp->getPaginator();
-        $paginator->itemsPerPage = 15;
+        $paginator->itemsPerPage = 20;
         $paginator->itemCount = $this->getItemsCount();
         
         if ($this->searchQuery != ""){
@@ -40,17 +40,21 @@ class SearchPresenter extends BasePresenter
         }
         $this->template->data = $this->context->data->search( $this->searchQuery, $this->tags, $paginator->getLength(), $paginator->getOffset() );
     }
-    
-    public function renderTest( )
-    {
-        $a = $this->context->data->getTagsId(Array('zdm', 'pa1'));
-        foreach ($a as $id){
-            echo $id.", ";
-        }
-        print_r($a);
-        exit;
-    }
 
+
+    public function renderStream()
+    {
+        $allCount = $this->context->data->getCount(TRUE);   
+        $this->template->itemsCount = $allCount;
+
+        // paginator...
+        $this->vp = new VisualPaginator( $this, 'vp' );
+        $paginator = $this->vp->getPaginator();
+        $paginator->itemsPerPage = 20;
+        $paginator->itemCount = $allCount;
+        $this->template->data = $this->context->data->getAll( $paginator->getLength(), $paginator->getOffset() );
+
+    }
     protected function createComponentSearchForm()
     {
         $form = new SearchForm();
