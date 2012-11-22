@@ -77,7 +77,7 @@ class SearchPresenter extends BasePresenter
     {
         if( $this->itemsCount == NULL )
         {
-            $this->itemsCount = $this->context->data->searchCount( $this->searchRequest->query, $this->searchRequest->tags );
+            $this->itemsCount = $this->context->data->searchCount( $this->searchRequest );
         }
         return $this->itemsCount;
     }

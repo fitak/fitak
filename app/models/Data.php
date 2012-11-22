@@ -103,32 +103,7 @@ class Data extends BaseModel
                 ->limit( $length )
                 ->offset( $offset );
 
-        if ( $request->query != "" )
-        {
-             $result = $result->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
-
-        }
-
-        if ( $request->from != "" )
-        {
-            $result = $result->where( "main.from_name LIKE %~like~", $request->from );
-        }
-
-        if ( count( $request->tags ) )
-        {
-             $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
-             if ( !count( $tagedPostsId ) )
-             {
-                $tagedPostsId = 0;
-             }
-             $result = $result->where( "main.id IN (%i)", $tagedPostsId );
-
-        }
-
-        if ( count( $request->groups ) )
-        {
-            $result = $result->where( "main.group_id IN %in", $request->groups );
-        }
+        $this->buildSearchCondition( $result, $request );
 
         $result = $result->fetchAll();
 
@@ -207,25 +182,43 @@ class Data extends BaseModel
     }
 
     // number of results by search
-    public function searchCount( $query, $tags )
+    public function searchCount( SearchRequest $request )
     {
         $result = $this->db->select("count(*)")
-                ->from("data");
+                ->from("data as main");
 
-        if ( $query != "")
-        {
-             $result = $result->where( "MATCH(message) AGAINST (%s IN BOOLEAN MODE)", $query );
-        }
-        if ( count( $tags ) )
-        {
-            $tagedPostsId = $this->getMatchedIdByTags( $tags );
-             if ( !count( $tagedPostsId ) )
-             {
-                $tagedPostsId = 0;
-             }
-            $result = $result->where( "id IN (%i)", $tagedPostsId );
-        }
+        $this->buildSearchCondition( $result, $request );
+
         return $result->fetchSingle();
+    }
+
+    private function buildSearchCondition( DibiFluent $sql, SearchRequest $request )
+    {
+        if ( $request->query != "" )
+        {
+            $sql->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
+        }
+
+        if ( $request->from != "" )
+        {
+            $sql = $sql->where( "main.from_name LIKE %~like~", $request->from );
+        }
+
+        if ( count( $request->tags ) )
+        {
+            $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
+            if ( !count( $tagedPostsId ) )
+            {
+                $tagedPostsId = 0;
+            }
+            $sql = $sql->where( "main.id IN %in", $tagedPostsId );
+
+        }
+
+        if ( count( $request->groups ) )
+        {
+            $sql->where( "main.group_id IN %in", $request->groups );
+        }
     }
 
     // sum of all topics and comments
