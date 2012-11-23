@@ -149,12 +149,6 @@
     {control vp}
 
     <script type="text/javascript">
-        {if isSet($highlightKeywords)}
-	{foreach $highlightKeywords as $kw}
-	    $('.message').highlight({$kw});
-	{/foreach}
-        {/if}
-
 	$(document).ready(function(){
 	    $('.showcomm').click(function(){
 		$("#comments-" + $(this).attr('id')).slideToggle();
@@ -166,6 +160,13 @@
             return false;
         });
 
+        {ifset $highlightKeywords}
+            var highlightKeywords = {$highlightKeywords};
+            var message = $('.message');
+            for (var i = 0; i < highlightKeywords.length; i++) {
+                message.highlight(highlightKeywords[i]);
+            }
+        {/ifset}
 	});
     </script>
 </div>
