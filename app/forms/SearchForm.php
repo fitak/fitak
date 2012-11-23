@@ -10,9 +10,9 @@ class SearchForm extends Form
     {
         parent::__construct();
 
-        $this->addText( 's', 'dotaz', 100, 500 )
-            ->setRequired( 'Nic jste nezadali.' )
-            ->addRule(Form::MIN_LENGTH, 'Vyhledávací dotaz musí mít alespoň %d znaky', 3);
+        $this->addText( 's', 'dotaz', 100, 500 );
+            //->setRequired( 'Nic jste nezadali.' );
+            //->addRule(Form::MIN_LENGTH, 'Vyhledávací dotaz musí mít alespoň %d znaky', 3);
 
         $this->addText( 'from', 'Autor:' );
 

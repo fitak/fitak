@@ -10,10 +10,10 @@
         <p><a href="#" class="toggle-search-advanced">Podrobné vyhledávání &#x25bc;</a></p>
 
         <div class="search-advanced">
-            {label from /}
+            <strong>{label from /}</strong>
             {input from}
-            <br>
-
+            <br />
+            <strong>Skupiny:</strong><br />
             {foreach $form['groups']->controls as $checkbox}
                 {input "groups-$checkbox->name"}
                 {label "groups-$checkbox->name" /}

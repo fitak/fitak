@@ -185,7 +185,9 @@ class Data extends BaseModel
     public function searchCount( SearchRequest $request )
     {
         $result = $this->db->select("count(*)")
-                ->from("data as main");
+                ->from( "data as main" )
+                ->join( "groups" )
+                ->on( "main.group_id = groups.id" );
 
         $this->buildSearchCondition( $result, $request );
 
@@ -198,10 +200,17 @@ class Data extends BaseModel
         {
             $sql->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
         }
+        
+        if ( $request->query == "" && $request->from == "" )
+        {
+            $sql->where( "main.parent_id = 0" );
+        }
 
         if ( $request->from != "" )
         {
             $sql = $sql->where( "main.from_name LIKE %~like~", $request->from );
+            // protection of hidden names in closed/secret groups 
+            $sql = $sql->where( "groups.closed = 0" );
         }
 
         if ( count( $request->tags ) )
@@ -209,9 +218,12 @@ class Data extends BaseModel
             $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
             if ( !count( $tagedPostsId ) )
             {
-                $tagedPostsId = 0;
+                $sql = $sql->where( "main.id = 0" );
             }
-            $sql = $sql->where( "main.id IN %in", $tagedPostsId );
+            else
+            {
+                $sql = $sql->where( "main.id IN %in", $tagedPostsId );
+            }
 
         }
 
@@ -278,7 +290,7 @@ class Data extends BaseModel
     private function urlChange( $inText )
     {
         // define an url regular exression pattern:
-        $urlPattern = "/(https?:\/\/|www.)(www.)?([-a-z0-9]*[a-z0-9]\.)(\bcom\b|\bbiz\b|\bgov\b|\bmil\b|\bnet\b|\borg\  b|[a-z][a-z]|[a-z][a-z]\.[a-z][a-z])\/?([a-zA-Z0-9]*)?([a-zA-Z0-9_\-\.\?=\/&%#;]*)?/";
+        $urlPattern = "/(https?:\/\/|www.)(www.)?([-a-z0-9]*[a-z0-9]\.)(\bcom\b|\bbiz\b|\bgov\b|\bmil\b|\bnet\b|\borg\  b|[a-z][a-z]|[a-z][a-z]\.[a-z][a-z])\/?([a-zA-Z0-9]*)?([a-zA-Z0-9_\-\.\?=\/&%#;~\+]*)?/";
         // get all matches
         preg_match_all( $urlPattern, $inText, $temp );
         $temp = $temp[0]; // an array of all urls

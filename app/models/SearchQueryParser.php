@@ -17,12 +17,7 @@ class SearchQueryParser extends Nette\Object
         $input = Strings::replace( $input, '/\s+/', ' ' );
 
         // extract tags
-        $matches = Strings::match( $input, '
-            /
-                (?<=^|\s)tag:\s*
-                (?<tag_list> [\pL\d_-]+ (?:\s*,\s*(?&tag_list))? )
-            /xu
-        ' );
+        $matches = Strings::match( $input, '/(?<=^|\s)tag:\s*(?<tag_list>[\pL\d_-]+(?:\s*,\s*(?&tag_list))?)/u' );
 
         if( $matches )
         {

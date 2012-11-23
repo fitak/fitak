@@ -169,4 +169,8 @@ blockquote p {
 
 .search-advanced {
 	display: none;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    border-left: 1px #BBBBBB solid;
+    font-size: 0.9em;
 }
