@@ -1,10 +1,10 @@
 common:
-	includes:		
+	includes:
 		- fbparams.neon
 
 	php:
 		date.timezone: Europe/Prague
-	
+
 
 	nette:
 		session:
@@ -16,7 +16,7 @@ common:
 
 		application:
 			errorPresenter: 'Error'
-		
+
 		security:
 			debugger: true
 
@@ -30,18 +30,21 @@ common:
 	services:
 		data:
 			class: Data(@dibi.connection)
-		
+
 		groups:
 			class: Groups(@dibi.connection)
-		
+
 		likes:
 			class: Likes(@dibi.connection)
-		
+
 		tags:
 			class: Tags(@dibi.connection)
-		
+
 		token:
 			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%)
+
+		searchQueryParser:
+			class: SearchQueryParser
 
 
 production < common:

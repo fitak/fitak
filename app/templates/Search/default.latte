@@ -4,14 +4,30 @@
 <h1>Vyhledávání</h1>
 <p>
     {form searchForm}
-	 {input s} {input send} <br />
+        {input s}
+        {input send, style => "width: 120px"}
+
+        <p><a href="#" class="toggle-search-advanced">Podrobné vyhledávání &#x25bc;</a></p>
+
+        <div class="search-advanced">
+            {label from /}
+            {input from}
+            <br>
+
+            {foreach $form['groups']->controls as $checkbox}
+                {input "groups-$checkbox->name"}
+                {label "groups-$checkbox->name" /}
+                {sep}<br>{/sep}
+            {/foreach}
+        </div>
     {/form}
+
 	<small><strong>Počet výsledků:</strong> {$itemsCount}
         {if count($tags)}
         <span style="padding-left:10px;padding-right:10px">|</span>
-        <strong>Filtruji tagy:</strong> 
+        <strong>Filtruji tagy:</strong>
         {foreach $tags as $tag}
-            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep}|| {/sep}
+            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
         {/foreach}
         {/if}
         </small>
@@ -129,21 +145,26 @@
 
     {/if}
     {/foreach}
-    
+
     {control vp}
-    
+
     <script type="text/javascript">
         {if isSet($highlightKeywords)}
 	{foreach $highlightKeywords as $kw}
 	    $('.message').highlight({$kw});
 	{/foreach}
         {/if}
-	    
+
 	$(document).ready(function(){
 	    $('.showcomm').click(function(){
 		$("#comments-" + $(this).attr('id')).slideToggle();
 		$("#comment-" + $(this).attr('id')).slideToggle();
 	    });
+
+        $('.toggle-search-advanced').on('click', function (e) {
+            $('.search-advanced').slideToggle();
+            return false;
+        });
 
 	});
     </script>

@@ -54,9 +54,9 @@ a[href^="error:"] {
 }
 
 .topic .header {
-    border-bottom:1px solid #777777; 
+    border-bottom:1px solid #777777;
     background-color: #87CEEB;
-    padding: 3px; 
+    padding: 3px;
     padding-left:5px;
     font-size:0.8em;
 }
@@ -76,9 +76,9 @@ a[href^="error:"] {
 }
 
 .topic .comment .header {
-    border-bottom:1px solid #777777; 
+    border-bottom:1px solid #777777;
     background-color: #FFFACD;
-    padding: 3px; 
+    padding: 3px;
     padding-left:5px;
     font-size:0.8em
 }
@@ -88,9 +88,9 @@ a[href^="error:"] {
 }
 
 .topic .comment-marked .header {
-    border-bottom:1px solid #777777; 
+    border-bottom:1px solid #777777;
     background-color: #FFFACD;
-    padding: 3px; 
+    padding: 3px;
     padding-left:5px;
     font-size:0.8em
 }
@@ -104,9 +104,9 @@ a[href^="error:"] {
 }
 
 .topic .showcomm {
-    background-color:#EEEEEE; 
+    background-color:#EEEEEE;
     width:100%;
-    cursor: hand; 
+    cursor: hand;
     cursor: pointer;
 }
 
@@ -165,4 +165,8 @@ blockquote p {
     width:450px;
     text-align:center;
     margin: 0px auto;
+}
+
+.search-advanced {
+	display: none;
 }
