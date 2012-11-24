@@ -326,24 +326,33 @@ class Data extends BaseModel
     // return array of variations for input word
     public function getWordVariations( $word )
     {
-        $highlightKeywords[] = $word;
-        $highlightKeywords[] = $sNoBrackets = preg_replace( "/[\[\](){}]/", "", $word );
-        foreach( explode( "-", $sNoBrackets ) as $subword )
+        $sNoBrackets = Strings::replace( $word, "/[\\[\\](){}]/", "" );
+
+        $keywords = array_merge(
+            array( $word, $sNoBrackets ),
+            explode( "-", $sNoBrackets ),
+            explode( "_", $sNoBrackets ),
+            explode( " ", $sNoBrackets ),
+            Strings::split( $sNoBrackets, "[ _-]" )
+        );
+
+        foreach( $keywords as $index => $kw )
         {
-            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
-                $highlightKeywords[] = $subword;
+            $keywords[$index] = Strings::trim( $kw );
+            if( Strings::length( $keywords[$index] ) < 3 )
+            {
+                unset( $keywords[$index] );
+            }
+            else
+            {
+                $keywords[] = Strings::toAscii( $keywords[$index] );
+            }
         }
-        foreach( explode( "_", $sNoBrackets ) as $subword )
-        {
-            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
-                $highlightKeywords[] = $subword;
-        }
-        foreach( explode( " ", $sNoBrackets ) as $subword )
-        {
-            if( !in_array( $subword, $highlightKeywords ) && strlen( $subword ) > 2 )
-                $highlightKeywords[] = $subword;
-        }
-        return $highlightKeywords;
+
+        $keywords = array_unique( $keywords );
+        $keywords = array_values( $keywords );
+
+        return $keywords;
     }
 
     // parse search query and return Array
