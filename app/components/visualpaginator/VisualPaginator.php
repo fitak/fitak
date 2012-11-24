@@ -22,6 +22,8 @@ use Nette\Application\UI\Control,
  * @author     David Grudl
  * @copyright  Copyright (c) 2009 David Grudl
  * @package    Nette Extras
+ *
+ * @property-read Paginator $paginator
  */
 class VisualPaginator extends Control
 {
@@ -33,7 +35,7 @@ class VisualPaginator extends Control
     public $page = 1;
 
     /**
-     * @return Nette\Paginator
+     * @return Nette\Utils\Paginator
      */
     public function getPaginator()
     {
