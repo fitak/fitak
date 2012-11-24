@@ -9,22 +9,14 @@ use Nette\Utils\Strings;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    function beforeRender(){
-		$that = $this;
-		// helper - makes active link from tag
-		$this->template->registerHelper('tagToUrl', function ($item) use ($that) {
-	 	
-		 	$tags = $that->context->tags->extractTags( $item );
-	        
-	        if ($tags)
-	        {
-		        foreach ( $tags[0] as $index => $tag )
-		        {
-		            $item = str_replace( '['.$tags[1][$index].']', "[<a href=\"".$that->link('Search:default', 'tag:'.$tag)."\">$tag</a>]", $item );
-		        }
-	        }
 
-		    return $item;
-		});
-	}
+    protected function createTemplate( $class = null )
+    {
+        $templateHelpers = new TemplateHelpers( $this, $this->context->tags );
+        $template = parent::createTemplate( $class );
+        $template->registerHelperLoader( callback( $templateHelpers, "loader" ) );
+
+        return $template;
+    }
+
 }
