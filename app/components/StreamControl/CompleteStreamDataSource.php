@@ -13,7 +13,7 @@ class CompleteStreamDataSource extends Nette\Object implements IStreamDataSource
 
     public function getTopics( $count, $offset )
     {
-        return $this->dataModel->getAll( $count, $offset );
+        return $this->dataModel->getAllTopics( $count, $offset );
     }
 
     public function getTotalCount()

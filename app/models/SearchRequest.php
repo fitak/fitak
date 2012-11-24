@@ -8,10 +8,10 @@
 class SearchRequest extends Nette\Object
 {
 
-    /** @var string search query */
+    /** @var string|NULL search query */
     public $query;
 
-    /** @var string author name */
+    /** @var string|NULL author name */
     public $from;
 
     /** @var array list of tags (# => tags) */

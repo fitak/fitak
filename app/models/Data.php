@@ -81,6 +81,33 @@ class Data extends BaseModel
         return false;
     }
 
+    // get all topics + comments
+    public function getAllTopics( $length, $offset )
+    {
+        $sql = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
+            ->from( "data" )
+            ->join( "groups" )
+            ->on( "data.group_id = groups.id" )
+            ->where( "data.parent_id = 0" )
+            ->orderBy( "data.created_time DESC" )
+            ->limit( $length )
+            ->offset( $offset );
+
+        $topics = $sql->fetchAssoc( "id" );
+        $this->addComments($topics);
+
+        return $topics;
+    }
+
+    // sum of all topics and comments
+    public function getCount( $justTopics = false )
+    {
+        $sql = $this->db->select( "count(*)" )->from( "data" );
+        if ($justTopics) $sql->where( "parent_id = 0" );
+
+        return $sql->fetchSingle();
+    }
+
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     public function search( SearchRequest $request, $length, $offset )
@@ -123,144 +150,22 @@ class Data extends BaseModel
             $topics[$topicId] = $topicsResult[$topicId];
         }
 
-        $comments = $this->getComments( $topicsIds );
-        $topics = $this->combineTopicsWithComments( $topics, $comments, $commentsIds );
+        $this->addComments($topics, $commentsIds);
 
         return $topics;
     }
 
-    private function getComments( array $topicsIds )
-    {
-        $comments = $this->db->select( "*" )
-            ->from( "data" )
-            ->where( "parent_id IN %in", $topicsIds )
-            ->fetchAssoc( "parent_id|id" );
-
-        return $comments;
-    }
-
-    private function combineTopicsWithComments( array $topics, array $comments, array $markedCommentsIds = array() )
-    {
-        foreach( $topics as $topic )
-        {
-            // $topic->likesData = $this->getLikes( $topic->id );
-            $topic->message = $this->cleanMessage( $topic->message );
-            $topic->from_name = stripslashes( $topic->from_name );
-
-            if( isset( $comments[$topic->id] ) )
-            {
-                $topic->comments = $comments[$topic->id];
-                foreach( $topic->comments as $comment )
-                {
-                    $comment->topic = $topic;
-                    $comment->marked = in_array( $comment->id, $markedCommentsIds );
-                    $comment->message = $this->cleanMessage( $comment->message );
-                    $comment->from_name = stripslashes( $comment->from_name );
-                }
-            }
-            else
-            {
-                $topic->comments = array();
-            }
-        }
-
-        return $topics;
-    }
-
-    // get all topics and their comments
-    public function getAll( $length, $offset )
-    {
-        $sql = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
-        ->from( "data" )
-        ->join( "groups" )
-        ->on( "data.group_id = groups.id" )
-        ->where( "data.parent_id = 0" )
-        ->orderBy( "data.created_time DESC" )
-        ->limit( $length )
-        ->offset( $offset );
-
-        $topics = $sql->fetchAssoc( "id" );
-
-        $comments = $this->getComments( array_keys( $topics ) );
-        $topics = $this->combineTopicsWithComments( $topics, $comments );
-
-        return $topics;
-    }
-
-    // get array of ids topics, which are labeled by input tags (string array = tag names)
-    public function getMatchedIdByTags( $tags )
-    {
-        return $this->db->select( "DISTINCT data_id" )
-                ->from( "data_tags" )
-                ->innerJoin( "tags" )
-                ->on( "data_tags.tags_id = tags.id" )
-                ->where( "tags.name IN (%s)", $tags )
-                ->fetchPairs();
-    }
-
-    // number of results
+    // number of results by search
     public function searchCount( SearchRequest $request )
     {
-        $result = $this->db->select("count(*)")
-                ->from( "data" )
-                ->join( "groups" )
-                ->on( "data.group_id = groups.id" );
+        $sql = $this->db->select( "count(*)" )
+            ->from( "data" )
+            ->join( "groups" )
+            ->on( "data.group_id = groups.id" );
 
-        $this->buildSearchCondition( $result, $request );
+        $this->addSearchCondition( $sql, $request );
 
-        return $result->fetchSingle();
-    }
-
-    // use filters on query (tags specified, searching by author, searching by query, groups selected)
-    private function buildSearchCondition( DibiFluent $sql, SearchRequest $request )
-    {
-        if ( $request->query != "" )
-        {
-            $sql->where( "MATCH(data.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
-        }
-
-        if ( $request->query == "" && $request->from == "" )
-        {
-            $sql->where( "data.parent_id = 0" );
-        }
-
-        if ( $request->from != "" )
-        {
-            $sql = $sql->where( "data.from_name LIKE %~like~", $request->from );
-            // protection of hidden names in closed/secret groups
-            $sql = $sql->where( "groups.closed = 0" );
-        }
-
-        if ( count( $request->tags ) )
-        {
-            $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
-            if ( !count( $tagedPostsId ) )
-            {
-                $sql = $sql->where( "data.id = 0" );
-            }
-            else
-            {
-                $sql = $sql->where( "data.id IN %in", $tagedPostsId );
-            }
-
-        }
-
-        if ( count( $request->groups ) )
-        {
-            $sql->where( "data.group_id IN %in", $request->groups );
-        }
-    }
-
-    // sum of all topics and comments
-    public function getCount($justTopics = FALSE)
-    {
-        $result = $this->db->select( "count(*)" )
-                           ->from( "data" );
-        if ($justTopics)
-        {
-            $result = $result->where( "parent_id = 0" );
-        }
-        return $result->fetchSingle();
+        return $sql->fetchSingle();
     }
 
     // get likes at topic by id
@@ -279,6 +184,94 @@ class Data extends BaseModel
             $item->from_name = stripslashes( $item->from_name );
         }
         return $result;
+    }
+
+    // get array of ids topics, which are labeled by string array of input tags
+    public function getMatchedIdByTags( $tags )
+    {
+        return $this->db->select( "DISTINCT data_id" )
+            ->from( "data_tags" )
+            ->innerJoin( "tags" )
+            ->on( "data_tags.tags_id = tags.id" )
+            ->where( "tags.name IN %in", $tags )
+            ->fetchPairs();
+    }
+
+    // add search condition corresponding with given search request
+    private function addSearchCondition( DibiFluent $sql, SearchRequest $request )
+    {
+        if ( $request->query == "" && $request->from == "" )
+        {
+            // limit results to topics
+            $sql->where( "data.parent_id = 0" );
+        }
+        else
+        {
+            if ( $request->query != "" )
+            {
+                $sql->where( "MATCH(data.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
+            }
+
+            if ( $request->from != "" )
+            {
+                $sql = $sql->where( "data.from_name LIKE %~like~", $request->from );
+                // protection of hidden names in closed/secret groups
+                $sql = $sql->where( "groups.closed = 0" );
+            }
+        }
+
+        if ( count( $request->tags ) )
+        {
+            $taggedPostsId = $this->getMatchedIdByTags( $request->tags );
+            $sql = $sql->where( "data.id IN %in", $taggedPostsId );
+        }
+
+        if ( count( $request->groups ) )
+        {
+            $sql->where( "data.group_id IN %in", $request->groups );
+        }
+    }
+
+    // returns comments for given list of topics
+    private function getComments( array $topicsIds )
+    {
+        $comments = $this->db->select( "*" )
+            ->from( "data" )
+            ->where( "parent_id IN %in", $topicsIds )
+            ->fetchAssoc( "parent_id|id" );
+
+        return $comments;
+    }
+
+    // add comments to given topics
+    private function addComments( array $topics, array $marked = array() )
+    {
+        $comments = $this->getComments( array_keys($topics) );
+
+        foreach( $topics as $topic )
+        {
+            // $topic->likesData = $this->getLikes( $topic->id );
+            $topic->message = $this->cleanMessage( $topic->message );
+            $topic->from_name = stripslashes( $topic->from_name );
+
+            if( isset( $comments[$topic->id] ) )
+            {
+                $topic->comments = $comments[$topic->id];
+                foreach( $topic->comments as $comment )
+                {
+                    $comment->topic = $topic;
+                    $comment->marked = in_array( $comment->id, $marked );
+                    $comment->message = $this->cleanMessage( $comment->message );
+                    $comment->from_name = stripslashes( $comment->from_name );
+                }
+            }
+            else
+            {
+                $topic->comments = array();
+            }
+        }
+
+        return $topics;
     }
 
     // change links, strip slashes and HTML
