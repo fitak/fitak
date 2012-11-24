@@ -26,7 +26,7 @@ class Tags extends BaseModel
         $this->db->query( "UPDATE tags SET count = count + 1 WHERE id = %i LIMIT 1", $id );
     }
 
-    // get cloud of tags 
+    // get cloud of tags
     public function getTrends()
     {
         $result = $this->db->query( "SELECT tags.name, count(tags.id) as count FROM data 
@@ -37,18 +37,18 @@ class Tags extends BaseModel
                                      ORDER BY count(tags.id) DESC
                                      LIMIT 25" )->fetchAll();
 
-        if ( !count ( $result ) )
+        if( !count( $result ) )
         {
-            return NULL;
+            return null;
         }
 
         $maximum = $result[0]["count"];
         $tagCloud = Array();
-        foreach ( $result as $key => $tag )
+        foreach( $result as $key => $tag )
         {
-            if ( $tag->name == "" ) continue;
+            if( $tag->name == "" ) continue;
             $tagCloud[$key]["name"] = $tag->name;
-            $tagCloud[$key]["size"] = round( 1 + ( $tag->count * 100 )/$maximum * 0.015, 1 );
+            $tagCloud[$key]["size"] = round( 1 + ( $tag->count * 100 ) / $maximum * 0.015, 1 );
         }
 
         usort( $tagCloud, function ( $elem1, $elem2 ) 
@@ -71,12 +71,13 @@ class Tags extends BaseModel
             $tags = Strings::split( $tags, '/\]\s*\[/' );
             $cleanTags = array_map( 'Nette\Utils\Strings::webalize', $tags );
             $cleanTags = array_map( 'Nette\Utils\Strings::lower', $cleanTags );
-            $tags = array($cleanTags, $tags);
+            $tags = array( $cleanTags, $tags );
         }
         else
         {
             $tags = array();
         }
+
         return $tags;
     }
 

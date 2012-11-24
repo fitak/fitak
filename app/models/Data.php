@@ -94,7 +94,7 @@ class Data extends BaseModel
             ->offset( $offset );
 
         $topics = $sql->fetchAssoc( "id" );
-        $this->addComments($topics);
+        $this->addComments( $topics );
 
         return $topics;
     }
@@ -103,7 +103,7 @@ class Data extends BaseModel
     public function getCount( $justTopics = false )
     {
         $sql = $this->db->select( "count(*)" )->from( "data" );
-        if ($justTopics) $sql->where( "parent_id = 0" );
+        if( $justTopics ) $sql->where( "parent_id = 0" );
 
         return $sql->fetchSingle();
     }
@@ -124,13 +124,14 @@ class Data extends BaseModel
 
         $topicsIds = array();
         $commentsIds = array();
-        foreach( $result as $item)
+        foreach( $result as $item )
         {
             if( $item->parent_id )
             {
                 $topicsIds[] = $item->parent_id;
                 $commentsIds[] = $item->id;
-            } else
+            }
+            else
             {
                 $topicsIds[] = $item->id;
             }
@@ -150,7 +151,7 @@ class Data extends BaseModel
             $topics[$topicId] = $topicsResult[$topicId];
         }
 
-        $this->addComments($topics, $commentsIds);
+        $this->addComments( $topics, $commentsIds );
 
         return $topics;
     }
@@ -200,19 +201,19 @@ class Data extends BaseModel
     // add search condition corresponding with given search request
     private function addSearchCondition( DibiFluent $sql, SearchRequest $request )
     {
-        if ( $request->query == "" && $request->from == "" )
+        if( $request->query == "" && $request->from == "" )
         {
             // limit results to topics
             $sql->where( "data.parent_id = 0" );
         }
         else
         {
-            if ( $request->query != "" )
+            if( $request->query != "" )
             {
                 $sql->where( "MATCH(data.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
             }
 
-            if ( $request->from != "" )
+            if( $request->from != "" )
             {
                 $sql = $sql->where( "data.from_name LIKE %~like~", $request->from );
                 // protection of hidden names in closed/secret groups
@@ -220,13 +221,13 @@ class Data extends BaseModel
             }
         }
 
-        if ( count( $request->tags ) )
+        if( count( $request->tags ) )
         {
             $taggedPostsId = $this->getMatchedIdByTags( $request->tags );
             $sql = $sql->where( "data.id IN %in", $taggedPostsId );
         }
 
-        if ( count( $request->groups ) )
+        if( count( $request->groups ) )
         {
             $sql->where( "data.group_id IN %in", $request->groups );
         }
@@ -246,7 +247,7 @@ class Data extends BaseModel
     // add comments to given topics
     private function addComments( array $topics, array $marked = array() )
     {
-        $comments = $this->getComments( array_keys($topics) );
+        $comments = $this->getComments( array_keys( $topics ) );
 
         foreach( $topics as $topic )
         {
@@ -289,7 +290,7 @@ class Data extends BaseModel
         preg_match_all( $urlPattern, $inText, $temp );
         $temp = $temp[0]; // an array of all urls
 
-        $urlTag = array( );
+        $urlTag = array();
         foreach( $temp as &$url )
         {
             $urlShort = str_replace( "http://", "", $url );
@@ -298,7 +299,8 @@ class Data extends BaseModel
                 if( is_bool( strpos( $urlShort, "/" ) ) )
                 { // are there any natural places to cut the link?
                     $urlShort = substr( $urlShort, 0, 30 );
-                } else
+                }
+                else
                 { // find a good place to cut the link
                     $newLength = max( strrpos( $urlShort, "/" ), strrpos( $urlShort, "?" ), strrpos( $urlShort, "#" ) );
                     $urlShort = substr( $urlShort, 0, $newLength );
@@ -311,7 +313,8 @@ class Data extends BaseModel
         {
             // if there are any urls in the text, replace them with the new code
             return strtr( $inText, array_combine( $temp, $urlTag ) );
-        } else
+        }
+        else
         {
             return $inText;
         }

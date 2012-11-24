@@ -13,13 +13,14 @@ class HomepagePresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $this->template->trends = $this->context->tags->getTrends();     
+        $this->template->trends = $this->context->tags->getTrends();
     }
 
     protected function createComponentSearchForm()
     {
-        $form = new SearchForm($this->context->groups);
+        $form = new SearchForm( $this->context->groups );
         $form->onSuccess[] = callback( $form, 'submitted' );
+
         return $form;
     }
 

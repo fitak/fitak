@@ -17,7 +17,7 @@ class CrawlerPresenter extends BasePresenter
     // getting data (topics, comments and likes) from Facebook groups
     public function actionDefault()
     {
-        @set_time_limit(600);
+        @set_time_limit( 600 );
         $this->token = $this->context->token->getToken();
         if( !$this->token )
         {
@@ -26,7 +26,7 @@ class CrawlerPresenter extends BasePresenter
         foreach( $this->context->groups->getList() as $group )
         {
             $this->gid = $group->id;
-            $this->nextPage = NULL;
+            $this->nextPage = null;
             echo "<h2>Checking group: $group->name </h2>";
             $this->startGrabbing();
             $this->cnt_inserted = $this->cnt_updated = $this->cnt_downloaded = 0;
@@ -41,7 +41,7 @@ class CrawlerPresenter extends BasePresenter
         if( !$this->context->token->checkAccess( $_SERVER['REMOTE_ADDR'] ) )
         {
             echo "Oh sorry man, this is a private party!";
-            mail($this->context->token->getEmail(), 'Notice', 'The token is maybe invalid!');
+            mail( $this->context->token->getEmail(), 'Notice', 'The token is maybe invalid!' );
             $this->terminate();
         }
 
@@ -60,7 +60,7 @@ class CrawlerPresenter extends BasePresenter
             $this->terminate();
         }
 
-        if( isSet( $stoken->state ) && ($stoken->state === $_GET['state']) )
+        if( isSet( $stoken->state ) && ( $stoken->state === $_GET['state'] ) )
         {
             $token_url = "https://graph.facebook.com/oauth/access_token?"
                     . "client_id=" . $this->context->token->getAppId() . "&redirect_uri=" .
@@ -75,9 +75,10 @@ class CrawlerPresenter extends BasePresenter
             $date->add( new DateInterval( 'PT' . $params["expires"] . 'S' ) );
             $this->context->token->saveToken( $params['access_token'], $date );
             echo "Thanks for your token :)";
-        } else
+        }
+        else
         {
-            echo("The state does not match. You may be a victim of CSRF.");
+            echo( "The state does not match. You may be a victim of CSRF." );
         }
         $this->terminate();
     }
@@ -125,7 +126,8 @@ class CrawlerPresenter extends BasePresenter
                 $this->context->data->insertTopic( $ids[1], $this->gid, 0, $mess, $message->created_time, $message->updated_time, $message->comments->count, $likes_count, $message->from->id, $message->from->name );
                 $this->saveTags( $mess, $ids[1] );
                 $this->cnt_inserted++;
-            } else
+            }
+            else
             {
                 $this->context->data->updateTopic( $ids[1], $mess, $message->updated_time, $message->comments->count, $likes_count );
                 $this->cnt_updated++;
@@ -156,7 +158,8 @@ class CrawlerPresenter extends BasePresenter
                     {
                         $this->context->data->updateComment( $ids[2], $ids[1], $mess, $likes_count );
                         $this->cnt_updated++;
-                    } else
+                    }
+                    else
                     {
 
 
@@ -166,6 +169,7 @@ class CrawlerPresenter extends BasePresenter
                 }
             }
         }
+
         return true;
     }
 
@@ -175,7 +179,8 @@ class CrawlerPresenter extends BasePresenter
         if( !$this->nextPage || $this->nextPage == "" )
         {
             $query = "https://graph.facebook.com/" . $this->gid . "/feed?access_token=" . $this->token;
-        } else
+        }
+        else
         {
             $query = $this->nextPage;
         }
@@ -194,18 +199,21 @@ class CrawlerPresenter extends BasePresenter
                 $this->terminate();
             }
             echo 'Caught exception: ', $e->getMessage(), " ... repeating query ($query)\n";
+
             return getJson( ++$cnt_attempts );
         }
         $json = json_decode( $pageContent );
         if( isSet( $json->paging->next ) )
         {
             $this->nextPage = $json->paging->next;
-        } else
+        }
+        else
         {
-            $this->nextPage = NULL;
+            $this->nextPage = null;
         }
 
         $this->cnt_downloaded++;
+
         return $json;
     }
 

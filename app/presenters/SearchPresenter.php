@@ -13,7 +13,7 @@ class SearchPresenter extends BasePresenter
     /** @var SearchRequest */
     private $searchRequest;
 
-    public function actionDefault( $s, $from = NULL, array $groups = NULL )
+    public function actionDefault( $s, $from = null, array $groups = null )
     {
         $parsed = $this->context->searchQueryParser->parseQuery( $s );
 
@@ -21,17 +21,17 @@ class SearchPresenter extends BasePresenter
         $this->searchRequest->query = $parsed['query'];
         $this->searchRequest->tags = $parsed['tags'];
         $this->searchRequest->from = $from;
-        $this->searchRequest->groups = ( $groups ? array_map( 'strval', $groups ) : NULL );
+        $this->searchRequest->groups = ( $groups ? array_map( 'strval', $groups ) : null );
 
         $dataModel = $this->context->data;
         $this['stream']->dataSource = new SearchDataSource( $dataModel, $this->searchRequest );
         $this['stream']->keywords = $dataModel->getWordVariations( $this->searchRequest->query );
     }
 
-    public function renderDefault( $s, $from = NULL, array $groups = NULL )
+    public function renderDefault( $s, $from = null, array $groups = null )
     {
         $this->template->tags = $this->searchRequest->tags;
-        $this->template->itemsCount = $this['stream']->dataSource->getTotalCount();
+        $this->template->resultsCount = $this['stream']->dataSource->getTotalCount();
     }
 
     public function actionStream()
@@ -41,26 +41,29 @@ class SearchPresenter extends BasePresenter
 
     protected function createComponentSearchForm()
     {
-        if ( $this->searchRequest->groups )
+        if( $this->searchRequest->groups )
         {
-            $groups = array_fill_keys( $this->searchRequest->groups, TRUE );
+            $groups = array_fill_keys( $this->searchRequest->groups, true );
         }
         else
         {
             $groups = array();
             foreach( $this->context->groups->getList() as $group )
             {
-                $groups[$group->id] = TRUE;
+                $groups[$group->id] = true;
             }
         }
 
         $form = new SearchForm( $this->context->groups );
-        $form->setDefaults( array(
-            's' => $this->getParameter( 's' ),
-            'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
-            'groups' => $groups,
-        ) );
+        $form->setDefaults(
+            array(
+                's' => $this->getParameter( 's' ),
+                'from' => $this->searchRequest ? $this->searchRequest->from : null,
+                'groups' => $groups,
+            )
+        );
         $form->onSuccess[] = callback( $form, 'submitted' );
+
         return $form;
     }
 
