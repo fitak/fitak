@@ -63,11 +63,11 @@ class Tags extends BaseModel
     // return array(cleanTags, originalTags)
     public function extractTags( $input )
     {
-        $matches = Strings::match( $input, '/^\s*(?<tag_list>\[\s*[\pL\d_-]+\s*\](?:\s*(?&tag_list))?)/u' );  
-        
+        $matches = Strings::match( $input, '/^\s*(?<tag_list>\[\s*[\pL\d .,_-]+\s*\](?:\s*(?&tag_list))?)/u' );
+
         if( $matches )
         {
-            $tags = Strings::trim( $matches['tag_list'], '[]' );
+            $tags = Strings::trim( $matches['tag_list'], '[] ' );
             $tags = Strings::split( $tags, '/\]\s*\[/' );
             $cleanTags = array_map( 'Nette\Utils\Strings::webalize', $tags );
             $cleanTags = array_map( 'Nette\Utils\Strings::lower', $cleanTags );
