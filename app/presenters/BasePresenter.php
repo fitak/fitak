@@ -10,34 +10,21 @@ use Nette\Utils\Strings;
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
     function beforeRender(){
-		$that = $this; // v PHP 5.4 nebude nutne pouzivat docasnu premennu a pojde do USE rovno dat $this
+		$that = $this;
+		// helper - makes active link from tag
 		$this->template->registerHelper('tagToUrl', function ($item) use ($that) {
 	 	
-		 	$flag = false;
-	        $tags = Array( );
-	        $tag = "";
-	        for( $i = 0; $i < strlen( $item ); $i++ )
-	        {
-	            if( $flag && $item[$i] == ']' )
-	            {
-	                $tags[] = $tag;
-	                $flag = false;
-	                $tag = "";
-	            }
-	            if( $flag )
-	                $tag .= $item[$i];
-	            if( $item[$i] == '[' )
-	                $flag = true;
-	        }
+		 	$tags = $this->context->tags->extractTags( $item );
 	        
-	        foreach ( $tags as $tag )
+	        if ($tags)
 	        {
-	            $cleanTag = Strings::webalize( Strings::trim( $tag ) );
-	            $item = str_replace( "[$tag]", "[<a href=\"".$that->link('Search:default', 'tag: '.$cleanTag)."\">$cleanTag</a>]", $item );
+		        foreach ( $tags[0] as $index => $tag )
+		        {
+		            $item = str_replace( '['.$tags[1][$index].']', "[<a href=\"".$that->link('Search:default', 'tag:'.$tag)."\">$tag</a>]", $item );
+		        }
 	        }
 
 		    return $item;
-
 		});
 	}
 }

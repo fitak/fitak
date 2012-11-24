@@ -3,7 +3,7 @@
 class Likes extends BaseModel
 {
 
-    // if exists the Like, it'll be updated... if not, it'll be created
+    // if the Like exists, it'll be updated... if not, it'll be created
     public function refill( $id, $from_id, $from_name )
     {
         $arr = array(

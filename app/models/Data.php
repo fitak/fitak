@@ -71,7 +71,7 @@ class Data extends BaseModel
         $this->db->query( 'INSERT INTO data', $arr );
     }
 
-    // is there same comment?
+    // is there same comment (topic id, parent id) ?
     public function existsComment( $id, $pid )
     {
         $result = $this->db->query( "SELECT id FROM data
@@ -103,13 +103,14 @@ class Data extends BaseModel
                 ->limit( $length )
                 ->offset( $offset );
 
+        // use of filters on query
         $this->buildSearchCondition( $result, $request );
 
         $result = $result->fetchAll();
 
         // there are two scenarios:
         // 1) we find our keyword in a topic -> now we get likes and comments
-        // 2) we find our keyrowd in a comment -> now we get parent topic, likes and other comments
+        // 2) we find our keyword in a comment -> now we get parent topic, likes and other comments
         foreach( $result as $item )
         {
             // add Likes details (from_name, from_id)
@@ -136,7 +137,8 @@ class Data extends BaseModel
 
                 $item->parentFrom_name = stripslashes( $item->parentFrom_name );
                 // scenario 1)
-            } else
+            } 
+            else
             {
                 $item->commentsData = $this->getComments( $item->id );
             }
@@ -144,7 +146,7 @@ class Data extends BaseModel
         return $result;
     }
 
-    // get all topics + comments
+    // get all topics and their comments
     public function getAll( $length, $offset )
     {
         $result = $this->db->select( "groups.name, groups.closed, data.*" )
@@ -170,7 +172,7 @@ class Data extends BaseModel
         return $result;
     }
 
-    // get array of ids topics, which are labeled by string array of input tags
+    // get array of ids topics, which are labeled by input tags (string array = tag names)
     public function getMatchedIdByTags( $tags )
     {
         return $this->db->select( "DISTINCT data_id" )
@@ -181,7 +183,7 @@ class Data extends BaseModel
                 ->fetchPairs();
     }
 
-    // number of results by search
+    // number of results
     public function searchCount( SearchRequest $request )
     {
         $result = $this->db->select("count(*)")
@@ -194,6 +196,7 @@ class Data extends BaseModel
         return $result->fetchSingle();
     }
 
+    // use filters on query (tags specified, searching by author, searching by query, groups selected)
     private function buildSearchCondition( DibiFluent $sql, SearchRequest $request )
     {
         if ( $request->query != "" )
@@ -282,11 +285,13 @@ class Data extends BaseModel
         return $result;
     }
 
+    // change links, strip slashes and HTML
     private function cleanMessage( $message )
     {
         return $this->urlChange( stripslashes( str_replace( '\n', '<br />', htmlspecialchars( $message ) ) ) );
     }
 
+    // find and replace all links in text, links will be shorter (clever cut), titled and active
     private function urlChange( $inText )
     {
         // define an url regular exression pattern:
@@ -353,58 +358,6 @@ class Data extends BaseModel
         $keywords = array_values( $keywords );
 
         return $keywords;
-    }
-
-    // parse search query and return Array
-    // 1. item: tags array from macro tag (tag: tag1, tag2 ... search query)
-    // 2. item: search query (rest of input)
-    public function parseQuery( $input ){
-        $tags = Array();
-        $input = strtolower( Strings::trim( $input ) );
-        $pos = strpos( $input, "tag:" );
-        if ( $pos === false || $pos != 0 )
-        {
-            $tags[] = $input;
-            return $tags;
-        }
-        $tag = Array();
-        $spaces = 0;
-        $inputLen = strlen( $input );
-        for ( $i = 4; $i < $inputLen; $i++ )
-        {
-            if ( $input[$i] == " " )
-            {
-                if ( $spaces )
-                {
-                    $tags[] = Strings::webalize( implode( $tag ) );
-                    return Array( $tags, trim( substr( $input, $i, $inputLen - $i ) ) );
-                }
-                if ( $input[$i-1] != "," && $input[$i-1] != ":" )
-                {
-                    if ( $input[$i+1] == "," )
-                    {
-                        continue;
-                    }
-                    $tags[] = Strings::webalize( implode( $tag ) );
-                    return Array( $tags, trim( substr( $input, $i, $inputLen - $i ) ) );
-                    return $tags;
-                }
-                $spaces++;
-                continue;
-            }
-
-            if ($input[$i] == ",")
-            {
-                $tags[] = Strings::webalize( implode( $tag ));
-                $tag = Array();
-                $spaces = 0;
-                continue;
-            }
-
-            $tag[] = $input[$i];
-        }
-        $tags[] = Strings::webalize( implode( $tag ) );
-        return Array( $tags, "" );
     }
 
 }

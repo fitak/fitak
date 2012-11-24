@@ -26,6 +26,7 @@ class Tags extends BaseModel
         $this->db->query( "UPDATE tags SET count = count + 1 WHERE id = %i LIMIT 1", $id );
     }
 
+    // get cloud of tags 
     public function getTrends()
     {
         $result = $this->db->query( "SELECT tags.name, count(tags.id) as count FROM data 
@@ -56,6 +57,27 @@ class Tags extends BaseModel
         });
 
         return $tagCloud;
+    }
+
+    // extract tags ([tag1][tag2]....) from the start of input
+    // return array(cleanTags, originalTags)
+    public function extractTags( $input )
+    {
+        $matches = Strings::match( $input, '/^\s*(?<tag_list>\[\s*[\pL\d_-]+\s*\](?:\s*(?&tag_list))?)/u' );  
+        
+        if( $matches )
+        {
+            $tags = Strings::trim( $matches['tag_list'], '[]' );
+            $tags = Strings::split( $tags, '/\]\s*\[/' );
+            $cleanTags = array_map( 'Nette\Utils\Strings::webalize', $tags );
+            $cleanTags = array_map( 'Nette\Utils\Strings::lower', $cleanTags );
+            $tags = array($cleanTags, $tags);
+        }
+        else
+        {
+            $tags = array();
+        }
+        return $tags;
     }
 
 }

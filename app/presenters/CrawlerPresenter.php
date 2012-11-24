@@ -212,35 +212,13 @@ class CrawlerPresenter extends BasePresenter
     // there are tags in messages like [tag], we wanna save them apart
     private function saveTags( $message, $message_id )
     {
-        $tags = $this->getTags( $message );
+        $tags = $this->context->tags->extractTags( $message );
         if( !$tags )
             return;
-        foreach( $tags as $tag )
+        foreach( $tags[0] as $tag )
         {
             $this->context->tags->saveTag( $tag, $message_id );
         }
-    }
-
-    // return array of tags from one message
-    private function getTags( $message )
-    {
-        $flag = false;
-        $tags = Array( );
-        $tag = "";
-        for( $i = 0; $i < strlen( $message ); $i++ )
-        {
-            if( $flag && $message[$i] == ']' )
-            {
-                $tags[] = Strings::webalize( Strings::trim( $tag ) );
-                $flag = false;
-                $tag = "";
-            }
-            if( $flag )
-                $tag .= $message[$i];
-            if( $message[$i] == '[' )
-                $flag = true;
-        }
-        return $tags;
     }
 
 }
