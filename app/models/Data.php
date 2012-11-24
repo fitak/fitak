@@ -123,13 +123,13 @@ class Data extends BaseModel
             $topics[$topicId] = $topicsResult[$topicId];
         }
 
-        $comments = $this->getComments2( $topicsIds );
+        $comments = $this->getComments( $topicsIds );
         $topics = $this->combineTopicsWithComments( $topics, $comments, $commentsIds );
 
         return $topics;
     }
 
-    private function getComments2( array $topicsIds )
+    private function getComments( array $topicsIds )
     {
         $comments = $this->db->select( "*" )
             ->from( "data" )
@@ -170,27 +170,21 @@ class Data extends BaseModel
     // get all topics and their comments
     public function getAll( $length, $offset )
     {
-        $result = $this->db->select( "groups.name, groups.closed, data.*" )
-                ->from( "data" )
-                ->join( "groups" )
-                ->on( "data.group_id = groups.id" )
-                ->where( "data.parent_id = 0" )
-                ->orderBy( "data.created_time DESC" )
-                ->limit( $length )
-                ->offset( $offset );
+        $sql = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
+        ->from( "data" )
+        ->join( "groups" )
+        ->on( "data.group_id = groups.id" )
+        ->where( "data.parent_id = 0" )
+        ->orderBy( "data.created_time DESC" )
+        ->limit( $length )
+        ->offset( $offset );
 
-        $result = $result->fetchAll();
+        $topics = $sql->fetchAssoc( "id" );
 
-        foreach( $result as $item )
-        {
-            // add Likes details (from_name, from_id)
-            $item->likesData = $this->getLikes( $item->id );
-            // strip slashes, \n => <br>, short URL etc...
-            $item->message = $this->cleanMessage( $item->message );
-            $item->from_name = stripslashes( $item->from_name );
-            $item->commentsData = $this->getComments( $item->id );
-        }
-        return $result;
+        $comments = $this->getComments( array_keys( $topics ) );
+        $topics = $this->combineTopicsWithComments( $topics, $comments );
+
+        return $topics;
     }
 
     // get array of ids topics, which are labeled by input tags (string array = tag names)
@@ -267,25 +261,6 @@ class Data extends BaseModel
             $result = $result->where( "parent_id = 0" );
         }
         return $result->fetchSingle();
-    }
-
-    // get comments at topic by id
-    public function getComments( $id )
-    {
-        $result = $this->db->query( "
-            SELECT *
-            FROM data
-            WHERE parent_id = %i
-            ORDER BY created_time
-            ", $id
-        );
-        $result = $result->fetchAll();
-        foreach( $result as $item )
-        {
-            $item->message = $this->cleanMessage( $item->message );
-            $item->from_name = stripslashes( $item->from_name );
-        }
-        return $result;
     }
 
     // get likes at topic by id

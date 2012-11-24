@@ -34,17 +34,9 @@ class SearchPresenter extends BasePresenter
         $this->template->itemsCount = $this['stream']->dataSource->getTotalCount();
     }
 
-    public function renderStream()
+    public function actionStream()
     {
-        $allCount = $this->context->data->getCount( TRUE );
-        $this->template->itemsCount = $allCount;
-
-        // paginator...
-        $paginator = $this['vp']->getPaginator();
-        $paginator->itemsPerPage = 20;
-        $paginator->itemCount = $allCount;
-        $this->template->data = $this->context->data->getAll( $paginator->getLength(), $paginator->getOffset() );
-
+        $this['stream']->dataSource = new CompleteStreamDataSource( $this->context->data );
     }
 
     protected function createComponentSearchForm()
@@ -72,23 +64,12 @@ class SearchPresenter extends BasePresenter
         return $form;
     }
 
-    /**
-     * @return StreamControl
-     */
     protected function createComponentStream()
     {
         $control = new StreamControl();
         $control->templateHelpersLoaders = $this->template->getHelperLoaders();
 
         return $control;
-    }
-
-    /**
-     * @return VisualPaginator
-     */
-    protected function createComponentVp()
-    {
-        return new VisualPaginator();
     }
 
 }
