@@ -86,7 +86,7 @@ class Data extends BaseModel
     {
         $sql = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
             ->from( "data" )
-            ->join( "groups" )
+            ->leftJoin( "groups" )
             ->on( "data.group_id = groups.id" )
             ->where( "data.parent_id = 0" )
             ->orderBy( "data.created_time DESC" )
@@ -114,7 +114,7 @@ class Data extends BaseModel
     {
         $sql = $this->db->select( "data.id, data.parent_id" )
             ->from( "data" )
-            ->join( "groups" )
+            ->leftJoin( "groups" )
             ->on( "data.group_id = groups.id" )
             ->orderBy( "data.created_time DESC" );
 
@@ -139,7 +139,7 @@ class Data extends BaseModel
 
         $topicsResult = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
             ->from( "data" )
-            ->join( "groups" )
+            ->leftJoin( "groups" )
             ->on( "data.group_id = groups.id" )
             ->where( "data.id IN %in", $topicsIds )
             ->fetchAssoc( "id" );
@@ -161,7 +161,7 @@ class Data extends BaseModel
     {
         $sql = $this->db->select( "count(*)" )
             ->from( "data" )
-            ->join( "groups" )
+            ->leftJoin( "groups" )
             ->on( "data.group_id = groups.id" );
 
         $this->addSearchCondition( $sql, $request );
