@@ -30,6 +30,7 @@ class SearchPresenter extends BasePresenter
 
     public function renderDefault( $s, $from = null, array $groups = null )
     {
+        $this->template->advancedSearch = ( $this->searchRequest->from || $this->searchRequest->groups );
         $this->template->tags = $this->searchRequest->tags;
         $this->template->resultsCount = $this['stream']->dataSource->getTotalCount();
     }

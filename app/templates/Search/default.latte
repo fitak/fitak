@@ -5,9 +5,12 @@
         {input s}
         {input send, style => "width: 120px"}
 
-        <p><a href="#" class="toggle-search-advanced">Podrobné vyhledávání &#x25bc;</a></p>
+        <p>
+            <a href="#" class="toggle-search-advanced">Podrobné vyhledávání
+            {if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}</a>
+        </p>
 
-        <div class="search-advanced">
+        <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
             <strong>{label from /}</strong>
             {input from}
             <br>
@@ -34,7 +37,12 @@
     <script>
         $(document).ready(function() {
             $('.toggle-search-advanced').on('click', function() {
-                $('.search-advanced').slideToggle();
+                var advSearch = $('.search-advanced');
+                var currentSymbol = advSearch.is(':hidden') ? "\u25ba" : "\u25bc";
+                var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
+                var link = $(this);
+                link.text(link.text().replace(currentSymbol, newSymbol));
+                advSearch.slideToggle();
                 return false;
             });
         });
