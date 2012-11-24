@@ -24,7 +24,7 @@ class TemplateHelpers extends Nette\Object
         }
     }
 
-    public function tagToUrl( $item )
+    public function tagsToLinks( $item )
     {
         $tags = $this->tagsModel->extractTags( $item );
 
