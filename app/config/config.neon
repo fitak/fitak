@@ -41,7 +41,7 @@ common:
 			class: Tags(@dibi.connection)
 
 		token:
-			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%)
+			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%, %admin_email%)
 
 		searchQueryParser:
 			class: SearchQueryParser

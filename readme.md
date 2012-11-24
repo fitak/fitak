@@ -21,12 +21,12 @@ PHP 5.3 or later and MySQL. It's based on the [Nette Framework](https://github.c
 Installation
 ------------
 - Create a database from /sql-structure.sql
-- Rename `/app/config/devel_example.neon` to `devel.neon` and edit parametrs for you devel DB
-- Rename `/app/config/product_example.neon` to product.neon and edit parametrs for you product DB
+- Rename `/app/config/devel_example.neon` to `devel.neon` and edit parametrs for your devel DB
+- Rename `/app/config/product_example.neon` to `product.neon` and edit parametrs for your product DB
 - You need a developer account on the Facebook. 
 - Create a new Facebook application `https://developers.facebook.com/apps`.
 - Rename `/app/config/fbparams_example.neon` to `fbparams.neon` and edit Facebook App parametrs. The 
-	email isn't connected with the Facebook. It's just for warnings, if something goes wrong. 
+	email isn't connected with the Facebook. It's just for warnings if something goes wrong. 
 - Add new groups to DB table `groups` (just the first column is mandatory = ID of the Facebook group)
 - Data from the selected Facebook groups are downloaded via one active user token. This user must have 
 	access to the all selected groups. That should be probably you. You have to generate the new token
@@ -34,8 +34,8 @@ Installation
 	something like "This is a private party!". That is for a protection. Just you can add the new token. 
 	Before that you have to add your IP address to DB table `ip`. Refresh `http://YOURURL/crawler/`. It should 
 	be working now. 
-- Be aware that this token goes inactive after some time. You must visit this URL repeatedly. It
-	should send you email automaticly, if token become invalid. 
+- Be aware that this token goes inactive after some time. You must visit this URL repeatedly. If the token
+	becomes invalid, it should send you a email automaticly. 
 - Now open `http://YOURURL/crawler/` again. It should start downloading and processing data from the Facebook.
 - You should add this URL to your Cron. :)
 - Good Luck!

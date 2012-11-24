@@ -14,7 +14,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 		// helper - makes active link from tag
 		$this->template->registerHelper('tagToUrl', function ($item) use ($that) {
 	 	
-		 	$tags = $this->context->tags->extractTags( $item );
+		 	$tags = $that->context->tags->extractTags( $item );
 	        
 	        if ($tags)
 	        {
