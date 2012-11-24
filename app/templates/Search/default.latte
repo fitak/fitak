@@ -33,5 +33,14 @@
         </small>
 </p>
 
-{control stream}
 
+<script>
+    $(document).ready(function() {
+        $('.toggle-search-advanced').on('click', function() {
+            $('.search-advanced').slideToggle();
+            return false;
+        });
+    });
+</script>
+
+{control stream}
