@@ -27,8 +27,8 @@ Installation
 - Create a new Facebook application `https://developers.facebook.com/apps`.
 - Rename `/app/config/fbparams_example.neon` to `fbparams.neon` and edit Facebook App parametrs. The 
 	email isn't connected with the Facebook. It's just for warnings if something goes wrong. 
-- Add new groups to DB table `groups` (just the first column is mandatory = ID of the Facebook group)
-- Data from the selected Facebook groups are downloaded via one active user token. This user must have 
+- Add some new groups to DB table `groups` (just the first column is mandatory = ID of the Facebook group)
+- Data from the selected Facebook groups are downloaded via one active user token. This user must have a
 	access to the all selected groups. That should be probably you. You have to generate the new token
 	and allow permissions to your Facebook App. Just open URL: `http://YOURURL/crawler/` - It should write 
 	something like "This is a private party!". That is for a protection. Just you can add the new token. 
