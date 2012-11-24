@@ -10,6 +10,7 @@
  */
 
 
+
 /**
  * Check PHP configuration.
  */

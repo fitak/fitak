@@ -41,7 +41,7 @@ class CrawlerPresenter extends BasePresenter
         if( !$this->context->token->checkAccess( $_SERVER['REMOTE_ADDR'] ) )
         {
             echo "Oh sorry man, this is a private party!";
-            mail('admin@fitak.cz', 'Notice', 'The token is maybe invalid!');
+            mail($this->context->token->getEmail(), 'Notice', 'The token is maybe invalid!');
             $this->terminate();
         }
 
