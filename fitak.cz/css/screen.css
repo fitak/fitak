@@ -48,6 +48,10 @@ a[href^="error:"] {
     color: white;
 }
 
+.stream {
+    width: 740px;
+}
+
 .topic {
     border:1px solid #777777;
     margin:4px;
@@ -63,6 +67,10 @@ a[href^="error:"] {
 
 .topic .message {
     padding: 5px;
+}
+
+.topic .comments-all {
+    display: none;
 }
 
 .topic .comment {
