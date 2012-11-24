@@ -104,11 +104,15 @@ class CrawlerPresenter extends BasePresenter
         @flush();
         foreach( $data->data as $message )
         {
+            // fix timezone issue
+            $message->created_time = date( DATE_ISO8601, strtotime( $message->created_time ) );
+            $message->updated_time = date( DATE_ISO8601, strtotime( $message->updated_time ) );
+
             $ids = explode( "_", $message->id );
             $datetime = null;
             $datetime = $this->context->data->getUpdatedTime( $ids[1] );
 
-            if( $datetime == str_replace( "+0000", "", str_replace( "T", " ", $message->updated_time ) ) )
+            if( strtotime( $datetime ) == strtotime( $message->updated_time ) )
             {
                 echo $this->cnt_inserted . ' messages was saved and ' . $this->cnt_updated . '
                     updated.<br />';
@@ -146,6 +150,9 @@ class CrawlerPresenter extends BasePresenter
             {
                 foreach( $message->comments->data as $comment )
                 {
+                    // fix timezone issue
+                    $comment->created_time = date( DATE_ISO8601, strtotime( $comment->created_time ) );
+
                     $ids = explode( "_", $comment->id );
                     $mess = "";
                     if( isSet( $comment->message ) )
