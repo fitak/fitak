@@ -13,8 +13,6 @@ class SearchPresenter extends BasePresenter
     /** @var SearchRequest */
     private $searchRequest;
 
-    private $itemsCount = NULL;
-
     public function actionDefault( $s, $from = NULL, array $groups = NULL )
     {
         $parsed = $this->context->searchQueryParser->parseQuery( $s );
@@ -24,24 +22,16 @@ class SearchPresenter extends BasePresenter
         $this->searchRequest->tags = $parsed['tags'];
         $this->searchRequest->from = $from;
         $this->searchRequest->groups = ( $groups ? array_map( 'strval', $groups ) : NULL );
+
+        $dataModel = $this->context->data;
+        $this['stream']->dataSource = new SearchDataSource( $dataModel, $this->searchRequest );
+        $this['stream']->keywords = $dataModel->getWordVariations( $this->searchRequest->query );
     }
 
     public function renderDefault( $s, $from = NULL, array $groups = NULL )
     {
-        $this->template->s = $s;
         $this->template->tags = $this->searchRequest->tags;
-        $this->template->itemsCount = $this->getItemsCount();
-
-        // paginator...
-        $paginator = $this['vp']->getPaginator();
-        $paginator->itemsPerPage = 20;
-        $paginator->itemCount = $this->getItemsCount();
-
-        if ( $this->searchRequest->query != "" )
-        {
-            $this->template->highlightKeywords = $this->context->data->getWordVariations( $this->searchRequest->query );
-        }
-        $this->template->data = $this->context->data->search( $this->searchRequest, $paginator->getLength(), $paginator->getOffset() );
+        $this->template->itemsCount = $this['stream']->dataSource->getTotalCount();
     }
 
     public function renderStream()
@@ -83,20 +73,22 @@ class SearchPresenter extends BasePresenter
     }
 
     /**
+     * @return StreamControl
+     */
+    protected function createComponentStream()
+    {
+        $control = new StreamControl();
+        $control->templateHelpersLoaders = $this->template->getHelperLoaders();
+
+        return $control;
+    }
+
+    /**
      * @return VisualPaginator
      */
     protected function createComponentVp()
     {
         return new VisualPaginator();
-    }
-
-    protected function getItemsCount()
-    {
-        if( $this->itemsCount == NULL )
-        {
-            $this->itemsCount = $this->context->data->searchCount( $this->searchRequest );
-        }
-        return $this->itemsCount;
     }
 
 }

@@ -83,67 +83,88 @@ class Data extends BaseModel
 
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
-    // comments - true = search in the comments too, false = search only in the topics
     public function search( SearchRequest $request, $length, $offset )
     {
-        $result = $this->db->select( "main.*, groups.name, groups.closed,
-                   data.message as parentMessage,
-                   data.created_time as parentCreated_time,
-                   data.updated_time as parentUpdated_time,
-                   data.comments as comments,
-                   data.likes as parentLikes,
-                   data.from_name as parentFrom_name,
-                   data.from_id as parentFrom_id" )
-                ->from( "data as main" )
-                ->join( "groups" )
-                ->on( "main.group_id = groups.id" )
-                ->leftJoin( "data" )
-                ->on( "main.parent_id = data.id" )
-                ->orderBy( "main.created_time DESC" )
-                ->limit( $length )
-                ->offset( $offset );
+        $sql = $this->db->select( "data.id, data.parent_id" )
+            ->from( "data" )
+            ->join( "groups" )
+            ->on( "data.group_id = groups.id" )
+            ->orderBy( "data.created_time DESC" );
 
         // use of filters on query
-        $this->buildSearchCondition( $result, $request );
+        $this->addSearchCondition( $sql, $request );
+        $result = $sql->fetchAll( $offset, $length );
 
-        $result = $result->fetchAll();
-
-        // there are two scenarios:
-        // 1) we find our keyword in a topic -> now we get likes and comments
-        // 2) we find our keyword in a comment -> now we get parent topic, likes and other comments
-        foreach( $result as $item )
+        $topicsIds = array();
+        $commentsIds = array();
+        foreach( $result as $item)
         {
-            // add Likes details (from_name, from_id)
-            $item->likesData = $this->getLikes( $item->id );
-            // strip slashes, \n => <br>, short URL etc...
-            $item->message = $this->cleanMessage( $item->message );
-            $item->from_name = stripslashes( $item->from_name );
-            // scenario 2)
-            if( isSet( $item->parentMessage ) )
+            if( $item->parent_id )
             {
-                $item->commentsData = $this->getComments( $item->parent_id );
-                // we'll mark comment, which is originally matched
-                foreach( $item->commentsData as $comment )
-                {
-                    if( $comment->id == $item->id )
-                    {
-                        $comment->marked = 1;
-                    } else
-                    {
-                        $comment->marked = 0;
-                    }
-                }
-                $item->parentMessage = $this->cleanMessage( $item->parentMessage );
-
-                $item->parentFrom_name = stripslashes( $item->parentFrom_name );
-                // scenario 1)
-            } 
-            else
+                $topicsIds[] = $item->parent_id;
+                $commentsIds[] = $item->id;
+            } else
             {
-                $item->commentsData = $this->getComments( $item->id );
+                $topicsIds[] = $item->id;
             }
         }
-        return $result;
+
+        $topicsResult = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
+            ->from( "data" )
+            ->join( "groups" )
+            ->on( "data.group_id = groups.id" )
+            ->where( "data.id IN %in", $topicsIds )
+            ->fetchAssoc( "id" );
+
+        // sort topics the same way as original result was sorted
+        $topics = array();
+        foreach( $topicsIds as $topicId )
+        {
+            $topics[$topicId] = $topicsResult[$topicId];
+        }
+
+        $comments = $this->getComments2( $topicsIds );
+        $topics = $this->combineTopicsWithComments( $topics, $comments, $commentsIds );
+
+        return $topics;
+    }
+
+    private function getComments2( array $topicsIds )
+    {
+        $comments = $this->db->select( "*" )
+            ->from( "data" )
+            ->where( "parent_id IN %in", $topicsIds )
+            ->fetchAssoc( "parent_id|id" );
+
+        return $comments;
+    }
+
+    private function combineTopicsWithComments( array $topics, array $comments, array $markedCommentsIds = array() )
+    {
+        foreach( $topics as $topic )
+        {
+            // $topic->likesData = $this->getLikes( $topic->id );
+            $topic->message = $this->cleanMessage( $topic->message );
+            $topic->from_name = stripslashes( $topic->from_name );
+
+            if( isset( $comments[$topic->id] ) )
+            {
+                $topic->comments = $comments[$topic->id];
+                foreach( $topic->comments as $comment )
+                {
+                    $comment->topic = $topic;
+                    $comment->marked = in_array( $comment->id, $markedCommentsIds );
+                    $comment->message = $this->cleanMessage( $comment->message );
+                    $comment->from_name = stripslashes( $comment->from_name );
+                }
+            }
+            else
+            {
+                $topic->comments = array();
+            }
+        }
+
+        return $topics;
     }
 
     // get all topics and their comments
@@ -187,9 +208,9 @@ class Data extends BaseModel
     public function searchCount( SearchRequest $request )
     {
         $result = $this->db->select("count(*)")
-                ->from( "data as main" )
+                ->from( "data" )
                 ->join( "groups" )
-                ->on( "main.group_id = groups.id" );
+                ->on( "data.group_id = groups.id" );
 
         $this->buildSearchCondition( $result, $request );
 
@@ -201,18 +222,18 @@ class Data extends BaseModel
     {
         if ( $request->query != "" )
         {
-            $sql->where( "MATCH(main.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
+            $sql->where( "MATCH(data.message) AGAINST (%s IN BOOLEAN MODE)", $request->query );
         }
-        
+
         if ( $request->query == "" && $request->from == "" )
         {
-            $sql->where( "main.parent_id = 0" );
+            $sql->where( "data.parent_id = 0" );
         }
 
         if ( $request->from != "" )
         {
-            $sql = $sql->where( "main.from_name LIKE %~like~", $request->from );
-            // protection of hidden names in closed/secret groups 
+            $sql = $sql->where( "data.from_name LIKE %~like~", $request->from );
+            // protection of hidden names in closed/secret groups
             $sql = $sql->where( "groups.closed = 0" );
         }
 
@@ -221,18 +242,18 @@ class Data extends BaseModel
             $tagedPostsId = $this->getMatchedIdByTags( $request->tags );
             if ( !count( $tagedPostsId ) )
             {
-                $sql = $sql->where( "main.id = 0" );
+                $sql = $sql->where( "data.id = 0" );
             }
             else
             {
-                $sql = $sql->where( "main.id IN %in", $tagedPostsId );
+                $sql = $sql->where( "data.id IN %in", $tagedPostsId );
             }
 
         }
 
         if ( count( $request->groups ) )
         {
-            $sql->where( "main.group_id IN %in", $request->groups );
+            $sql->where( "data.group_id IN %in", $request->groups );
         }
     }
 
