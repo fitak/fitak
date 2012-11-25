@@ -297,6 +297,7 @@ class Data extends BaseModel
         foreach( $keywords as $index => $kw )
         {
             $keywords[$index] = Strings::trim( $kw );
+            $keywords[$index] = Strings::replace( $keywords[$index], '/^\+/', '' ); // remove + operator
             if( Strings::length( $keywords[$index] ) < 3 )
             {
                 unset( $keywords[$index] );
