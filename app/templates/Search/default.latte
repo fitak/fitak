@@ -1,19 +1,20 @@
-
 {block content}
 
-<h1>Vyhledávání</h1>
-<p>
+    <h1>Vyhledávání</h1>
     {form searchForm}
         {input s}
         {input send, style => "width: 120px"}
 
-        <p><a href="#" class="toggle-search-advanced">Podrobné vyhledávání &#x25bc;</a></p>
+        <p>
+            <a href="#" class="toggle-search-advanced">Podrobné vyhledávání
+            {if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}</a>
+        </p>
 
-        <div class="search-advanced">
+        <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
             <strong>{label from /}</strong>
             {input from}
-            <br />
-            <strong>Skupiny:</strong><br />
+            <br>
+            <strong>Skupiny:</strong><br>
             {foreach $form['groups']->controls as $checkbox}
                 {input "groups-$checkbox->name"}
                 {label "groups-$checkbox->name" /}
@@ -22,16 +23,31 @@
         </div>
     {/form}
 
-	<small><strong>Počet výsledků:</strong> {$itemsCount}
+    <small>
+        <strong>Počet výsledků:</strong> {$resultsCount}
         {if count($tags)}
-        <span style="padding-left:10px;padding-right:10px">|</span>
-        <strong>Filtruji tagy:</strong>
-        {foreach $tags as $tag}
-            <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
-        {/foreach}
+            <span style="padding-left:10px;padding-right:10px">|</span>
+            <strong>Filtruji tagy:</strong>
+            {foreach $tags as $tag}
+                <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
+            {/foreach}
         {/if}
-        </small>
-</p>
+    </small>
 
-{control stream}
+    <script>
+        $(document).ready(function() {
+            $('.toggle-search-advanced').on('click', function() {
+                var advSearch = $('.search-advanced');
+                var currentSymbol = advSearch.is(':hidden') ? "\u25ba" : "\u25bc";
+                var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
+                var link = $(this);
+                link.text(link.text().replace(currentSymbol, newSymbol));
+                advSearch.slideToggle();
+                return false;
+            });
+        });
+    </script>
 
+    {control stream}
+
+{/block}
