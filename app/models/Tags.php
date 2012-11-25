@@ -29,7 +29,7 @@ class Tags extends BaseModel
     // get cloud of tags
     public function getTrends()
     {
-        $result = $this->db->query( "SELECT tags.name, count(tags.id) as count FROM data 
+        $result = $this->db->query( "SELECT tags.name, count(tags.id) as count FROM data
                                      INNER JOIN data_tags ON data.id = data_tags.data_id
                                      INNER JOIN tags ON data_tags.tags_id = tags.id
                                      WHERE data.created_time > DATE_SUB(now(), INTERVAL 1 MONTH)
@@ -51,7 +51,7 @@ class Tags extends BaseModel
             $tagCloud[$key]["size"] = round( 1 + ( $tag->count * 100 ) / $maximum * 0.015, 1 );
         }
 
-        usort( $tagCloud, function ( $elem1, $elem2 ) 
+        usort( $tagCloud, function ( $elem1, $elem2 )
         {
              return strcmp( $elem1['name'], $elem2['name'] );
         });

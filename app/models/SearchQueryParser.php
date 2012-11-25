@@ -17,19 +17,19 @@ class SearchQueryParser extends Nette\Object
         $input = Strings::replace( $input, '/\s+/', ' ' );
 
         // extract tags
-        $matches = Strings::match( $input, '/(?<=^|\s)tag:\s*(?<tag_list>[\pL\d_-]+(?:\s*,\s*(?&tag_list))?)/u' );
+        $matches = Strings::matchAll( $input, '/(?<=^|\s)tag:\s*(?<tag_list>[\pL\d_-]+(?:\s*,\s*(?&tag_list))?)/u' );
 
-        if( $matches )
+        $tags = array();
+        $query = $input;
+        foreach( $matches as $m )
         {
-            $tags = Strings::split( $matches['tag_list'], '/\s*,\s*/' );
-            $tags = array_map( 'Nette\Utils\Strings::webalize', $tags );
-            $query = str_replace( $matches[0], '', $input );
+            $tmp = Strings::split( $m['tag_list'], '/\s*,\s*/' );
+            $tmp = array_map( 'Nette\Utils\Strings::webalize', $tmp );
+            $tmp = array_unique( $tmp );
+            $tags = array_merge( $tags, $tmp );
+            $query = str_replace( $m[0], '', $query );
         }
-        else
-        {
-            $tags = array();
-            $query = $input;
-        }
+        $query = Strings::trim( $query ) ?: null;
 
         return array(
             'query' => $query,

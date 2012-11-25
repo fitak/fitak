@@ -168,8 +168,6 @@ class CrawlerPresenter extends BasePresenter
                     }
                     else
                     {
-
-
                         $this->context->data->insertComment( $ids[2], $this->gid, $ids[1], $mess, $comment->created_time, $likes_count, $comment->from->id, $comment->from->name );
                         $this->cnt_inserted++;
                     }

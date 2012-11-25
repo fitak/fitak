@@ -13,7 +13,7 @@ class SearchPresenter extends BasePresenter
     /** @var SearchRequest */
     private $searchRequest;
 
-    public function actionDefault( $s, $from = null, array $groups = null )
+    public function actionDefault( $s, $from = null, array $groups = null, $sortBy = null )
     {
         $parsed = $this->context->searchQueryParser->parseQuery( $s );
 
@@ -22,13 +22,14 @@ class SearchPresenter extends BasePresenter
         $this->searchRequest->tags = $parsed['tags'];
         $this->searchRequest->from = $from;
         $this->searchRequest->groups = ( $groups ? array_map( 'strval', $groups ) : null );
+        $this->searchRequest->sortBy = ($sortBy === SearchRequest::SORT_RELEVANCE) ? $sortBy : SearchRequest::SORT_TIME;
 
         $dataModel = $this->context->data;
         $this['stream']->dataSource = new SearchDataSource( $dataModel, $this->searchRequest );
         $this['stream']->keywords = $dataModel->getWordVariations( $this->searchRequest->query );
     }
 
-    public function renderDefault( $s, $from = null, array $groups = null )
+    public function renderDefault( $s, $from = null, array $groups = null, $sortBy = null )
     {
         $this->template->advancedSearch = ( $this->searchRequest->from || $this->searchRequest->groups );
         $this->template->tags = $this->searchRequest->tags;
