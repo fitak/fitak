@@ -11,9 +11,8 @@
         </p>
 
         <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
-            <strong>{label from /}</strong>
-            {input from}
-            <br>
+            <strong>{label sortBy /}</strong> {input sortBy} <br>
+            <strong>{label from /}</strong> {input from} <br>
             <strong>Skupiny:</strong><br>
             {foreach $form['groups']->controls as $checkbox}
                 {input "groups-$checkbox->name"}

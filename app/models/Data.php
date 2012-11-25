@@ -9,8 +9,6 @@ class Data extends BaseModel
     {
         $result = $this->db->query( "SELECT updated_time FROM data
                                    WHERE id = %i LIMIT 1", $id );
-        if( !count( $result ) )
-            return false;
         return $result->fetchSingle();
     }
 
@@ -115,11 +113,21 @@ class Data extends BaseModel
         $sql = $this->db->select( "data.id, data.parent_id" )
             ->from( "data" )
             ->leftJoin( "groups" )
-            ->on( "data.group_id = groups.id" )
-            ->orderBy( "data.created_time DESC" );
+            ->on( "data.group_id = groups.id" );
 
         // use of filters on query
         $this->addSearchCondition( $sql, $request );
+
+        // sort by time or relevance
+        if( $request->sortBy === SearchRequest::SORT_RELEVANCE && $request->query != "" )
+        {
+            $sql->orderBy( "MATCH(data.message) AGAINST (%s) DESC", $request->query );
+        }
+        else
+        {
+            $sql->orderBy( "data.created_time DESC" );
+        }
+
         $result = $sql->fetchAll( $offset, $length );
 
         $topicsIds = array();
@@ -287,6 +295,7 @@ class Data extends BaseModel
         foreach( $keywords as $index => $kw )
         {
             $keywords[$index] = Strings::trim( $kw );
+            $keywords[$index] = Strings::replace( $keywords[$index], '/^\+/', '' ); // remove + operator
             if( Strings::length( $keywords[$index] ) < 3 )
             {
                 unset( $keywords[$index] );
