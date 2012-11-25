@@ -29,6 +29,7 @@ class SearchQueryParser extends Nette\Object
             $tags = array_merge( $tags, $tmp );
             $query = str_replace( $m[0], '', $query );
         }
+        $query = Strings::trim( $query ) ?: null;
 
         return array(
             'query' => $query,
