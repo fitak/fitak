@@ -12,6 +12,11 @@ class SearchForm extends Form
 
         $this->addText( 's', 'dotaz', 100, 500 )
             ->setAttribute( 'autofocus', true );
+
+        $this->addSelect( 'sortBy', 'Seřadit podle:', array(
+                SearchRequest::SORT_TIME => 'času',
+                SearchRequest::SORT_RELEVANCE => 'relevance',
+        ) );
             //->setRequired( 'Nic jste nezadali.' );
             //->addRule(Form::MIN_LENGTH, 'Vyhledávací dotaz musí mít alespoň %d znaky', 3);
 
@@ -31,6 +36,11 @@ class SearchForm extends Form
     {
         $values = $form->getValues( true );
         $params = array( 's' => $values['s'] );
+
+        if( $values['sortBy'] === SearchRequest::SORT_RELEVANCE )
+        {
+            $params['sortBy'] = $values['sortBy'];
+        }
 
         if( $values['groups'] !== array_filter( $values['groups'] ) )
         {
