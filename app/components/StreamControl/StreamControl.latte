@@ -12,7 +12,7 @@
             {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
         </div>
         <div class="message">
-            {!$comment->message}
+            {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
         </div>
     </div>
 {/define}
@@ -35,7 +35,7 @@
                     <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:55}</a>
                 </div>
                 <div class="message">
-                    {!$topic->message|tagToUrl}
+                    {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
                     <div class="comments-marked">
                         {var $anyMarked = false}
                         {foreach $topic->comments as $comment}
@@ -68,11 +68,6 @@
             $('.showcomm').on('click', function() {
                 var topic = $(this).closest('.topic');
                 topic.find('.comments-all, .comments-marked').slideToggle();
-                return false;
-            });
-
-            $('.toggle-search-advanced').on('click', function() {
-                $('.search-advanced').slideToggle();
                 return false;
             });
 

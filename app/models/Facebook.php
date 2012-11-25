@@ -15,10 +15,10 @@ class Facebook extends BaseModel
                     . APP_ID . "&redirect_uri=" . urlencode( REDIRECT_URI ) . "&scope=" . PERMISSIONS . "&state="
                     . $_SESSION['state'];
 
-            echo("<script> top.location.href='" . $dialog_url . "'</script>");
+            echo "<script> top.location.href='" . $dialog_url . "'</script>";
         }
 
-        if( $_SESSION['state'] && ($_SESSION['state'] === $_REQUEST['state']) )
+        if( $_SESSION['state'] && ( $_SESSION['state'] === $_REQUEST['state'] ) )
         {
             $token_url = "https://graph.facebook.com/oauth/access_token?"
                     . "client_id=" . APP_ID . "&redirect_uri=" . urlencode( REDIRECT_URI )
@@ -38,9 +38,10 @@ class Facebook extends BaseModel
             dibi::query( 'INSERT INTO tokens', $arr );
 
             echo "Thanks for your token :)";
-        } else
+        }
+        else
         {
-            echo("The state does not match. You may be a victim of CSRF.");
+            echo "The state does not match. You may be a victim of CSRF.";
         }
     }
 

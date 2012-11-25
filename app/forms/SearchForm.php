@@ -31,12 +31,12 @@ class SearchForm extends Form
         $values = $form->getValues( true );
         $params = array( 's' => $values['s'] );
 
-        if ( $values['groups'] !== array_filter( $values['groups'] ) )
+        if( $values['groups'] !== array_filter( $values['groups'] ) )
         {
             $params['groups'] = array_keys( array_filter( $values['groups'] ) );
         }
 
-        if ( !empty( $values['from'] ) )
+        if( !empty( $values['from'] ) )
         {
             $params['from'] = $values['from'];
         }
