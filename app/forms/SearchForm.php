@@ -17,8 +17,6 @@ class SearchForm extends Form
                 SearchRequest::SORT_TIME => 'času',
                 SearchRequest::SORT_RELEVANCE => 'relevance',
         ) );
-            //->setRequired( 'Nic jste nezadali.' );
-            //->addRule(Form::MIN_LENGTH, 'Vyhledávací dotaz musí mít alespoň %d znaky', 3);
 
         $this->addText( 'from', 'Autor:' );
 

@@ -9,8 +9,6 @@ class Data extends BaseModel
     {
         $result = $this->db->query( "SELECT updated_time FROM data
                                    WHERE id = %i LIMIT 1", $id );
-        if( !count( $result ) )
-            return false;
         return $result->fetchSingle();
     }
 
