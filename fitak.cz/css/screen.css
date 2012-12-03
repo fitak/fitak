@@ -53,13 +53,13 @@ a[href^="error:"] {
 }
 
 .topic {
-    border:1px solid #777777;
+    border-top:1px solid #777777;
     margin:4px;
 }
 
 .topic .header {
     border-bottom:1px solid #777777;
-    background-color: #87CEEB;
+    background-color: #F1F1F1;
     padding: 3px;
     padding-left:5px;
     font-size:0.8em;
@@ -74,17 +74,17 @@ a[href^="error:"] {
 }
 
 .topic .comment {
-    border:1px dashed #777777;
+    border-top:1px solid #AAAAAA;
     margin:5px;
 }
 
 .topic .comment-marked {
-    border:3px solid darkred;
+    border:2px solid darkred;
     margin:5px;
 }
 
 .topic .comment .header {
-    border-bottom:1px solid #777777;
+    border-bottom:1px solid #AAAAAA;
     background-color: #FFFACD;
     padding: 3px;
     padding-left:5px;
@@ -112,17 +112,21 @@ a[href^="error:"] {
 }
 
 .topic .showcomm {
-    background-color:#EEEEEE;
     width:100%;
     cursor: hand;
     cursor: pointer;
 }
 
-.topic .showcomm .showcommin {
+.topic .showcomm .showcommin, .closecommin {
     padding:2px;
     color:darkred;
     text-align:center;
     font-size: 0.9em;
+    font-family: arial;
+}
+
+.topic .showcomm .closecommin {
+    display: none;
 }
 
 .context {
@@ -133,7 +137,7 @@ a[href^="error:"] {
 
 .paginator {
 	margin: 1em 0;
-	font-size: 90%;
+	font-size: 70%;
 	text-align:center;
 }
 
@@ -147,6 +151,10 @@ a[href^="error:"] {
 	border: 1px solid #9AAFE5;
 	text-decoration: none;
 	color: #105CB6;
+}
+
+.paginator a:hover {
+    background-color: #F1F1F1;
 }
 
 .paginator span.button {

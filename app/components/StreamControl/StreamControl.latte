@@ -54,7 +54,10 @@
                 {if count($topic->comments)}
                     <div class="showcomm">
                         <div class="showcommin">
-                            Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
+                            &raquo; Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)}) &laquo;
+                        </div>
+                        <div class="closecommin">
+                            &raquo; Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)}) &laquo;
                         </div>
                     </div>
                 {/if}
@@ -67,7 +70,7 @@
         $(document).ready(function() {
             $('.showcomm').on('click', function() {
                 var topic = $(this).closest('.topic');
-                topic.find('.comments-all, .comments-marked').slideToggle();
+                topic.find('.comments-all, .comments-marked, .closecommin, .showcommin').slideToggle();
                 return false;
             });
 
