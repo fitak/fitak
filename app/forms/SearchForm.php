@@ -10,7 +10,8 @@ class SearchForm extends Form
     {
         parent::__construct();
 
-        $this->addText( 's', 'dotaz', 100, 500 )
+        $this->addText( 's', 'dotaz')
+            ->setHtmlId( 's' )
             ->setAttribute( 'autofocus', true );
 
         $this->addSelect( 'sortBy', 'Seřadit podle:', array(
@@ -27,7 +28,8 @@ class SearchForm extends Form
         }
 
 
-        $this->addSubmit( 'send', 'Vyhledej' );
+        $this->addSubmit( 'send', 'Vyhledat' )
+            ->setHtmlId( 'send' );
     }
 
     public function submitted( self $form )

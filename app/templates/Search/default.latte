@@ -1,13 +1,23 @@
 {block content}
 
-    <h1>Vyhledávání</h1>
     {form searchForm}
-        {input s}
-        {input send, style => "width: 120px"}
+        {input s, style => "margin-right:9px"}
+        {input send}
 
-        <p>
-            <a href="#" class="toggle-search-advanced">Podrobné vyhledávání
-            {if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}</a>
+        <p style="text-align:center;">
+            <small>
+                <a href="#" class="toggle-search-advanced">Podrobné vyhledávání
+                {if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}</a>
+                <span style="padding-left:5px;padding-right:5px">|</span>
+                <strong>Počet výsledků:</strong> {$resultsCount}
+                {if count($tags)}
+                   <span style="padding-left:5px;padding-right:5px">|</span>
+                    <strong>Filtruji tagy:</strong>
+                    {foreach $tags as $tag}
+                        <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
+                    {/foreach}
+                {/if}
+            </small>
         </p>
 
         <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
@@ -22,16 +32,7 @@
         </div>
     {/form}
 
-    <small>
-        <strong>Počet výsledků:</strong> {$resultsCount}
-        {if count($tags)}
-            <span style="padding-left:10px;padding-right:10px">|</span>
-            <strong>Filtruji tagy:</strong>
-            {foreach $tags as $tag}
-                <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
-            {/foreach}
-        {/if}
-    </small>
+    
 
     <script>
         $(document).ready(function() {
