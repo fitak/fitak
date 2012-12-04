@@ -57,11 +57,11 @@
             I tak ale není systém všemocný a je potřeba dodržovat jakousi kulturu. Proto pro jednotlivé předměty používáme zkratky 
             bez kódu programu, tedy: 
             <blockquote>
-                [pa1], [zma], [lin]
+                [pa1], [zma] nebo [lin]
             </blockquote>
             Další oblíbené tagy, které se ujaly v širším měřítku: 
             <blockquote>
-                [ot], [prace], [zkouska], [semestralka], [latex], [rozvrh], [kos]
+                [ot], [prace], [zkouska], [semestralka], [latex], [rozvrh] nebo [kos]
             </blockquote>
             Kromě písmen (preferujeme malá a bez diakritiky) a číslic mohou tagy obsahovat ještě tyto znaky (v opačném případě nebudou zaindexovány):
             <blockquote>
@@ -87,8 +87,8 @@
        
         <strong>To-do list</strong>
         <ul>
-            <li>Mobilní verze.</li>
-            <li>Řazení dle relevance (nyní je jen chronologické).</li>
+            <li>Mobilní verze. (Nové UI - Twitter Bootstrap? / nativní mobilní aplikace?)</li>
+            <li>Facebook login - ochrana skrytých skupin. (Možnost reagovat přímo z Fitaka?)</li>
             <li>Žebříčky - kdo zakládá nejvíce vláken, kdo nejvíce komentuje, kdo nejvíce používá
              "líbí se mi", kdo nejvíce "hejtuje" javu a androida atd.</li>
         </ul>
@@ -96,8 +96,6 @@
         <strong>Možná budoucnost</strong>
         <ul>
             <li>Zahrnout do vyhledávání i další zdroje. Například školní fórum, stránky, fit-guide či fit-wiki.</li>
-            <li>Jakmile facebook spustí real-time api i pro skupiny, dávalo by smysl přidat podporu pro
-            přímé psaní příspěvků rovnou na této stránce.</li>
     	    <li>Nasadit <a href="http://sphinxsearch.com/">http://sphinxsearch.com/</a>
     	    místo (směšného) MySQL fulltextu, na to je však potřeba vlastní server.
     	    </li>
@@ -115,16 +113,21 @@
 	</p>
         
         <h2 id="pozadi">Pozadí</h2>
-        <p>Projekt jsem vytvořil hlavně ze 2 důvodů: 1) Řeší problém s "utápěním" informací na facebooku. 2)
-        Chtěl jsem si ozkoušet facebook api. :)<br />
-        Web běží na PHP + Nette + MySQL.
-        </p>
+        <p>Technologie pohánějící Fiťáka: HTML, CSS, JS, PHP, MySQL, Nette, jQuery a FB API.</p>
         
         
         <h2 id="autor">Autor</h2>
         <p>Vojtěch Mikšů - <a href="mailto: vojtech@miksu.cz">osobní email</a>, <a href="http://blog.miksu.cz">blog</a>
         </p>
-        
-        <p style="text-align:right"><i>Poslední aktualizace této stránky: 22.11.2012</i></p>
+                
+        <p style="text-align:right"><i>Poslední aktualizace této stránky: 
+        <script language="JavaScript">
+            var lastMod = new Date(document.lastModified);
+            theMonth = lastMod.getMonth() + 1;
+            theDate = lastMod.getDate();
+            theYear = lastMod.getFullYear();
+            document.write(theDate + "." + theMonth + "." + theYear);
+        </script>
+        </i></p>
 </div>
 {/block}
