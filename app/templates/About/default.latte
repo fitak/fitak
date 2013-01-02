@@ -1,129 +1,153 @@
 {block content}
-	<h1>O projektu</h1>
-         <ul>
-            <li><a href="#uvod">Úvod</a></li>
-            <li><a href="#pouzivejte-tagy">Používejte tagy (prefixy)</a></li>
-            <li><a href="#vyhledavani-tagu">Vyhledávní tagů (prefixů)</a></li>
-            <li><a href="#dalsi-verze">Další verze?</a></li>
-            <li><a href="#spolecny-vyvoj">Společný vývoj?</a></li>
-            <li><a href="#pozadi">Pozadí</a></li>
-            <li><a href="#autor">Autor</a></li>
-        </ul>
-        <h2 id="uvod">Úvod</h2>
-        <p>
-            Tento projekt vznikl za účelem archivace školních facebook skupin 
-            <a href="http://fit.cvut.cz">Fakulty informačních technologií</a> 
-            <a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze, 
-            které obsahují velké
-            množství informací. Bohužel tyto znalosti velmi rychle zapadnou a vyhledávání v nich je 
-            poměrně obtížné. V současné době totiž tito studenti napsali 
-            <strong>{$count} příspěvků</strong>!
-            To už je pořádná dávka informací. Také přijde vhod studentům, kteří nepoužívají facebook a zároveň chtějí 
-            být v obraze. 
-        </p>
-        
-        <p>
-            <strong>Nyní jsou indexovány tyto skupiny:</strong>
-            <ul>
-		{foreach $groups as $group}
-		<li><a href="https://www.facebook.com/groups/{$group->id}/">{$group->name}</a></li>
-                {/foreach}
-            </ul>    
-        </p>
-        
-        <p>
-            Pokud vám tu nějaká chybí, stačí <a href="mailto: admin@fitak.cz">napsat</a>. Příspěvky, které pocházejí z uzavřených skupin, mají skrytého autora. Indexace probíhá zcela automaticky a to v hodinovém intervalu.
-        </p>
-        <h2 id="pouzivejte-tagy">Používejte tagy (prefixy)</h2>
-        <p>
-            Na školních facebook skupinách používáme tagy pro rychlejší orientaci. Tagy se nacházejí na začátku příspěvku a jsou v hranatých závorkách. Může jich být i víc za sebou. Příklad užití: 
-            <blockquote>
-                [pa1][zkouska] Na co se máme připravit?
-            </blockquote> 
-            Fitak tuto myšlenku podporuje a dále rozvijí. Ze všech příspěvků jsou tyto tagy vybírány a konsolidovány. Například tagy
-            <blockquote>
-                [ Semestralka ][Semestrálka][ SEMESTRALKa]
-            </blockquote>
-            se převedou na jednotný tvar
-            <blockquote>
-                [semestralka]
-            </blockquote>
-            To pak v důsledku umožňuje mj. rychlé a efektivní vyhledávání (popsáno níže).
-        </p>
-        <p>
-            I tak ale není systém všemocný a je potřeba dodržovat jakousi kulturu. Proto pro jednotlivé předměty používáme zkratky 
-            bez kódu programu, tedy: 
-            <blockquote>
-                [pa1], [zma] nebo [lin]
-            </blockquote>
-            Další oblíbené tagy, které se ujaly v širším měřítku: 
-            <blockquote>
-                [ot], [prace], [zkouska], [semestralka], [latex], [rozvrh] nebo [kos]
-            </blockquote>
-            Kromě písmen (preferujeme malá a bez diakritiky) a číslic mohou tagy obsahovat ještě tyto znaky (v opačném případě nebudou zaindexovány):
-            <blockquote>
-                .-_
-            </blockquote>
-            <strong>Vyvarujte se mezerám!</strong><br />  
-            Nesnažte se být za každou cenu kreativní při vymýšlení nových tagů. Můžete se inspirovat třeba trendy z hlavní stránky. 
-        </p>
-       
-        <h2 id="vyhledavani-tagu">Vyhledávní tagů (prefixů)</h2>
-        <p>
-            Na začátek dotazu stačí vložit makro <i>tag:</i> a za něj název tagu, který chcete filtrovat. Těch může být
-            i více, pokud je oddělíte čárkou. Vše zadávejte bez mezer (nicméně pokud je použijete rozumně, tak je systém taky zvládne).
-            <strong>Pokud chcete vyhledat slovo</strong> <i>test</i> v příspěvcích, které mají tag/prefix <i>[pa1]</i> nebo <i>[zma]</i> nebo <i>[mlo]</i>, použijte zápis: <br />
-            <blockquote>tag:pa1,zma,mlo test</blockquote>
-        </p>
-        <p>
-            Můžete si například jednoduše sestavit filtr, který bude vypisovat jen novinky z předmětů, které právě absolvujete a odkaz si 
-            přidat do záložek. Aneb <a n:href="Search:default 'tag:pa1,pai,cao,uos,mlo,zma'">první</a> a <a n:href="Search:default 'tag:pa2,ted,sap,lin'">druhý</a> semestr - teď už vám nic neuteče a nemusíte kvůli tomu trávit všechen volný čas na facebooku, dobré ne? :)
-        </p>
+<h2>O projektu</h2>
+<ul>
+    <li><a href="#uvod">Úvod</a></li>
+    <li><a href="#pouzivejte-tagy">Používejte tagy (prefixy)</a></li>
+    <li><a href="#vyhledavani-tagu">Vyhledávní tagů (prefixů)</a></li>
+    <li><a href="#dalsi-verze">Další verze?</a></li>
+    <li><a href="#spolecny-vyvoj">Společný vývoj?</a></li>
+    <li><a href="#pozadi">Pozadí</a></li>
+    <li><a href="#autor">Autor</a></li>
+</ul>
 
-        <h2 id="dalsi-verze">Další verze?</h2>
-       
-        <strong>To-do list</strong>
-        <ul>
-            <li>Mobilní verze. (Nové UI - Twitter Bootstrap? / nativní mobilní aplikace?)</li>
-            <li>Facebook login - ochrana skrytých skupin. (Možnost reagovat přímo z Fitaka?)</li>
-            <li>Žebříčky - kdo zakládá nejvíce vláken, kdo nejvíce komentuje, kdo nejvíce používá
-             "líbí se mi", kdo nejvíce "hejtuje" javu a androida atd.</li>
-        </ul>
-        
-        <strong>Možná budoucnost</strong>
-        <ul>
-            <li>Zahrnout do vyhledávání i další zdroje. Například školní fórum, stránky, fit-guide či fit-wiki.</li>
-    	    <li>Nasadit <a href="http://sphinxsearch.com/">http://sphinxsearch.com/</a>
-    	    místo (směšného) MySQL fulltextu, na to je však potřeba vlastní server.
-    	    </li>
-            <li>Nějaké další nápady na směřování Fitaka?</li>
-        </ul>
-	
-	<h2 id="spolecny-vyvoj">Společný vývoj?</h2>
-	<p>Abych rozprášil obavy o budoucnosti tohoto nástroje, dávám ho všanc světu
-	   open-source a každý z vás se tak může (nejen) do vývoje aktivně zapojit. 
-	   <br /><br />
-	   <strong>Git repositář je k dispozici na:</strong><br /> 
-	   <a href="https://github.com/tajo/fitak">https://github.com/tajo/fitak</a><br /><br />
-	   Budu rád pokud tam budete i ohlašovat bugy, či posílat návrhy na vylepšení. Samozřejmě
-	   můžete použít i <a href="mailto: admin@fitak.cz">email</a>.
-	</p>
-        
-        <h2 id="pozadi">Pozadí</h2>
-        <p>Technologie pohánějící Fiťáka: HTML, CSS, JS, PHP, MySQL, Nette, jQuery a FB API.</p>
-        
-        
-        <h2 id="autor">Autor</h2>
-        <p>Vojtěch Mikšů - <a href="mailto: vojtech@miksu.cz">osobní email</a>, <a href="http://blog.miksu.cz">blog</a>
-        </p>
-                
-        <p style="text-align:right"><i>Poslední aktualizace této stránky: 
-        <script language="JavaScript">
-            var lastMod = new Date(document.lastModified);
-            theMonth = lastMod.getMonth() + 1;
-            theDate = lastMod.getDate();
-            theYear = lastMod.getFullYear();
-            document.write(theDate + "." + theMonth + "." + theYear);
-        </script>
-        </i></p>
+<h3 id="uvod">Úvod</h3>
+<p>
+    Tento projekt vznikl za účelem archivace školních facebook skupin
+    <a href="http://fit.cvut.cz">Fakulty informačních technologií</a>
+    <a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze,
+    které obsahují velké
+    množství informací. Bohužel tyto znalosti velmi rychle zapadnou a vyhledávání v nich je
+    poměrně obtížné. V současné době totiž tito studenti napsali
+    <strong>{$count} příspěvků</strong>!
+    To už je pořádná dávka informací. Také přijde vhod studentům, kteří nepoužívají facebook a zároveň chtějí
+    být v obraze.
+</p>
+<p>
+    <strong>Nyní jsou indexovány tyto skupiny:</strong>
+</p>
+<ul>
+    <li n:foreach="$groups as $group">
+        <a href="https://www.facebook.com/groups/{$group->id}/">{$group->name}</a>
+    </li>
+</ul>
+<p>
+    Pokud vám tu nějaká chybí, stačí <a href="mailto: admin@fitak.cz">napsat</a>. Příspěvky,
+    které pocházejí z uzavřených skupin, mají skrytého autora. Indexace probíhá zcela automaticky
+    a to v hodinovém intervalu.
+</p>
+
+<h3 id="pouzivejte-tagy">Používejte tagy (prefixy)</h3>
+<p>
+    Na školních facebook skupinách používáme tagy pro rychlejší orientaci. Tagy se nacházejí
+	na začátku příspěvku a jsou v hranatých závorkách. Může jich být i víc za sebou. Příklad užití:
+</p>
+<blockquote>[pa1][zkouska] Na co se máme připravit?</blockquote>
+<p>
+	Fitak tuto myšlenku podporuje a dále rozvijí. Ze všech příspěvků jsou tyto tagy vybírány a
+	konsolidovány. Například tagy
+</p>
+<blockquote>[ Semestralka ][Semestrálka][ SEMESTRALKa]</blockquote>
+<p>
+	se převedou na jednotný tvar
+</p>
+<blockquote>[semestralka]</blockquote>
+<p>
+	To pak v důsledku umožňuje mj. rychlé a efektivní vyhledávání (popsáno níže).
+</p>
+<p>
+    I tak ale není systém všemocný a je potřeba dodržovat jakousi kulturu. Proto pro jednotlivé
+	předměty používáme zkratky bez kódu programu, tedy:
+</p>
+<blockquote>[pa1], [zma] nebo [lin]</blockquote>
+<p>
+	Další oblíbené tagy, které se ujaly v širším měřítku:
+</p>
+<blockquote>[ot], [prace], [zkouska], [semestralka], [latex], [rozvrh] nebo [kos]</blockquote>
+<p>
+	Kromě písmen (preferujeme malá a bez diakritiky) a číslic mohou tagy obsahovat ještě tyto znaky
+	(v opačném případě nebudou zaindexovány):
+</p>
+<blockquote>.-_</blockquote>
+<p>
+	<strong>Vyvarujte se mezerám!</strong><br/>
+	Nesnažte se být za každou cenu kreativní při vymýšlení nových tagů. Můžete se inspirovat třeba
+	trendy z hlavní stránky.
+</p>
+
+<h3 id="vyhledavani-tagu">Vyhledávní tagů (prefixů)</h3>
+<p>
+    Na začátek dotazu stačí vložit makro <i>tag:</i> a za něj název tagu, který chcete filtrovat. Těch
+	může být i více, pokud je oddělíte čárkou. Vše zadávejte bez mezer (nicméně pokud je použijete
+	rozumně, tak je systém taky zvládne).
+</p>
+<p>
+    <strong>Pokud chcete vyhledat slovo</strong> <em>test</em> v příspěvcích, které mají tag/prefix
+	<em>[pa1]</em> nebo <em>[zma]</em> nebo <em>[mlo]</em>, použijte zápis:
+</p>
+<blockquote>tag:pa1,zma,mlo test</blockquote>
+<p>
+    Můžete si například jednoduše sestavit filtr, který bude vypisovat jen novinky z předmětů, které
+	právě absolvujete a odkaz si přidat do záložek. Aneb
+	<a n:href="Search:default 'tag:pa1,pai,cao,uos,mlo,zma'">první</a> a
+    <a n:href="Search:default 'tag:pa2,ted,sap,lin'">druhý</a> semestr - teď už vám nic neuteče a
+	nemusíte kvůli tomu trávit všechen volný čas na facebooku, dobré ne? :)
+</p>
+
+<h3 id="dalsi-verze">Další verze?</h3>
+<h4>To-do list</h4>
+<ul>
+    <li>Mobilní verze. (Nové UI - Twitter Bootstrap? / nativní mobilní aplikace?)</li>
+    <li>Facebook login - ochrana skrytých skupin. (Možnost reagovat přímo z Fitaka?)</li>
+    <li>Žebříčky - kdo zakládá nejvíce vláken, kdo nejvíce komentuje, kdo nejvíce používá
+        "líbí se mi", kdo nejvíce "hejtuje" javu a androida atd.
+    </li>
+</ul>
+
+<h4>Možná budoucnost</h4>
+<ul>
+    <li>Zahrnout do vyhledávání i další zdroje. Například školní fórum, stránky, fit-guide či fit-wiki.</li>
+    <li>Nasadit <a href="http://sphinxsearch.com/">http://sphinxsearch.com/</a>
+        místo (směšného) MySQL fulltextu, na to je však potřeba vlastní server.
+    </li>
+    <li>Nějaké další nápady na směřování Fitaka?</li>
+</ul>
+
+<h3 id="spolecny-vyvoj">Společný vývoj?</h3>
+
+<p>
+	Abych rozprášil obavy o budoucnosti tohoto nástroje, dávám ho všanc světu
+    open-source a každý z vás se tak může (nejen) do vývoje aktivně zapojit.
+</p>
+<p>
+    <strong>Git repositář je k dispozici na:</strong>
+    <a href="https://github.com/tajo/fitak">https://github.com/tajo/fitak</a>
+</p>
+<p>
+    Budu rád pokud tam budete i ohlašovat bugy, či posílat návrhy na vylepšení. Samozřejmě
+    můžete použít i <a href="mailto: admin@fitak.cz">email</a>.
+</p>
+
+<h3 id="pozadi">Pozadí</h3>
+<p>
+	Technologie pohánějící Fiťáka: HTML, CSS, JS, PHP, MySQL, Nette, jQuery a FB API.
+</p>
+
+<h3 id="autor">Autor</h3>
+<p>
+	Vojtěch Mikšů - <a href="mailto: vojtech@miksu.cz">osobní email</a>,
+	<a href="http://blog.miksu.cz">blog</a>
+</p>
+
+<p class="pull-right">
+	<em>
+		Poslední aktualizace této stránky:
+	    <script language="javascript">
+	        var lastMod = new Date(document.lastModified);
+	        theMonth = lastMod.getMonth() + 1;
+	        theDate = lastMod.getDate();
+	        theYear = lastMod.getFullYear();
+	        document.write(theDate + "." + theMonth + "." + theYear);
+	    </script>
+    </em>
+</p>
 {/block}
