@@ -28,8 +28,7 @@ class SearchForm extends Form
         }
 
 
-        $this->addSubmit( 'send', 'Vyhledat' )
-            ->setHtmlId( 'send' );
+        $this->addSubmit( 'send', 'Vyhledat' );
     }
 
     public function submitted( self $form )
