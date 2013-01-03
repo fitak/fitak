@@ -8,6 +8,10 @@ body {
 	color: #333;
 }
 
+.container {
+	width: 70%;
+}
+
 .search-main {
 	text-align: center;
 }

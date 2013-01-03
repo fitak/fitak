@@ -48,8 +48,8 @@
     </script>
 </head>
 <body>
-	<div class="container-fluid">
-		<div class="navbar">
+	<div class="container">
+        <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" n:href="homepage:">Fiťák.cz</a>
                 <ul class="nav">
@@ -57,7 +57,7 @@
                     <li><a n:href="about:">O projektu</a></li>
                 </ul>
             </div>
-		</div>
+        </div>
 
 		<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}">
 	        <button type="button" class="close" data-dismiss="alert">&times;</button>
