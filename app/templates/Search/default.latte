@@ -1,20 +1,18 @@
 {block content}
 	<div class="well">
-		<span class="pull-right">
-			<strong>Počet výsledků:</strong> {$resultsCount}
-			{if count($tags)}
-                <br>
-                <strong>Filtruji tagy:</strong>
-				{foreach $tags as $tag}
-                    <span class="label">{$tag}</span>{sep} nebo {/sep}
-				{/foreach}
-			{/if}
-		</span>
-
 		{form searchForm, class => 'form-horizontal'}
-			<div class="input-append">
-				{input s, class => 'input-xlarge'}{input send, class => 'btn btn-primary'}
+			<div class="row-fluid">
+				<div class="input-append span6">
+					{input s, class => 'input-xlarge'}<button n:input="send" class="btn btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
+	            </div>
+				<span n:if="count($tags)" class="span6">
+					<strong>Filtruji tagy:</strong>
+					{foreach $tags as $tag}
+						<span class="label">{$tag}</span>{sep} nebo {/sep}
+					{/foreach}
+				</span>
             </div>
+
             <p>
                 <small>
                     <a href="#" class="toggle-search-advanced">
@@ -26,17 +24,17 @@
 
             <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
                 <div class="control-group">
-                    <strong>{label sortBy, class => 'control-label' /}</strong>
+                    {label sortBy, class => 'control-label' /}
 	                <div class="controls">{input sortBy}</div>
                 </div>
 
 	            <div class="control-group">
-	                <strong>{label from, class => 'control-label' /}</strong>
+	                {label from, class => 'control-label' /}
                     <div class="controls">{input from}</div>
 	            </div>
 
 	            <div class="control-group">
-	                <strong class="control-label">Skupiny:</strong>
+	                <label class="control-label">Skupiny:</label>
                     <div class="controls">
 						{foreach $form['groups']->controls as $checkbox}
 							{label "groups-$checkbox->name"}
@@ -48,6 +46,8 @@
 	            </div>
             </div>
 		{/form}
+
+        <strong>Počet výsledků:</strong> {$resultsCount}
 
         <script type="text/javascript">
             $(document).ready(function () {

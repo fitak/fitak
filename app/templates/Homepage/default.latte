@@ -1,15 +1,15 @@
 {block content}
-<div class="hero-unit search-main">
+<div class="hero-unit offset3 span6 search-main">
     <img src="{$basePath}/img/logo.png" alt="Fitak.cz logo" title="Fitak.cz logo">
 	<br>
 
     {form searchForm}
-	    <ul class="errors" n:if="$form->hasErrors()">
-			<li n:foreach="$form->errors as $error">{$error}</li>
+	    <ul class="unstyled" n:if="$form->hasErrors()">
+			<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>
 	    </ul>
 	    {input s, class => 'input-block-level'}
 	    <br>
-	    {input send, class => 'btn btn-large btn-primary'}
+	    <button n:input="send" class="btn btn-large btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
     {/form}
  
     <div class="cloud">
