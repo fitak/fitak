@@ -11,7 +11,6 @@ class SearchForm extends Form
         parent::__construct();
 
         $this->addText( 's', 'dotaz')
-            ->setHtmlId( 's' )
             ->setAttribute( 'autofocus', true );
 
         $this->addSelect( 'sortBy', 'Seřadit podle:', array(

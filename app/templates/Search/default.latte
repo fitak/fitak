@@ -1,53 +1,68 @@
 {block content}
+	<div class="well">
+		<span class="pull-right">
+			<strong>Počet výsledků:</strong> {$resultsCount}
+			{if count($tags)}
+                <br>
+                <strong>Filtruji tagy:</strong>
+				{foreach $tags as $tag}
+                    <span class="label">{$tag}</span>{sep} nebo {/sep}
+				{/foreach}
+			{/if}
+		</span>
 
-    {form searchForm}
-        {input s, style => "margin-right:9px"}
-        {input send}
+		{form searchForm, class => 'form-horizontal'}
+			<div class="input-append">
+				{input s, class => 'input-xlarge'}{input send, class => 'btn btn-primary'}
+            </div>
+            <p>
+                <small>
+                    <a href="#" class="toggle-search-advanced">
+                        Podrobné vyhledávání
+						{if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}
+                    </a>
+                </small>
+            </p>
 
-        <p style="text-align:center;">
-            <small>
-                <a href="#" class="toggle-search-advanced">Podrobné vyhledávání
-                {if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}</a>
-                <span style="padding-left:5px;padding-right:5px">|</span>
-                <strong>Počet výsledků:</strong> {$resultsCount}
-                {if count($tags)}
-                   <span style="padding-left:5px;padding-right:5px">|</span>
-                    <strong>Filtruji tagy:</strong>
-                    {foreach $tags as $tag}
-                        <span style="background-color:#FFFF66;padding:3px">{$tag}</span>{sep} nebo {/sep}
-                    {/foreach}
-                {/if}
-            </small>
-        </p>
+            <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
+                <div class="control-group">
+                    <strong>{label sortBy, class => 'control-label' /}</strong>
+	                <div class="controls">{input sortBy}</div>
+                </div>
 
-        <div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
-            <strong>{label sortBy /}</strong> {input sortBy} <br>
-            <strong>{label from /}</strong> {input from} <br>
-            <strong>Skupiny:</strong><br>
-            {foreach $form['groups']->controls as $checkbox}
-                {input "groups-$checkbox->name"}
-                {label "groups-$checkbox->name" /}
-                {sep}<br>{/sep}
-            {/foreach}
-        </div>
-    {/form}
+	            <div class="control-group">
+	                <strong>{label from, class => 'control-label' /}</strong>
+                    <div class="controls">{input from}</div>
+	            </div>
 
-    
+	            <div class="control-group">
+	                <strong class="control-label">Skupiny:</strong>
+                    <div class="controls">
+						{foreach $form['groups']->controls as $checkbox}
+							{label "groups-$checkbox->name"}
+								{input "groups-$checkbox->name"}
+								{$form["groups-$checkbox->name"]->label[0]}
+							{/label}
+						{/foreach}
+                    </div>
+	            </div>
+            </div>
+		{/form}
 
-    <script>
-        $(document).ready(function() {
-            $('.toggle-search-advanced').on('click', function() {
-                var advSearch = $('.search-advanced');
-                var currentSymbol = advSearch.is(':hidden') ? "\u25ba" : "\u25bc";
-                var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
-                var link = $(this);
-                link.text(link.text().replace(currentSymbol, newSymbol));
-                advSearch.slideToggle();
-                return false;
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('.toggle-search-advanced').on('click', function () {
+                    var advSearch = $('.search-advanced');
+                    var currentSymbol = advSearch.is(':hidden') ? "\u25ba" : "\u25bc";
+                    var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
+                    var link = $(this);
+                    link.text(link.text().replace(currentSymbol, newSymbol));
+                    advSearch.slideToggle();
+                    return false;
+                });
             });
-        });
-    </script>
+        </script>
+	</div>
 
-    {control stream}
-
+	{control stream}
 {/block}
