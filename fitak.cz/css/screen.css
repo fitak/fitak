@@ -8,13 +8,6 @@ body {
 	color: #333;
 }
 
-blockquote {
-	margin: 1em 3em;
-	padding: .5em 1em;
-	border-left: 5px solid #fce27c;
-	background-color: #f6ebc1;
-}
-
 .search-main {
 	text-align: center;
 }
@@ -25,10 +18,9 @@ blockquote {
 
 .search-advanced {
 	display: none;
-	margin-bottom: 20px;
-	padding-left: 15px;
+	margin-bottom: 1.8em;
+	padding-left: 1.5em;
 	border-left: 1px #BBBBBB solid;
-	font-size: 0.9em;
 }
 
 #ajax-spinner {
@@ -45,125 +37,36 @@ a[href^="error:"] {
     color: white;
 }
 
-.topic {
-    border-top:1px solid #777777;
-    margin:4px;
-}
-
-.topic .header {
-    border-bottom:1px solid #777777;
-    background-color: #F1F1F1;
-    padding: 3px;
-    padding-left:5px;
-    font-size:0.8em;
-}
-
 .topic .message {
-    padding: 5px;
+	padding: 0.5em 0 0.8em;
 }
 
-.topic .comments-all {
+.topic .comment,
+.topic .hide-comments{
     display: none;
-}
-
-.topic .comment {
-    border-top:1px solid #AAAAAA;
-    margin:5px;
 }
 
 .topic .comment-marked {
-    border:2px solid darkred;
-    margin:5px;
-}
-
-.topic .comment .header {
-    border-bottom:1px solid #AAAAAA;
-    background-color: #FFFACD;
-    padding: 3px;
-    padding-left:5px;
-    font-size:0.8em
-}
-
-.topic .comment .message {
-    padding: 5px;
-}
-
-.topic .comment-marked .header {
-    border-bottom:1px solid #777777;
-    background-color: #FFFACD;
-    padding: 3px;
-    padding-left:5px;
-    font-size:0.8em
-}
-
-.topic .comment-marked .message {
-    padding: 5px;
+    border-left-color: darkred;
 }
 
 .highlight {
-    background-color:yellow;
-}
-
-.topic .showcomm {
-    width:100%;
-    cursor: hand;
-    cursor: pointer;
-}
-
-.topic .showcomm .showcommin, .closecommin {
-    padding:2px;
-    color:darkred;
-    text-align:center;
-    font-size: 0.9em;
-    font-family: arial;
-}
-
-.topic .showcomm .closecommin {
-    display: none;
-}
-
-.context {
-    cursor:help;
-    border-bottom: 1px #444444 dashed;
-}
-
-
-.paginator {
-	margin: 1em 0;
-	font-size: 70%;
-	text-align:center;
-}
-
-.paginator a, .paginator span {
-	margin-right: 0.1em;
-	padding: 0.2em 0.5em;
-	color: #999999;
-}
-
-.paginator a {
-	border: 1px solid #9AAFE5;
-	text-decoration: none;
-	color: #105CB6;
-}
-
-.paginator a:hover {
-    background-color: #F1F1F1;
-}
-
-.paginator span.button {
-	border: 1px solid #DDDDDD;
-}
-
-.paginator .current {
-	background: #2E6AB1;
-	border: 1px solid #2E6AB1;
-	color: white;
-	font-weight: bold;
+	background-color: yellow;
+	padding: 1px 0;
+	border-radius: 3px;
 }
 
 /* Clear floats */
-.fclear {clear:both}
+.fclear {
+	clear:both
+}
 
+/* Other */
 .fb-like {
 	margin-left: -15px;
+}
+
+.context {
+	cursor: help;
+	border-bottom: 1px #444444 dashed;
 }
