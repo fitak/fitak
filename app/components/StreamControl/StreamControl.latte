@@ -1,85 +1,104 @@
 {define #comment}
     {default $marked = $comment->marked}
-    <div n:class="$marked ? comment-marked : comment">
-        <div class="header">
-            <strong>Od:</strong>
-            {if $comment->topic->group_closed}
-                Skryto
-            {else}
-                <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
-            {/if}
-            <strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-            {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
+    <div n:class="$marked ? 'comment-marked' : 'comment'">
+        <div class="row-fluid header">
+            <div class="span3">
+	            <strong>Od:</strong>
+	            {if $comment->topic->group_closed}
+	                Skryto
+	            {else}
+	                <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
+	            {/if}
+	        </div>
+
+            <div class="span3">
+	            <strong>Kdy:</strong>
+	            <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
+            </div>
         </div>
-        <div class="message">
+
+        {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
+
+        <div class="row-fluid message">
             {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
         </div>
     </div>
 {/define}
 
-<div class="stream">
+{control paginator}
 
-    {control paginator}
+<div n:foreach="$topics as $topic" class="topic">
+    <div class="row-fluid header">
+	    <div class="span3">
+	        <strong>Od:</strong>
+	        {if $topic->group_closed}
+	            Skryto
+	        {else}
+	            <a href="https://www.facebook.com/profile.php?id={$topic->from_id}">{$topic->from_name}</a>
+	        {/if}
+        </div>
 
-    {foreach $topics as $topic}
-            <div class="topic">
-                <div class="header">
-                    <strong>Od:</strong>
-                    {if $topic->group_closed}
-                        Skryto
-                    {else}
-                        <a href="https://www.facebook.com/profile.php?id={$topic->from_id}">{$topic->from_name}</a>
-                    {/if}
-                    <strong>Kdy:</strong> <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
-                    {*<span class="context" title='{foreach $topic->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$topic->likes ? $topic->likes : 0}x</span>*}
-                    <strong>Zdroj:</strong> <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:55}</a>
-                </div>
-                <div class="message">
-                    {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
-                    <div class="comments-marked">
-                        {var $anyMarked = false}
-                        {foreach $topic->comments as $comment}
-                            {if $comment->marked}
-                                {include #comment, $comment, marked => false}
-                                {var $anyMarked = true}
-                            {/if}
-                        {/foreach}
-                    </div>
-                    <div class="comments-all">
-                        {foreach $topic->comments as $comment}
-                            {include #comment, $comment}
-                        {/foreach}
-                    </div>
-                </div>
-                {if count($topic->comments)}
-                    <div class="showcomm">
-                        <div class="showcommin">
-                            &raquo; Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)}) &laquo;
-                        </div>
-                        <div class="closecommin">
-                            &raquo; Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)}) &laquo;
-                        </div>
-                    </div>
-                {/if}
-            </div>
-    {/foreach}
+        <div class="span3">
+	        <strong>Kdy:</strong>
+	        <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
+        </div>
 
-    {control paginator}
+        <div class="span6">
+		    <strong>Zdroj:</strong>
+		    <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:55}</a>
+        </div>
+    </div>
 
-    <script>
-        $(document).ready(function() {
-            $('.showcomm').on('click', function() {
-                var topic = $(this).closest('.topic');
-                topic.find('.comments-all, .comments-marked, .closecommin, .showcommin').slideToggle();
-                return false;
-            });
+	{*<span class="context" title='{foreach $topic->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$topic->likes ? $topic->likes : 0}x</span>*}
 
-            var keywords = {$highlightKeywords};
-            var message = $('.message');
-            for (var i = 0; i < keywords.length; i++) {
-                message.highlight(keywords[i]);
-            }
-        });
-    </script>
+    <div class="row-fluid message">
+        {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
+    </div>
 
+    <div class="comments">
+	    {default $anyMarked = false}
+		{foreach $topic->comments as $comment}
+		    {include #comment, $comment}
+		    {if $comment->marked}
+			    {var $anyMarked = true}
+		    {/if}
+		{/foreach}
+    </div>
+
+    {if count($topic->comments)}
+        <span class="show-comments">
+	        <a href="#" class="btn btn-mini">
+                <i class="icon-comment"></i>
+                Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
+            </a>
+        </span>
+	    <span class="hide-comments">
+	        <a href="#"  class="btn btn-mini">
+	            <i class="icon-comment"></i>
+	            Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
+	        </a>
+        </span>
+    {/if}
 </div>
+
+{control paginator}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.show-comments, .hide-comments').on('click', function() {
+            var topic = $(this).closest('.topic');
+            topic.find('.show-comments, .hide-comments').toggle();
+            topic.find('.comment').slideToggle();
+            return false;
+        });
+
+        var keywords = {$highlightKeywords};
+        var message = $('.message');
+	    var options = {
+		    color: ''
+	    };
+        for (var i = 0; i < keywords.length; i++) {
+            message.highlight(keywords[i]);
+        }
+    });
+</script>

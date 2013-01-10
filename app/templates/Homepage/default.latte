@@ -1,37 +1,33 @@
 {block content}
-<div id="search">
-    <img src="{$basePath}/images/logo.png" alt="Fitak.cz logo" title="Fitak.cz logo" /><br />
+<div class="row-fluid">
+	<div class="offset2 span8 search-main">
+	    <img src="{$basePath}/img/logo.png" alt="Fitak.cz logo" title="Fitak.cz logo">
+		<br>
 
-    {form searchForm}
-    <ul class="errors" n:if="$form->hasErrors()">
-	<li n:foreach="$form->errors as $error">{$error}</li>
-    </ul>
+	    {form searchForm}
+		    <ul class="unstyled" n:if="$form->hasErrors()">
+				<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>
+		    </ul>
+		    {input s, class => 'input-block-level'}
+		    <br>
+		    <button n:input="send" class="btn btn-large btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
+	    {/form}
 
-    {input s} 
-    {input send}
-    {/form}
- 
-    <div class="cloud">
-    {if $trends}
-    {foreach $trends as $item}
-        <span style="font-size:{!$item["size"]}em"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
-    {/foreach}
-    {else}
-        Žádné trendy v poslední době.
-    {/if}
-    </div>
+	    <div class="cloud">
+	    {if $trends}
+	        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
+	    {else}
+	        Žádné trendy v poslední době.
+	    {/if}
+	    </div>
 
-    <script type="text/javascript">
- 
-	$(document).ready(function(){
-
-	    $('#options').click(function(){
-		 $("#incComments").slideToggle();
-	    });
-
-	});
- 
-    </script>
-
+	    <script type="text/javascript">
+			$(document).ready(function() {
+			    $('#options').click(function() {
+				    $("#incComments").slideToggle();
+			    });
+			});
+	    </script>
+	</div>
 </div>
 {/block}
