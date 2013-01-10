@@ -10,6 +10,7 @@ body {
 
 .container {
 	width: 70%;
+	max-width: 765px;
 }
 
 .search-main {
@@ -41,17 +42,47 @@ a[href^="error:"] {
     color: white;
 }
 
+.topic {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #999999;
+	border-radius: 5px;
+	box-shadow: 0 0 10px #999999;
+	padding: 1em;
+	margin-bottom: 1em;
+}
+
+.topic .header {
+	font-size: 0.8em;
+}
+
 .topic .message {
 	padding: 0.5em 0 0.8em;
 }
 
 .topic .comment,
-.topic .hide-comments{
+.topic .hide-comments {
     display: none;
 }
 
+.topic .comment,
 .topic .comment-marked {
-    border-left-color: darkred;
+	padding: 0.5em 0.5em 0 0.5em;
+	margin-bottom: 1em;
+	border-top-left-radius: 3px;
+	box-shadow: -1px -1px 4px #999999;
+	background-color: #f5f5f5;
+	border-top: 1px solid #999999;
+	border-left: 1px solid #999999;
+}
+
+.topic .comment {
+	background-color: #f5f5f5;
+}
+
+.topic .comment-marked {
+    border-color: darkred;
+	box-shadow: -1px -1px 4px darkred;
 }
 
 .highlight {

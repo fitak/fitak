@@ -5,7 +5,7 @@
 				<div class="input-append span6">
 					{input s, class => 'input-xlarge'}<button n:input="send" class="btn btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
 	            </div>
-				<span n:if="count($tags)" class="span6">
+				<span n:if="count($tags)" class="offset1 span4">
 					<strong>Filtruji tagy:</strong>
 					{foreach $tags as $tag}
 						<span class="label">{$tag}</span>{sep} nebo {/sep}

@@ -1,8 +1,8 @@
 {define #comment}
     {default $marked = $comment->marked}
-    <blockquote n:class="$marked ? 'comment-marked' : 'comment'">
-        <div class="row-fluid">
-            <div class="span2">
+    <div n:class="$marked ? 'comment-marked' : 'comment'">
+        <div class="row-fluid header">
+            <div class="span3">
 	            <strong>Od:</strong>
 	            {if $comment->topic->group_closed}
 	                Skryto
@@ -22,14 +22,14 @@
         <div class="row-fluid message">
             {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
         </div>
-    </blockquote>
+    </div>
 {/define}
 
 {control paginator}
 
-<div n:foreach="$topics as $topic" class="well well-small topic">
-    <div class="row-fluid">
-	    <div class="span2">
+<div n:foreach="$topics as $topic" class="topic">
+    <div class="row-fluid header">
+	    <div class="span3">
 	        <strong>Od:</strong>
 	        {if $topic->group_closed}
 	            Skryto
@@ -43,7 +43,7 @@
 	        <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
         </div>
 
-        <div class="span7">
+        <div class="span6">
 		    <strong>Zdroj:</strong>
 		    <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:55}</a>
         </div>
