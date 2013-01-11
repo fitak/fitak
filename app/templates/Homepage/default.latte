@@ -15,7 +15,7 @@
 
 	    <div class="cloud">
 	    {if $trends}
-	        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
+	        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em; margin: 15px; padding-top:15px;"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
 	    {else}
 	        Žádné trendy v poslední době.
 	    {/if}
