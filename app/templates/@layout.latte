@@ -55,6 +55,18 @@
                 <ul class="nav">
                     <li><a n:href="Search:stream">Stream všech skupin</a></li>
                     <li><a n:href="about:">O projektu</a></li>
+                    <li>
+                        <div style="margin-top:12px; margin-left: 20px;">
+                            <!-- Place this tag where you want the +1 button to render -->
+                            <g:plusone size="small"></g:plusone>
+                        </div>
+                    </li>
+                    <li>
+                        <div style="margin-top:11px; margin-left: 20px;">
+                        <div id="fb-root"></div>
+                        <div class="fb-like" data-href="http://www.fitak.cz" data-send="false" data-layout="button_count" data-width="115" data-show-faces="true"></div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -66,7 +78,6 @@
 
 		{include #content}
 
-        <div id="fb-root"></div>
         <script type="text/javascript">
             window.fbAsyncInit = function () {
                 FB.init({
@@ -97,9 +108,6 @@
 
         <div>
             <div>
-                <!-- Place this tag where you want the +1 button to render -->
-                <g:plusone size="small"></g:plusone>
-
                 <!-- Place this render call where appropriate -->
                 <script type="text/javascript">
                     window.___gcfg = { lang: 'cs' };
@@ -113,7 +121,7 @@
                         s.parentNode.insertBefore(po, s);
                     })();
                 </script>
-                <div class="fb-like" data-href="http://www.fitak.cz" data-send="false" data-layout="button_count" data-width="115" data-show-faces="true"></div>
+                
             </div>
         </div>
     </div>
