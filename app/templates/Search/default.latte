@@ -5,12 +5,6 @@
 				<div class="input-append span6">
 					{input s, class => 'input-xxlarge'}<button n:input="send" class="btn btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
 	            </div>
-				<span n:if="count($tags)" class="offset1 span4">
-					<strong>Filtruji tagy:</strong>
-					{foreach $tags as $tag}
-						<span class="label">{$tag}</span>{sep} nebo {/sep}
-					{/foreach}
-				</span>
             </div>
 
             <p>
@@ -46,6 +40,13 @@
 	            </div>
             </div>
 		{/form}
+
+        <div n:if="count($tags)">
+                    <strong>Filtruji tagy:</strong>
+                    {foreach $tags as $tag}
+                        <span class="label">{$tag}</span>{sep} nebo {/sep}
+                    {/foreach}
+        </div>
 
         <strong>Počet výsledků:</strong> {$resultsCount}
 
