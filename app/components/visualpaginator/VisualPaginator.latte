@@ -10,11 +10,11 @@
 
 		{foreach $steps as $step}
 			{if $step == $paginator->page}
-	            <li class="active"><span>{$step}</span></li>
+	            <li class="active hidden-phone"><span>{$step}</span></li>
 			{else}
-	            <li><a n:href="this, 'page' => $step">{$step}</a></li>
+	            <li class="hidden-phone"><a n:href="this, 'page' => $step">{$step}</a></li>
 			{/if}
-			{if $iterator->nextValue > $step + 1}<li><span>…</span></li>{/if}
+			{if $iterator->nextValue > $step + 1}<li class="hidden-phone"><span>…</span></li>{/if}
 		{/foreach}
 
         <li n:class="$paginator->isLast() ? 'disabled' : ''">
