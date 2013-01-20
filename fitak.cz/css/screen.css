@@ -81,8 +81,8 @@ a[href^="error:"] {
 }
 
 .topic .comment-marked {
-    border-color: darkred;
-	box-shadow: -1px -1px 4px darkred;
+    border-color: darkgreen;
+	box-shadow: -1px -1px 4px darkgreen;
 }
 
 .highlight {
