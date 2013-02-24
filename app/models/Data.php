@@ -4,6 +4,9 @@ use Nette\Utils\Strings;
 class Data extends BaseModel
 {
 
+    // topics with these tags are not displayed (+ comments with such parents)
+    private $mutedTags = array( 'mute' );
+
     // get updated time at topic/comment by id
     public function getUpdatedTime( $id )
     {
@@ -87,6 +90,7 @@ class Data extends BaseModel
             ->leftJoin( "groups" )
             ->on( "data.group_id = groups.id" )
             ->where( "data.parent_id = 0" )
+            ->where( "data.id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) )
             ->orderBy( "data.created_time DESC" )
             ->limit( $length )
             ->offset( $offset );
@@ -113,7 +117,9 @@ class Data extends BaseModel
         $sql = $this->db->select( "data.id, data.parent_id" )
             ->from( "data" )
             ->leftJoin( "groups" )
-            ->on( "data.group_id = groups.id" );
+            ->on( "data.group_id = groups.id" )
+            ->where( "data.id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) )
+            ->where( "data.parent_id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) );
 
         // use of filters on query
         $this->addSearchCondition( $sql, $request );
@@ -170,7 +176,9 @@ class Data extends BaseModel
         $sql = $this->db->select( "count(*)" )
             ->from( "data" )
             ->leftJoin( "groups" )
-            ->on( "data.group_id = groups.id" );
+            ->on( "data.group_id = groups.id" )
+            ->where( "data.id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) )
+            ->where( "data.parent_id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) );
 
         $this->addSearchCondition( $sql, $request );
 
