@@ -37,6 +37,9 @@ common:
 		likes:
 			class: Likes(@dibi.connection)
 
+		news:
+			class: News(@dibi.connection)
+
 		tags:
 			class: Tags(@dibi.connection)
 
