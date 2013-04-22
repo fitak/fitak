@@ -117,3 +117,8 @@ a[href^="error:"] {
 	background-color: #BDE5F8;
 	background-image: url('../img/info.png');
 }
+
+.autor a:hover
+{
+	text-decoration: none;
+}
