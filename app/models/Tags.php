@@ -46,7 +46,7 @@ class Tags extends BaseModel
         $tagCloud = Array();
         foreach( $result as $key => $tag )
         {
-            if( $tag->name == "" ) continue;
+            if( $tag->name == "" || $tag->name == "mute" ) continue;
             $tagCloud[$key]["name"] = $tag->name;
             $tagCloud[$key]["size"] = round( 1 + ( $tag->count * 100 ) / $maximum * 0.015, 1 );
         }
