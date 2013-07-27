@@ -3,5 +3,6 @@
 /app/config/product.neon
 /log/
 /tmp/
+/libs/
 fitak.sublime-project
 fitak.sublime-workspace
