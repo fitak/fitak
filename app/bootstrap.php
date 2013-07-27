@@ -1,14 +1,10 @@
 <?php
 
-/**
- * My Application bootstrap file.
- */
 use Nette\Application\Routers\Route;
+use Nette\DI\CompilerExtension;
 
-
-// Load Nette Framework
-require LIBS_DIR . '/Nette/loader.php';
-
+// Load Composer Autoloader
+require LIBS_DIR . '/autoload.php';
 
 // Configure application
 $configurator = new Nette\Config\Configurator;
@@ -21,12 +17,11 @@ $configurator->enableDebugger(__DIR__ . '/../log');
 $configurator->setTempDirectory(__DIR__ . '/../tmp');
 $configurator->createRobotLoader()
         ->addDirectory(APP_DIR)
-        ->addDirectory(LIBS_DIR)
         ->register();
 
 // dibi
 $configurator->onCompile[] = function($configurator, $compiler) {
-        $compiler->addExtension('dibi', new DibiNetteExtension);
+        $compiler->addExtension('dibi', new DibiNette20Extension);
 };
 
 // Create Dependency Injection container from config.neon file
