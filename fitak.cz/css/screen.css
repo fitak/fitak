@@ -6,6 +6,7 @@ body {
 	font-family: Verdana, "Geneva CE", lucida, sans-serif;
 	background: #FFFFFF;
 	color: #333;
+	padding-top: 30px;
 }
 
 .container {
@@ -23,10 +24,34 @@ body {
 }
 
 .search-advanced {
+	padding-top:20px;
 	display: none;
-	margin-bottom: 1.8em;
-	padding-left: 1.5em;
-	border-left: 1px #BBBBBB solid;
+}
+
+
+.navbg {
+  background-color: #43609c;
+}
+.navbg .navbar-brand {
+  color: #fff;
+}
+.navbg .navbar-nav > li > a {
+  color: #cdbfe3;
+}
+.navbg .navbar-nav > li > a:hover {
+  color: #fff;
+}
+.navbg .navbar-nav > .active > a,
+.navbg .navbar-nav > .active > a:hover {
+  color: #fff;
+  background-color: #463265;
+}
+.navbg .navbar-toggle {
+  border-color: #563d7c;
+}
+.navbg .navbar-toggle:hover {
+  background-color: #463265;
+  border-color: #463265;
 }
 
 #ajax-spinner {
@@ -58,7 +83,7 @@ a[href^="error:"] {
 }
 
 .topic .message {
-	padding: 0.5em 0 0.8em;
+	padding: 1em;
 }
 
 .topic .comment,
@@ -71,19 +96,8 @@ a[href^="error:"] {
 	padding: 0.5em 0.5em 0 0.5em;
 	margin-bottom: 1em;
 	border-top-left-radius: 3px;
-	box-shadow: -1px -1px 4px #999999;
-	background-color: #f5f5f5;
-	border-top: 1px solid #999999;
-	border-left: 1px solid #999999;
-}
-
-.topic .comment {
-	background-color: #f5f5f5;
-}
-
-.topic .comment-marked {
-    border-color: darkgreen;
-	box-shadow: -1px -1px 4px darkgreen;
+	border-top: 1px solid #BBBBBB;
+	border-left: 1px solid #BBBBBB;
 }
 
 .highlight {

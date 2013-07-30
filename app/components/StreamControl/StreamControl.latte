@@ -1,8 +1,8 @@
 {define #comment}
     {default $marked = $comment->marked}
     <div n:class="$marked ? 'comment-marked' : 'comment'">
-        <div class="row-fluid header">
-            <div class="span3">
+        <div class="row header">
+            <div class="col-3">
 	            <strong>Od:</strong>
 	            {if $comment->topic->group_closed}
 	                Skryto
@@ -11,7 +11,7 @@
 	            {/if}
 	        </div>
 
-            <div class="span3">
+            <div class="col-3">
 	            <strong>Kdy:</strong>
 	            <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
             </div>
@@ -19,7 +19,7 @@
 
         {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
 
-        <div class="row-fluid message">
+        <div class="row message">
             {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
         </div>
     </div>
@@ -28,8 +28,8 @@
 {control paginator}
 
 <div n:foreach="$topics as $topic" class="topic">
-    <div class="row-fluid header">
-	    <div class="span3">
+    <div class="row header">
+	    <div class="col-3">
 	        <strong>Od:</strong>
 	        {if $topic->group_closed}
 	            Skryto
@@ -38,12 +38,12 @@
 	        {/if}
         </div>
 
-        <div class="span3">
+        <div class="col-3">
 	        <strong>Kdy:</strong>
 	        <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
         </div>
 
-        <div class="span6 hidden-phone">
+        <div class="col-6 hidden-sm">
 		    <strong>Zdroj:</strong>
 		    <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:45}</a>
         </div>
@@ -51,7 +51,7 @@
 
 	{*<span class="context" title='{foreach $topic->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$topic->likes ? $topic->likes : 0}x</span>*}
 
-    <div class="row-fluid message">
+    <div class="row message">
         {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
     </div>
 
@@ -67,16 +67,16 @@
 
     {if count($topic->comments)}
         <span class="show-comments">
-	        <a href="#" class="btn btn-mini">
+            <button class="btn btn-small btn-success">
                 <i class="icon-comment"></i>
                 Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
-            </a>
+            </button>
         </span>
 	    <span class="hide-comments">
-	        <a href="#"  class="btn btn-mini">
+	        <button class="btn btn-small btn-warning">
 	            <i class="icon-comment"></i>
 	            Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
-	        </a>
+	        </button>
         </span>
     {/if}
 </div>

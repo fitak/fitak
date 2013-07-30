@@ -1,39 +1,40 @@
 {block content}
-<div class="row-fluid">
-	<div class="offset2 span8 search-main">
-	    <img src="{$basePath}/img/logo.png" alt="Fitak.cz logo" title="Fitak.cz logo">
-		<br>
+<div class="row text-center">
+	<img src="{$basePath}/img/logo.png" alt="Fitak.cz" title="Fitak.cz" style="max-width: 100%;">
+</div>
+<div class="row text-center">
+    {form searchForm}
+    	<fieldset>
+	    <ul class="unstyled" n:if="$form->hasErrors()">
+			<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>
+	    </ul>
+	    {input s, class => 'form-control'}
+	    <button n:input="send" class="btn btn-primary" style="margin-top:10px"><i class="icon-search icon-white"></i> Vyhledat</button>
+	    </fieldset>
+    {/form}
+<div class="row text-center cloud">
+    {if $trends}
+        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em; margin-right: 15px;"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
+    {else}
+        Žádné trendy v poslední době.
+    {/if}
+    </div>
 
-	    {form searchForm}
-		    <ul class="unstyled" n:if="$form->hasErrors()">
-				<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>
-		    </ul>
-		    {input s, class => 'input-block-level'}
-		    <br>
-		    <button n:input="send" class="btn btn-large btn-primary"><i class="icon-search icon-white"></i> Vyhledat</button>
-	    {/form}
+    {foreach $news as $message}
+    	<div class="panel panel-info"> 
+    		<div class="panel-heading">
+   		    	<h3 class="panel-title">Info</h3>
+  			</div>
+    		{!$message->message}
+    	</div>
+    {/foreach}
 
-	    <div class="cloud">
-	    {if $trends}
-	        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em; margin-right: 15px;"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
-	    {else}
-	        Žádné trendy v poslední době.
-	    {/if}
-	    </div>
-
-	    {foreach $news as $message}
-	    	<div class="news">
-	    		{!$message->message}
-	    	</div>
-	    {/foreach}
-
-	    <script type="text/javascript">
-			$(document).ready(function() {
-			    $('#options').click(function() {
-				    $("#incComments").slideToggle();
-			    });
-			});
-	    </script>
-	</div>
+    <script type="text/javascript">
+		$(document).ready(function() {
+		    $('#options').click(function() {
+			    $("#incComments").slideToggle();
+		    });
+		});
+    </script>
 </div>
 {/block}

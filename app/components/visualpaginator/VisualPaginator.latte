@@ -1,28 +1,49 @@
-<div n:if="$paginator->pageCount > 1" class="pagination pagination-centered">
-	<ul>
-        <li n:class="$paginator->isFirst() ? 'disabled' : ''">
-	        {if $paginator->isFirst()}
-                <span>« Předchozí</span>
-		    {else}
-                <a n:href="this, 'page' => $paginator->page - 1">« Předchozí</a>
-	        {/if}
-        </li>
+
+<div class="row text-center hidden-sm">
+	<ul n:if="$paginator->pageCount > 1" class="pagination pagination-small">
+		<li n:class="$paginator->isFirst() ? 'disabled' : ''">
+			{if $paginator->isFirst()}
+				<span>« Předchozí</span>
+			{else}
+				<a n:href="this, 'page' => $paginator->page - 1">« Předchozí</a>
+			{/if}
+		</li>
 
 		{foreach $steps as $step}
 			{if $step == $paginator->page}
-	            <li class="active hidden-phone"><span>{$step}</span></li>
+				<li class="active"><span>{$step}</span></li>
 			{else}
-	            <li class="hidden-phone"><a n:href="this, 'page' => $step">{$step}</a></li>
+				<li><a n:href="this, 'page' => $step">{$step}</a></li>
 			{/if}
-			{if $iterator->nextValue > $step + 1}<li class="hidden-phone"><span>…</span></li>{/if}
+			{if $iterator->nextValue > $step + 1}<li><span>…</span></li>{/if}
 		{/foreach}
 
-        <li n:class="$paginator->isLast() ? 'disabled' : ''">
-            {if $paginator->isLast()}
-                <span>Další »</span>
-            {else}
-	            <a n:href="this, 'page' => $paginator->page + 1">Další »</a>
-	        {/if}
-        </li>
+		<li n:class="$paginator->isLast() ? 'disabled' : ''">
+			{if $paginator->isLast()}
+				<span>Další »</span>
+			{else}
+				<a n:href="this, 'page' => $paginator->page + 1">Další »</a>
+			{/if}
+		</li>
 	</ul>
 </div>
+
+<div class="row text-center visible-sm">
+	<ul n:if="$paginator->pageCount > 1" class="pager">
+		<li n:class="$paginator->isFirst() ? 'disabled' : ''">
+			{if $paginator->isFirst()}
+				<span>« Předchozí</span>
+			{else}
+				<a n:href="this, 'page' => $paginator->page - 1">« Předchozí</a>
+			{/if}
+		</li>
+		<li n:class="$paginator->isLast() ? 'disabled' : ''">
+			{if $paginator->isLast()}
+				<span>Další »</span>
+			{else}
+				<a n:href="this, 'page' => $paginator->page + 1">Další »</a>
+			{/if}
+		</li>
+	</ul>
+</div>
+

@@ -33,7 +33,7 @@ class TemplateHelpers extends Nette\Object
             foreach ( $tags[0] as $index => $tag )
             {
                 $url = $this->presenter->link( 'Search:default', 'tag:' . $tag );
-                $item = str_replace( '['.$tags[1][$index].']', "[<a href=\"$url\">$tag</a>]", $item );
+                $item = str_replace( '['.$tags[1][$index].']', "<a href=\"$url\"><span class=\"label label-info\">$tag</span></a> ", $item );
             }
         }
 
