@@ -1,37 +1,23 @@
 {block content}
-<h2>O projektu</h2>
+<h2>O webu</h2>
 <ul>
     <li><a href="#uvod">Úvod</a></li>
-    <li>
-        <a href="#pouzivejte-tagy">Používejte tagy (prefixy)</a>
-        <ul>
-            <li><a href="#specialni-tagy">Speciální tagy</a></li>
-        </ul>
-    </li>
-    <li><a href="#vyhledavani-tagu">Vyhledávní tagů (prefixů)</a></li>
-    <li>
-	    <a href="#dalsi-verze">Další verze?</a>
-	    <ul>
-            <li><a href="#to-do-list">To-do list</a></li>
-            <li><a href="#mozna-budoucnost">Možná budoucnost</a></li>
-	    </ul>
-    </li>
-    <li><a href="#spolecny-vyvoj">Společný vývoj?</a></li>
+    <li><a href="#pouzivejte-tagy">Používejte tagy</a>
+    <li><a href="#specialni-tagy">Speciální tagy</a></li></li>
+    <li><a href="#vyhledavani-tagu">Vyhledávání tagů</a></li>
+    <li><a href="#spolecny-vyvoj">Společný vývoj</a></li>
     <li><a href="#pozadi">Pozadí</a></li>
     <li><a href="#autor">Autor</a></li>
 </ul>
 
 <h3 id="uvod">Úvod</h3>
 <p>
-    Tento projekt vznikl za účelem archivace školních facebook skupin
+    Tento web archivuje školní Facebook skupiny
     <a href="http://fit.cvut.cz">Fakulty informačních technologií</a>
-    <a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze,
-    které obsahují velké
-    množství informací. Bohužel tyto znalosti velmi rychle zapadnou a vyhledávání v nich je
-    poměrně obtížné. V současné době totiž tito studenti napsali
-    <strong>{$count} příspěvků</strong>!
-    To už je pořádná dávka informací. Také přijde vhod studentům, kteří nepoužívají facebook a zároveň chtějí
-    být v obraze.
+    <a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze. Tyto
+    skupiny obsahují velké množství informací. Ty ale bohužel velmi rychle zapadnou a vyhledávání v nich je
+    poměrně obtížné. Od narození naší fakulty jsme vyprodukovali již
+    <abbr title="a to je fakt moc">{$count} příspěvků</abbr>!
 </p>
 <p>
     <strong>Nyní jsou indexovány tyto skupiny:</strong>
@@ -47,7 +33,7 @@
     a to v hodinovém intervalu.
 </p>
 
-<h3 id="pouzivejte-tagy">Používejte tagy (prefixy)</h3>
+<h3 id="pouzivejte-tagy">Používejte tagy</h3>
 <p>
     Na školních facebook skupinách používáme tagy pro rychlejší orientaci. Tagy se nacházejí
 	na začátku příspěvku a jsou v hranatých závorkách. Může jich být i víc za sebou. Příklad užití:
@@ -79,26 +65,24 @@
 	(v opačném případě nebudou zaindexovány):
 </p>
 <pre>.-_</pre>
-<p>
-	<strong>Vyvarujte se mezerám!</strong><br/>
-	Nesnažte se být za každou cenu kreativní při vymýšlení nových tagů. Můžete se inspirovat třeba
-	trendy z hlavní stránky.
+<p class="text-warning">
+	<strong>Vyvarujte se mezerám uvnitř tagu</strong> a nesnažte se být za každou cenu kreativní při vymýšlení těch nových. Můžete se inspirovat třeba trendy z <a n:href="Homepage:">hlavní stránky</a>.
 </p>
 
-<h4 id="specialni-tagy">Speciální tagy</h4>
+<h3 id="specialni-tagy">Speciální tagy</h3>
 <p>
     Tento tag způsobí, že dané vlákno bude na Fitak.cz kompletně skryto a to i včetně jeho komentářů.
 </p>
 <pre>[mute]</pre>
 
-<h3 id="vyhledavani-tagu">Vyhledávní tagů (prefixů)</h3>
+<h3 id="vyhledavani-tagu">Vyhledávní tagů</h3>
 <p>
     Na začátek dotazu stačí vložit makro <i>tag:</i> a za něj název tagu, který chcete filtrovat. Těch
 	může být i více, pokud je oddělíte čárkou. Vše zadávejte bez mezer (nicméně pokud je použijete
 	rozumně, tak je systém taky zvládne).
 </p>
 <p>
-    <strong>Pokud chcete vyhledat slovo</strong> <em>test</em> v příspěvcích, které mají tag/prefix
+    <strong>Pokud chcete vyhledat slovo</strong> <em>test</em> v příspěvcích, které mají tag
 	<em>[pa1]</em> nebo <em>[zma]</em> nebo <em>[mlo]</em>, použijte zápis:
 </p>
 <pre>tag:pa1,zma,mlo test</pre>
@@ -110,42 +94,22 @@
 	nemusíte kvůli tomu trávit všechen volný čas na facebooku, dobré ne? :)
 </p>
 
-<h3 id="dalsi-verze">Další verze?</h3>
-<h4 id="to-do-list">To-do list</h4>
-<ul>
-    <li>Facebook login - ochrana skrytých skupin. (Možnost reagovat přímo z Fitaka?)</li>
-    <li>Žebříčky - kdo zakládá nejvíce vláken, kdo nejvíce komentuje, kdo nejvíce používá
-        "líbí se mi", kdo nejvíce "hejtuje" javu a androida atd.
-    </li>
-</ul>
 
-<h4 id="mozna-budoucnost">Možná budoucnost</h4>
-<ul>
-    <li>Zahrnout do vyhledávání i další zdroje. Například školní fórum, stránky, fit-guide či fit-wiki.</li>
-    <li>Nasadit <a href="http://sphinxsearch.com/">http://sphinxsearch.com/</a>
-        místo (směšného) MySQL fulltextu, na to je však potřeba vlastní server.
-    </li>
-    <li>Nějaké další nápady na směřování Fitaka?</li>
-</ul>
-
-<h3 id="spolecny-vyvoj">Společný vývoj?</h3>
-
+<h3 id="spolecny-vyvoj">Společný vývoj</h3>
 <p>
-	Abych rozprášil obavy o budoucnosti tohoto nástroje, dávám ho všanc světu
-    open-source a každý z vás se tak může (nejen) do vývoje aktivně zapojit.
+	Fiťákův je kód otevřený a pečuje o něj malá komunita vývojářů - fiťáků. 
 </p>
 <p>
     <strong>Git repositář je k dispozici na:</strong>
-    <a href="https://github.com/tajo/fitak">https://github.com/tajo/fitak</a>
+    <a href="https://github.com/fitak/fitak"><i class="icon-github-alt"></i> https://github.com/fitak/fitak</a>
 </p>
 <p>
-    Budu rád pokud tam budete i ohlašovat bugy, či posílat návrhy na vylepšení. Samozřejmě
-    můžete použít i <a href="mailto: admin@fitak.cz">email</a>.
+    Budeme rádi, pokud tam budete ohlašovat bugy, či posílat návrhy na vylepšení. Taktéž nás můžete pozdravit pomocí <a href="mailto: admin@fitak.cz">emailu</a>.
 </p>
 
 <h3 id="pozadi">Pozadí</h3>
 <p>
-	Technologie pohánějící Fiťáka: HTML, CSS, JS, PHP, MySQL, Nette, jQuery, Twitter Bootstrap a FB API.
+	Technologie pohánějící Fiťáka: HTML, CSS, JavaScript, PHP, MySQL, Nette, Composer, Git, jQuery, Twitter Bootstrap a FB API.
 </p>
 
 <h3 id="autor">Autor</h3>
@@ -154,18 +118,5 @@
     <a href="http://miksu.cz" title="osobní stránka"><i class="icon-home icon-2x"></i></a>
     <a href="https://twitter.com/vmiksu" title="twitter"><i class="icon-twitter icon-2x"></i></a>
     <a href="https://www.facebook.com/vojtech.miksu" title="facebook"><i class="icon-facebook-sign icon-2x"></i></a>
-</p>
-
-<p class="pull-right">
-	<em>
-		Poslední aktualizace této stránky:
-	    <script language="javascript">
-	        var lastMod = new Date(document.lastModified);
-	        theMonth = lastMod.getMonth() + 1;
-	        theDate = lastMod.getDate();
-	        theYear = lastMod.getFullYear();
-	        document.write(theDate + "." + theMonth + "." + theYear);
-	    </script>
-    </em>
 </p>
 {/block}
