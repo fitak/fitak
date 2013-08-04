@@ -71,7 +71,7 @@ a[href^="error:"] {
 .topic {
 	border-width: 1px;
 	border-style: solid;
-	border-color: #CCCCCC;
+	border-color: #BBBBBB;
 	border-radius: 5px;
 	padding: 1em;
 	margin-bottom: 1em;
@@ -95,8 +95,8 @@ a[href^="error:"] {
 	padding: 1em;
 	margin-bottom: 1em;
 	border-top-left-radius: 3px;
-	border-top: 1px solid #DDDDDD;
-	border-left: 1px solid #DDDDDD;
+	border-top: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
 }
 
 .highlight {
