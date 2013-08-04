@@ -278,6 +278,7 @@ class Data extends BaseModel
         $comments = $this->db->select( "*" )
             ->from( "data" )
             ->where( "parent_id IN %in", $topicsIds )
+            ->orderBy( "data.created_time" )
             ->fetchAssoc( "parent_id|id" );
 
         return $comments;
