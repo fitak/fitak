@@ -53,6 +53,29 @@
 
     <div class="row message">
         {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
+
+
+        {if $topic->name}
+            <blockquote style="margin-top:15px">
+            {if $topic->link}
+                <a href="{$topic->link}">
+            {/if}
+            <strong>
+                {$topic->name}
+            </strong>
+        {/if}
+        {if $topic->description}
+            <br /><small>{$topic->description}</small>
+        {/if}
+        {if $topic->picture}
+            <br /><img src="{$topic->picture}" title="{$topic->name}" />      
+        {/if}
+        {if $topic->name}
+            {if $topic->link}
+                </a>
+            {/if}
+            </blockquote>
+        {/if}
     </div>
 
     <div class="comments">
