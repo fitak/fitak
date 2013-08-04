@@ -96,8 +96,8 @@ class CrawlerPresenter extends BasePresenter
         while( $this->grabPage() )
         {
             echo "Inserted: " . $this->cnt_inserted . " | Updated: " . $this->cnt_updated . "<br />";
-            @ob_flush();
-            @flush();
+            //@ob_flush();
+            //@flush();
         }
     }
 
@@ -106,13 +106,14 @@ class CrawlerPresenter extends BasePresenter
     {
         $data = $this->getJson();
     
+       
         if( !$this->nextPage ){
             echo "The last page";
             return false;
         }
         //echo "JSONS downloaded: " . $this->cnt_downloaded . "<br />";
-        @ob_flush();
-        @flush();
+        //@ob_flush();
+        //@flush();
         foreach( $data['data'] as $message )
         {
             // fix timezone issue
