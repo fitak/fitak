@@ -16,19 +16,42 @@ class Data extends BaseModel
     }
 
     // insert new topic
-    public function insertTopic( $id, $gid, $pid, $message, $ctime, $utime, $comments, $likes, $from_id, $from_name )
+    public function insertTopic( $id, 
+                                 $gid, 
+                                 $pid, 
+                                 $message, 
+                                 $ctime, 
+                                 $utime, 
+                                 $comments, 
+                                 $likes, 
+                                 $from_id, 
+                                 $from_name,
+                                 $type, 
+                                 $link,
+                                 $source, 
+                                 $picture, 
+                                 $name, 
+                                 $caption, 
+                                 $description )
     {
         $arr = array(
             'id' => $id,
             'group_id' => $gid,
             'parent_id' => $pid,
             'message' => $message,
-            'created_time' => $ctime,
-            'updated_time' => $utime,
+            'created_time' => new DateTime($ctime),
+            'updated_time' => new DateTime($utime),
             'comments' => $comments,
             'likes' => $likes,
             'from_id' => $from_id,
-            'from_name' => $from_name
+            'from_name' => $from_name,
+            'type' => $type,
+            'link' => $link,
+            'source' => $source,
+            'picture' => $picture,
+            'name' => $name,
+            'caption' => $caption,
+            'description' => $description,
         );
         $this->db->query( 'INSERT INTO data', $arr );
     }
@@ -38,7 +61,7 @@ class Data extends BaseModel
     {
         $arr = array(
             'message' => $message,
-            'updated_time' => $utime,
+            'updated_time' => new DateTime($utime),
             'comments' => $comments,
             'likes' => $likes,
         );
@@ -64,7 +87,7 @@ class Data extends BaseModel
             'group_id' => $gid,
             'parent_id' => $pid,
             'message' => $message,
-            'created_time' => $ctime,
+            'created_time' => new DateTime($ctime),
             'likes' => $likes,
             'from_id' => $from_id,
             'from_name' => $from_name

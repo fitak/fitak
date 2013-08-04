@@ -66,14 +66,16 @@
 			<a class="navbar-brand" n:href="homepage:">Fiťák.cz</a>
 			<div class="nav-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="dropdown {$presenter->islinkCurrent('Search:stream') ? active}">
+					<li class="dropdown {$presenter->islinkCurrent('Search:*') ? active}">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
 							Stream<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a n:href="Search:stream">Vše</a></li>
-							<li><a href="#">Skupina 1</a></li>
-							<li><a href="#">Skupina 2</a></li>
+							<li>
+								<a n:href="Search:">Vše</a></li>
+							<li n:foreach="$groupList as $group">
+						        <a n:href="Search: 'groups[]' => $group->id">{$group->name}</a>
+						    </li>
 						</ul>
 					</li>
 					<li n:class="$presenter->islinkCurrent('about:*') ? active"><a n:href="about:">O webu</a></li>

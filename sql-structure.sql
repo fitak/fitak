@@ -88,5 +88,15 @@ CREATE TABLE `news` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
+ALTER TABLE `data`
+ADD `type` enum('status','video','link','photo') NOT NULL,
+ADD `link` varchar(500) NOT NULL AFTER `type`,
+ADD `name` varchar(500) NOT NULL AFTER `link`,
+ADD `caption` varchar(500) NOT NULL AFTER `name`,
+ADD `description` text NOT NULL AFTER `caption`,
+ADD `picture` varchar(500) NOT NULL AFTER `description`,
+ADD `source` varchar(500) NOT NULL AFTER `picture`,
+COMMENT='';
+
 
 -- 2013-02-24 18:19:21

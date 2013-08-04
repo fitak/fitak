@@ -15,6 +15,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $templateHelpers = new TemplateHelpers( $this, $this->context->tags );
         $template = parent::createTemplate( $class );
         $template->registerHelperLoader( callback( $templateHelpers, "loader" ) );
+        $template->groupList = $this->context->groups->getList();
 
         return $template;
     }

@@ -13,6 +13,7 @@ class CrawlerPresenter extends BasePresenter
 {
 
     private $gid, $token, $nextPage, $cnt_inserted = 0, $cnt_updated = 0, $cnt_downloaded = 0;
+    private $facebook;
 
     // getting data (topics, comments and likes) from Facebook groups
     public function actionDefault()
@@ -23,6 +24,13 @@ class CrawlerPresenter extends BasePresenter
         {
             $this->redirect( 'Crawler:token' );
         }
+
+        $config = array();
+        $config['appId'] = $this->context->token->getAppId();
+        $config['secret'] = $this->context->token->getAppSecret();
+        $this->facebook = new Facebook($config);
+        $this->facebook->setAccessToken($this->token);
+
         foreach( $this->context->groups->getList() as $group )
         {
             $this->gid = $group->id;
@@ -97,22 +105,25 @@ class CrawlerPresenter extends BasePresenter
     private function grabPage()
     {
         $data = $this->getJson();
-        if( !$this->nextPage )
+    
+        if( !$this->nextPage ){
+            echo "The last page";
             return false;
+        }
         //echo "JSONS downloaded: " . $this->cnt_downloaded . "<br />";
         @ob_flush();
         @flush();
-        foreach( $data->data as $message )
+        foreach( $data['data'] as $message )
         {
             // fix timezone issue
-            $message->created_time = date( DATE_ISO8601, strtotime( $message->created_time ) );
-            $message->updated_time = date( DATE_ISO8601, strtotime( $message->updated_time ) );
+            $message['created_time'] = date( DATE_ISO8601, strtotime( $message['created_time'] ) );
+            $message['updated_time'] = date( DATE_ISO8601, strtotime( $message['updated_time'] ) );
 
-            $ids = explode( "_", $message->id );
+            $ids = explode( "_", $message['id'] );
             $datetime = null;
             $datetime = $this->context->data->getUpdatedTime( $ids[1] );
 
-            if( strtotime( $datetime ) == strtotime( $message->updated_time ) )
+            if( strtotime( $datetime ) == strtotime( $message['updated_time'] ) )
             {
                 echo $this->cnt_inserted . ' messages was saved and ' . $this->cnt_updated . '
                     updated.<br />';
@@ -120,55 +131,107 @@ class CrawlerPresenter extends BasePresenter
             }
             $mess = "";
             $likes_count = 0;
-            if( isSet( $message->likes ) )
-                $likes_count = $message->likes->count;
-            if( isSet( $message->message ) )
-                $mess = $message->message;
+    
+            $link = null;
+            $source = null;
+            $picture = null;
+            $name = null;
+            $caption = null;
+            $description = null;
+     
+            if( isSet( $message['message'] ) )
+                $mess = $message['message'];
+
+            $commentsNum = 0;
+            if ( isSet ($message['comments']) )
+            {
+                $commentsNum = count($message['comments']);
+            }
+
+            if ( isSet ( $message['link'] ))
+            {
+                $link = $message['link'];
+            }
+
+            if ( isSet ( $message['source'] ))
+            {
+                $source = $message['source'];
+            }
+
+            if ( isSet ( $message['picture'] ))
+            {
+                $picture = $message['picture'];
+            }
+
+            if ( isSet ( $message['name'] ))
+            {
+                $name = $message['name'];
+            }
+
+            if ( isSet ( $message['caption'] ))
+            {
+                $caption = $message['caption'];
+            }
+
+            if ( isSet ( $message['description'] ))
+            {
+                $description = $message['description'];
+            }
 
             if( !$datetime )
             {
-                $this->context->data->insertTopic( $ids[1], $this->gid, 0, $mess, $message->created_time, $message->updated_time, $message->comments->count, $likes_count, $message->from->id, $message->from->name );
+                $this->context->data->insertTopic( 
+                    $ids[1], 
+                    $this->gid, 
+                    0, 
+                    $mess, 
+                    $message['created_time'], 
+                    $message['updated_time'], 
+                    $commentsNum, 
+                    0, 
+                    $message['from']['id'], 
+                    $message['from']['name'],
+                    $message['type'],
+                    $link, 
+                    $source, 
+                    $picture, 
+                    $name, 
+                    $caption, 
+                    $description
+                );
                 $this->saveTags( $mess, $ids[1] );
                 $this->cnt_inserted++;
             }
             else
             {
-                $this->context->data->updateTopic( $ids[1], $mess, $message->updated_time, $message->comments->count, $likes_count );
+                $this->context->data->updateTopic( 
+                    $ids[1], 
+                    $mess, 
+                    $message['updated_time'], 
+                    $commentsNum, 
+                    0 );
                 $this->cnt_updated++;
             }
 
-            if( isSet( $message->likes->data ) && count( $message->likes->data ) )
+            if( isSet( $message['comments']['data'] ) && count( $message['comments']['data'] ) )
             {
-                foreach( $message->likes->data as $like )
-                {
-                    $this->context->likes->refill( $ids[1], $like->id, $like->name );
-                }
-            }
-
-
-            if( isSet( $message->comments->data ) && count( $message->comments->data ) )
-            {
-                foreach( $message->comments->data as $comment )
+                foreach( $message['comments']['data'] as $comment )
                 {
                     // fix timezone issue
-                    $comment->created_time = date( DATE_ISO8601, strtotime( $comment->created_time ) );
-
-                    $ids = explode( "_", $comment->id );
+                    $comment['created_time'] = date( DATE_ISO8601, strtotime( $comment['created_time'] ) );
                     $mess = "";
-                    if( isSet( $comment->message ) )
-                        $mess = $comment->message;
+                    if( isSet( $comment['message'] ) )
+                        $mess = $comment['message'];
                     $likes_count = 0;
-                    if( isSet( $comment->likes ) )
-                        $likes_count = $comment->likes;
-
-                    if( $this->context->data->existsComment( $ids[2], $ids[1] ) )
+                   
+                    if( $this->context->data->existsComment( $comment['id'], $ids[1] ) )
                     {
-                        $this->context->data->updateComment( $ids[2], $ids[1], $mess, $likes_count );
+                        $this->context->data->updateComment( $comment['id'], $ids[1], $mess, $likes_count );
                         $this->cnt_updated++;
                     }
                     else
                     {
-                        $this->context->data->insertComment( $ids[2], $this->gid, $ids[1], $mess, $comment->created_time, $likes_count, $comment->from->id, $comment->from->name );
+                        $this->context->data->insertComment( $comment['id'], $this->gid, $ids[1], $mess, $comment['created_time'], $likes_count, $comment['from']['id'], $comment['from']['name'] );
                         $this->cnt_inserted++;
                     }
                 }
@@ -183,17 +246,17 @@ class CrawlerPresenter extends BasePresenter
     {
         if( !$this->nextPage || $this->nextPage == "" )
         {
-            $query = "https://graph.facebook.com/" . $this->gid . "/feed?access_token=" . $this->token;
+            $query = "/" . $this->gid . "/feed";
         }
         else
         {
-            $query = $this->nextPage;
+            $query = str_replace( 'https://graph.facebook.com', '', $this->nextPage );
         }
 
         // trying download next json, it is possible to make 5 attempts per one query
         try
         {
-            $pageContent = file_get_contents( $query );
+            $result = $this->facebook->api( $query );
         } catch( Exception $e )
         {
             echo "$cnt_attempts attempt per query ($query).";
@@ -205,12 +268,12 @@ class CrawlerPresenter extends BasePresenter
             }
             echo 'Caught exception: ', $e->getMessage(), " ... repeating query ($query)\n";
 
-            return getJson( ++$cnt_attempts );
+            return $this->getJson( ++$cnt_attempts );
         }
-        $json = json_decode( $pageContent );
-        if( isSet( $json->paging->next ) )
+
+        if( isSet( $result['paging']['next'] ) )
         {
-            $this->nextPage = $json->paging->next;
+            $this->nextPage = $result['paging']['next'];
         }
         else
         {
@@ -219,7 +282,7 @@ class CrawlerPresenter extends BasePresenter
 
         $this->cnt_downloaded++;
 
-        return $json;
+        return $result;
     }
 
     // there are tags in messages like [tag], we wanna save them apart
