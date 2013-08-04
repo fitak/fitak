@@ -71,9 +71,8 @@ a[href^="error:"] {
 .topic {
 	border-width: 1px;
 	border-style: solid;
-	border-color: #999999;
+	border-color: #CCCCCC;
 	border-radius: 5px;
-	box-shadow: 0 0 10px #999999;
 	padding: 1em;
 	margin-bottom: 1em;
 }
@@ -93,11 +92,11 @@ a[href^="error:"] {
 
 .topic .comment,
 .topic .comment-marked {
-	padding: 0.5em 0.5em 0 0.5em;
+	padding: 1em;
 	margin-bottom: 1em;
 	border-top-left-radius: 3px;
-	border-top: 1px solid #BBBBBB;
-	border-left: 1px solid #BBBBBB;
+	border-top: 1px solid #DDDDDD;
+	border-left: 1px solid #DDDDDD;
 }
 
 .highlight {
