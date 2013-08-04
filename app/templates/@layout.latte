@@ -47,6 +47,14 @@
 	</script>
 </head>
 <body>
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/cs_CZ/all.js#xfbml=1&appId=105567419586340";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
 	
 	<div class="navbar navbar-inverse navbar-fixed-top navbg"> 
 		<div class="container">
@@ -69,9 +77,9 @@
 						</ul>
 					</li>
 					<li n:class="$presenter->islinkCurrent('about:*') ? active"><a n:href="about:">O webu</a></li>
-					<li><a href="#">Přihlásit se</a></li>
+					<li><a href="https://www.github.com/fitak">GitHub</a></li>
+					<li><a href="https://www.facebook.com/fitakcz">Facebook</a></li>
 				</ul>
-				
 			</div>
 		</div>
 	</div>
