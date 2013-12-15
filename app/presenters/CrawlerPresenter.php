@@ -247,8 +247,6 @@ class CrawlerPresenter extends BasePresenter
     // save comments
     private function addComments( $comments, $topicId )
     {
-        var_dump($comments);
-        echo "<hr>";
         foreach( $comments as $comment )
         {
             // fix timezone issue
