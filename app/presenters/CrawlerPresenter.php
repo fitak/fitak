@@ -216,30 +216,59 @@ class CrawlerPresenter extends BasePresenter
 
             if( isSet( $message['comments']['data'] ) && count( $message['comments']['data'] ) )
             {
-                foreach( $message['comments']['data'] as $comment )
+                $this->addComments( $message['comments']['data'], $ids[1] );
+
+                $next = false;
+                if( isSet( $message['comments']['paging']['next'] ))
                 {
-                    // fix timezone issue
-                    $comment['created_time'] = date( DATE_ISO8601, strtotime( $comment['created_time'] ) );
-                    $mess = "";
-                    if( isSet( $comment['message'] ) )
-                        $mess = $comment['message'];
-                    $likes_count = 0;
-                   
-                    if( $this->context->data->existsComment( $comment['id'], $ids[1] ) )
+                    $next = $message['comments']['paging']['next'];
+                }
+
+                while( $next )
+                {
+                    $url = $next.'&access_token='.$this->token;
+                    $extraComments = json_decode( file_get_contents($url), true );
+                    $next = false;
+                    if ( isSet( $extraComments['data'] ) )
                     {
-                        $this->context->data->updateComment( $comment['id'], $ids[1], $mess, $likes_count );
-                        $this->cnt_updated++;
-                    }
-                    else
-                    {
-                        $this->context->data->insertComment( $comment['id'], $this->gid, $ids[1], $mess, $comment['created_time'], $likes_count, $comment['from']['id'], $comment['from']['name'] );
-                        $this->cnt_inserted++;
-                    }
+                        $this->addComments( $extraComments['data'], $ids[1] );
+                        if( isSet( $extraComments['paging']['previous'] ))
+                        {
+                            $next = $extraComments['paging']['previous'];
+                        }    
+                    }                
                 }
             }
         }
 
         return true;
+    }
+
+    // save comments
+    private function addComments( $comments, $topicId )
+    {
+        var_dump($comments);
+        echo "<hr>";
+        foreach( $comments as $comment )
+        {
+            // fix timezone issue
+            $comment['created_time'] = date( DATE_ISO8601, strtotime( $comment['created_time'] ) );
+            $mess = "";
+            if( isSet( $comment['message'] ) )
+                $mess = $comment['message'];
+            $likes_count = 0;
+           
+            if( $this->context->data->existsComment( $comment['id'], $topicId ) )
+            {
+                $this->context->data->updateComment( $comment['id'], $topicId, $mess, $likes_count );
+                $this->cnt_updated++;
+            }
+            else
+            {
+                $this->context->data->insertComment( $comment['id'], $this->gid, $topicId, $mess, $comment['created_time'], $likes_count, $comment['from']['id'], $comment['from']['name'] );
+                $this->cnt_inserted++;
+            }
+        }
     }
 
     // get another json with group feed
