@@ -24,18 +24,18 @@
 				</small>
 				</span>
 			</div>
-			
+
 			<div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
 				<div class="form-group">
 				{label sortBy/}
 				{input sortBy, class => "form-control"}
 				</div>
-				
+
 				<div class="form-group">
 				{label from/}
 				{input from, class => "form-control"}
 				</div>
-			
+
 				<div class="form-group">
 				{foreach $form['groups']->controls as $checkbox}
 				<div class="checkbox">
@@ -59,7 +59,7 @@
 					var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
 					var link = $(this);
 					link.text(link.text().replace(currentSymbol, newSymbol));
-					advSearch.slideToggle();
+					advSearch.slideToggle(0);
 					return false;
 				});
 			});
