@@ -20,14 +20,8 @@
     {/if}
     </div>
 
-    <p><a href="#" onClick="shit()" style="border-top:1px solid #BBBBBB; padding-top:3px;">Kdy jsou státnice?</a></p>
-    <div id="statnice" style="display:none;font-size:22px;padding-top:20px">
-        <p><strong>Bakalářská státní závěrečná zkouška</strong></p>
-        <p id="countdown2"></p>
+    <p><img src="{$basePath}/img/keepitup.jpg" title="Keep it up!" alt="Keep it up!" /></p>
 
-        <p style="padding-top:20px;"><strong>Magisterská státní závěrečná zkouška</strong></p>
-        <p id="countdown"></p>
-    </div>
 
     {foreach $news as $message}
     	<div class="panel panel-info">
@@ -44,80 +38,6 @@
 			    $("#incComments").slideToggle();
 		    });
 		});
-
-        var end = new Date('06/9/2014 0:00 AM');
-        var end2 = new Date('06/16/2014 0:00 AM');
-        var _second = 1000;
-        var _minute = _second * 60;
-        var _hour = _minute * 60;
-        var _day = _hour * 24;
-        var timer;
-        var timer2;
-        var run = false;
-        var audio = new Audio('mi.mp3');
-
-        function shit()
-        {
-            if (!run)
-            {
-                audio.play();
-                run = true;
-                document.getElementById('statnice').style.display = 'block';
-            }
-            else
-            {
-                audio.pause();
-                run = false;
-                document.getElementById('statnice').style.display = 'none';
-            }
-        }
-
-        function showRemaining() {
-            var now = new Date();
-            var distance = end - now;
-            var distance2 = end2 - now;
-            if (distance < 0) {
-                clearInterval(timer);
-                document.getElementById('countdown').innerHTML = 'Hodně štěstí!';
-                return;
-            }
-            if (distance2 < 0) {
-                clearInterval(timer);
-                document.getElementById('countdown2').innerHTML = 'Hodně štěstí!';
-                return;
-            }
-
-            var str = "" + 1;
-            var pad = "000";
-            var days = Math.floor(distance / _day);
-            var hours = Math.floor((distance % _day) / _hour);
-            var minutes = Math.floor((distance % _hour) / _minute);
-            var seconds = Math.floor((distance % _minute) / _second);
-            var milliseconds = Math.floor((distance % _second)).toString();
-            milliseconds = pad.substring(0, pad.length - milliseconds.length) + milliseconds;
-
-            document.getElementById('countdown').innerHTML = days + ' dní ';
-            document.getElementById('countdown').innerHTML += hours + ' hodin ';
-            document.getElementById('countdown').innerHTML += minutes + ' minut ';
-            document.getElementById('countdown').innerHTML += seconds + '.' + milliseconds + ' sekund';
-
-            var str2 = "" + 1;
-            var pad2 = "000";
-            var days2 = Math.floor(distance2 / _day);
-            var hours2 = Math.floor((distance2 % _day) / _hour);
-            var minutes2 = Math.floor((distance2 % _hour) / _minute);
-            var seconds2 = Math.floor((distance2 % _minute) / _second);
-            var milliseconds2 = Math.floor((distance2 % _second)).toString();
-            milliseconds2 = pad2.substring(0, pad2.length - milliseconds2.length) + milliseconds2;
-
-            document.getElementById('countdown2').innerHTML = days2 + ' dní ';
-            document.getElementById('countdown2').innerHTML += hours2 + ' hodin ';
-            document.getElementById('countdown2').innerHTML += minutes2 + ' minut ';
-            document.getElementById('countdown2').innerHTML += seconds2 + '.' + milliseconds2 + ' sekund';
-
-        }
-
-        timer = setInterval(showRemaining, 10);
     </script>
 </div>
 {/block}
