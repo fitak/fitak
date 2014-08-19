@@ -72,6 +72,13 @@ common:
 		templateFactory:
 			class: TemplateFactory
 
+		routerFactory:
+			class: RouterFactory
+			arguments: [%productionMode%]
+
+		router:
+			factory: @routerFactory::create
+
 
 production < common:
 	includes:
