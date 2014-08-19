@@ -72,10 +72,7 @@ class SearchPresenter extends BasePresenter
 
     protected function createComponentStream()
     {
-        $control = new StreamControl();
-        $control->templateHelpersLoaders = $this->template->getHelperLoaders();
-
-        return $control;
+        return new StreamControl($this->templateFactory);
     }
 
 }

@@ -2,6 +2,9 @@ common:
 	includes:
 		- fbparams.neon
 
+	extensions:
+		dibi: Dibi\Bridges\Nette\DibiExtension22
+
 	php:
 		date.timezone: Europe/Prague
 
@@ -48,6 +51,15 @@ common:
 
 		searchQueryParser:
 			class: SearchQueryParser
+
+		linkFactory:
+			class: Nextras\Application\LinkFactory
+
+		templateHelpers:
+			class: TemplateHelpers
+
+		templateFactory:
+			class: TemplateFactory
 
 
 production < common:

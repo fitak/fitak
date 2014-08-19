@@ -14,8 +14,14 @@ class StreamControl extends UI\Control
     /** @var int maximum number of topics on a single page */
     public $topicsPerPage = 20;
 
-    /** @var Nette\Callback[] */
-    public $templateHelpersLoaders;
+    private $templateFactory;
+
+    public function __construct( TemplateFactory $templateFactory )
+    {
+        parent::__construct(  );
+        $this->templateFactory = $templateFactory;
+    }
+
 
     public function render()
     {
@@ -38,12 +44,8 @@ class StreamControl extends UI\Control
 
     protected function createTemplate( $class = null )
     {
-        $template = parent::createTemplate( $class );
+        $template = $this->templateFactory->createTemplate($this);
         $template->setFile( __DIR__ . '/StreamControl.latte' );
-        foreach( $this->templateHelpersLoaders as $loader )
-        {
-            $template->registerHelperLoader( $loader );
-        }
 
         return $template;
     }

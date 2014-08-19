@@ -7,7 +7,7 @@ use Nette\DI\CompilerExtension;
 require LIBS_DIR . '/autoload.php';
 
 // Configure application
-$configurator = new Nette\Config\Configurator;
+$configurator = new Nette\Configurator;
 
 // Enable Nette Debugger for error visualisation & logging
 //$configurator->setDebugMode($configurator::AUTO);
@@ -19,13 +19,8 @@ $configurator->createRobotLoader()
         ->addDirectory(APP_DIR)
         ->register();
 
-// dibi
-$configurator->onCompile[] = function($configurator, $compiler) {
-        $compiler->addExtension('dibi', new DibiNette20Extension);
-};
-
 // Create Dependency Injection container from config.neon file
-$configurator->addConfig(__DIR__ . '/config/config.neon');
+$configurator->addConfig(__DIR__ . '/config/config.neon', $configurator::AUTO);
 $container = $configurator->createContainer();
 
 

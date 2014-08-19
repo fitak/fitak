@@ -5,16 +5,20 @@
  *
  * @author     Vojtech Miksu <vojtech@miksu.cz>
  */
-use Nette\Utils\Strings;
-
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
+    /** @var TemplateFactory */
+    protected $templateFactory;
+
+    public function __construct(TemplateFactory $templateFactory)
+    {
+        parent::__construct();
+        $this->templateFactory = $templateFactory;
+    }
 
     protected function createTemplate( $class = null )
     {
-        $templateHelpers = new TemplateHelpers( $this, $this->context->tags );
-        $template = parent::createTemplate( $class );
-        $template->registerHelperLoader( callback( $templateHelpers, "loader" ) );
+        $template = $this->templateFactory->createTemplate($this);
         $template->groupList = $this->context->groups->getList();
 
         return $template;

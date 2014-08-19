@@ -3,7 +3,7 @@
 	"description": "Fitak - Web tool for downloading data from Facebook groups. Search engine included.",
 	"keywords": ["searchengine", "facebook"],
 	"homepage": "http://www.fitak.cz",
-	"license": ["New-BSD-License"],
+	"license": ["BSD-3-Clause"],
 	"authors": [
 		{
 			"name": "Vojtech Miksu",
@@ -16,10 +16,8 @@
 	"require": {
 		"php": ">= 5.3.0",
 		"nette/nette": ">= 2.0.11",
-		"dg/dibi": ">= 2.0.0",
-		"facebook/php-sdk": ">= 3.2.2"
-	},
-	"autoload": {
-		"classmap": ["libs/"]
+		"dibi/dibi": ">= 2.0.0",
+		"facebook/php-sdk": ">= 3.2.2",
+		"nextras/link-factory": "@dev"
 	}
 }

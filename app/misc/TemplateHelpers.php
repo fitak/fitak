@@ -4,23 +4,23 @@ use Nette\Utils\Strings;
 class TemplateHelpers extends Nette\Object
 {
 
-    /** @var Nette\Application\UI\Presenter */
-    private $presenter;
-
     /** @var Tags */
     private $tagsModel;
 
-    public function __construct( Nette\Application\UI\Presenter $presenter, Tags $tagsModel )
+    /** @var \Nextras\Application\LinkFactory */
+    private $linkFactory;
+
+    public function __construct( Nextras\Application\LinkFactory $linkFactory, Tags $tagsModel )
     {
-        $this->presenter = $presenter;
         $this->tagsModel = $tagsModel;
+        $this->linkFactory = $linkFactory;
     }
 
-    public function loader( $name )
+    public function loader( $name, $a = NULL, $b = NULL, $c = NULL )
     {
         if( method_exists( $this, $name ) )
         {
-            return callback( $this, $name );
+            return $this->$name($a, $b, $c);
         }
     }
 
@@ -32,7 +32,7 @@ class TemplateHelpers extends Nette\Object
         {
             foreach ( $tags[0] as $index => $tag )
             {
-                $url = $this->presenter->link( 'Search:default', 'tag:' . $tag );
+                $url = $this->linkFactory->link( 'Search:default', ['s' => 'tag:' . $tag] );
                 $item = str_replace( '['.$tags[1][$index].']', "<a href=\"$url\"><span class=\"label label-info\">$tag</span></a> ", $item );
             }
         }
