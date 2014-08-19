@@ -140,9 +140,14 @@ class Data extends BaseModel
         $sql = $this->db->select( "data.id, data.parent_id" )
             ->from( "data" )
             ->leftJoin( "groups" )
-            ->on( "data.group_id = groups.id" )
-            ->where( "data.id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) )
-            ->where( "data.parent_id NOT IN %in", $this->getMatchedIdByTags( $this->mutedTags ) );
+            ->on( "data.group_id = groups.id" );
+
+        $muted = $this->getMatchedIdByTags( $this->mutedTags );
+        if ($muted)
+        {
+            $sql->where( "data.id NOT IN %in", $muted )
+                ->where( "data.parent_id NOT IN %in", $muted );
+        }
 
         // use of filters on query
         $this->addSearchCondition( $sql, $request );
