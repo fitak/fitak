@@ -36,48 +36,20 @@ common:
 				- 127.0.0.1
 
 	services:
-		data:
-			class: Data(@dibi.connection)
-
-		elasticSearch:
-			class: ElasticSearch(%elastic%, %appDir%)
-
-		groups:
-			class: Groups(@dibi.connection)
-
-		highlighter:
-			class: Highlighter
-
-		likes:
-			class: Likes(@dibi.connection)
-
-		news:
-			class: News(@dibi.connection)
-
-		tags:
-			class: Tags(@dibi.connection)
-
-		token:
-			class: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%, %admin_email%)
-
-		searchQueryParser:
-			class: SearchQueryParser
-
-		linkFactory:
-			class: Nextras\Application\LinkFactory
-
-		templateHelpers:
-			class: TemplateHelpers
-
-		templateFactory:
-			class: TemplateFactory
-
-		routerFactory:
-			class: RouterFactory
-			arguments: [%productionMode%]
-
-		router:
-			factory: @routerFactory::create
+		data: Data
+		elasticSearch: ElasticSearch(%elastic%, %appDir%)
+		groups: Groups
+		highlighter: Highlighter
+		likes: Likes
+		news: News
+		tags: Tags
+		token: Token(@dibi.connection, %app_id%, %permissions%, %app_secret%, %admin_email%)
+		searchQueryParser: SearchQueryParser
+		linkFactory: Nextras\Application\LinkFactory
+		templateHelpers: TemplateHelpers
+		templateFactory: TemplateFactory
+		routerFactory: RouterFactory(%productionMode%)
+		router: @routerFactory::create
 
 
 production < common:
