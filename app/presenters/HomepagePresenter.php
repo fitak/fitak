@@ -1,13 +1,8 @@
 <?php
 
 /**
- * Homepage presenter.
- *
  * @author     Vojtech Miksu <vojtech@miksu.cz>
  */
-use Nette\Application\UI\Form,
-    Nette\Diagnostics\Debugger;
-
 class HomepagePresenter extends BasePresenter
 {
 

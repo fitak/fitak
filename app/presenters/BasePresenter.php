@@ -7,6 +7,7 @@
  */
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
+
     /** @var TemplateFactory */
     protected $templateFactory;
 

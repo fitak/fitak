@@ -1,12 +1,8 @@
 <?php
 
 /**
- * Description of SearchPresenter
- *
  * @author Vojtech Miksu <vojtech@miksu.cz>
  */
-use Nette\Diagnostics\Debugger;
-
 class SearchPresenter extends BasePresenter
 {
 
