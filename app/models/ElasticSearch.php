@@ -104,7 +104,7 @@ class ElasticSearch extends Client
 								'should' => [
 									'match' => [
 										'is_topic' => [
-											'query' => true,
+											'query' => TRUE,
 										],
 									],
 								]
@@ -194,7 +194,8 @@ class ElasticSearch extends Client
 	 */
 	public static function getStopwords()
 	{
-		return ['a', 's', 'k', 'o', 'i', 'u', 'v', 'z', 'dnes', 'cz', 'tímto', 'budeš', 'budem',
+		return [
+			'a', 's', 'k', 'o', 'i', 'u', 'v', 'z', 'dnes', 'cz', 'tímto', 'budeš', 'budem',
 			'byli', 'jseš', 'můj', 'svým', 'ta', 'tomto', 'tohle', 'tuto', 'tyto',
 			'jej', 'zda', 'proč', 'máte', 'tato', 'kam', 'tohoto', 'kdo', 'kteří',
 			'mi', 'nám', 'tom', 'tomuto', 'mít', 'nic', 'proto', 'kterou', 'byla',
@@ -211,7 +212,8 @@ class ElasticSearch extends Client
 			'to', 'jako', 'za', 'zpět', 'ze', 'do', 'pro', 'je', 'na', 'atd', 'atp',
 			'jakmile', 'přičemž', 'já', 'on', 'ona', 'ono', 'oni', 'ony', 'my', 'vy',
 			'jí', 'ji', 'mě', 'mne', 'jemu', 'tomu', 'těm', 'těmu', 'němu', 'němuž',
-			'jehož', 'jíž', 'jelikož', 'jež', 'jakož', 'načež'];
+			'jehož', 'jíž', 'jelikož', 'jež', 'jakož', 'načež'
+		];
 	}
 
 }

@@ -1,5 +1,6 @@
 <?php
 
+
 class Highlighter
 {
 
@@ -48,19 +49,19 @@ class Highlighter
 			$words[] = preg_quote($word, '~');
 		}
 		return '~' .
-			preg_quote(ElasticSearch::HIGHLIGHT_END, '~') .
-			'(\W*\s*(' . implode('|', $words) . ')\s*\W*)' .
-			preg_quote(ElasticSearch::HIGHLIGHT_START, '~') .
-			'~';
+		preg_quote(ElasticSearch::HIGHLIGHT_END, '~') .
+		'(\W*\s*(' . implode('|', $words) . ')\s*\W*)' .
+		preg_quote(ElasticSearch::HIGHLIGHT_START, '~') .
+		'~';
 	}
 
 	private static function buildTagsRegex()
 	{
 		return '~\\[([^\\[]{0,10})' .
-			'(' . preg_quote(ElasticSearch::HIGHLIGHT_START, '~') . ')' .
-			'([^\\]]{1,15})' .
-			'(' . preg_quote(ElasticSearch::HIGHLIGHT_END, '~') . ')' .
-			'([^\\]]){0,10}\\]~';
+		'(' . preg_quote(ElasticSearch::HIGHLIGHT_START, '~') . ')' .
+		'([^\\]]{1,15})' .
+		'(' . preg_quote(ElasticSearch::HIGHLIGHT_END, '~') . ')' .
+		'([^\\]]){0,10}\\]~';
 	}
 
 }

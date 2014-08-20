@@ -1,23 +1,24 @@
 <?php
 
+
 /**
  * @author     Vojtech Miksu <vojtech@miksu.cz>
  */
 class HomepagePresenter extends BasePresenter
 {
 
-    public function renderDefault()
-    {
-        $this->template->trends = $this->context->tags->getTrends();
-        $this->template->news = $this->context->news->getAllNews();
-    }
+	public function renderDefault()
+	{
+		$this->template->trends = $this->context->tags->getTrends();
+		$this->template->news = $this->context->news->getAllNews();
+	}
 
-    protected function createComponentSearchForm()
-    {
-        $form = new SearchForm( $this->context->groups, $advanced = false);
-        $form->onSuccess[] = callback( $form, 'submitted' );
+	protected function createComponentSearchForm()
+	{
+		$form = new SearchForm($this->context->groups, $advanced = FALSE);
+		$form->onSuccess[] = callback($form, 'submitted');
 
-        return $form;
-    }
+		return $form;
+	}
 
 }

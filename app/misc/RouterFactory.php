@@ -4,29 +4,30 @@ use Nette\Application\Routers\RouteList;
 
 class RouterFactory extends Nette\Object
 {
-    /** @var bool */
-    private $useHttps;
 
-    public function __construct( $useHttps )
-    {
-        $this->useHttps = $useHttps;
-    }
+	/** @var bool */
+	private $useHttps;
 
-    /**
-     * @return \Nette\Application\IRouter
-     */
-    public function create()
-    {
-        $router = new RouteList();
-        $router[] = new Route( 'index.php', 'Homepage:default', Route::ONE_WAY );
+	public function __construct($useHttps)
+	{
+		$this->useHttps = $useHttps;
+	}
 
-        $flags = $this->useHttps ? [ Route::ONE_WAY, Route::SECURED ] : [ 0 ];
-        foreach( $flags as $flag )
-        {
-            $router[] = new Route( 'stream/', 'Search:stream', $flag );
-            $router[] = new Route( '<presenter>/<action>[/<id>]', 'Homepage:default', $flag );
-        }
+	/**
+	 * @return \Nette\Application\IRouter
+	 */
+	public function create()
+	{
+		$router = new RouteList();
+		$router[] = new Route('index.php', 'Homepage:default', Route::ONE_WAY);
 
-        return $router;
-    }
+		$flags = $this->useHttps ? [Route::ONE_WAY, Route::SECURED] : [0];
+		foreach ($flags as $flag)
+		{
+			$router[] = new Route('stream/', 'Search:stream', $flag);
+			$router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', $flag);
+		}
+
+		return $router;
+	}
 }

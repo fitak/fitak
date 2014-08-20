@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * Base class for all application presenters.
  *
@@ -8,21 +9,21 @@
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
-    /** @var TemplateFactory */
-    protected $templateFactory;
+	/** @var TemplateFactory */
+	protected $templateFactory;
 
-    public function __construct(TemplateFactory $templateFactory)
-    {
-        parent::__construct();
-        $this->templateFactory = $templateFactory;
-    }
+	public function __construct(TemplateFactory $templateFactory)
+	{
+		parent::__construct();
+		$this->templateFactory = $templateFactory;
+	}
 
-    protected function createTemplate( $class = null )
-    {
-        $template = $this->templateFactory->createTemplate($this);
-        $template->groupList = $this->context->groups->getList();
+	protected function createTemplate($class = NULL)
+	{
+		$template = $this->templateFactory->createTemplate($this);
+		$template->groupList = $this->context->groups->getList();
 
-        return $template;
-    }
+		return $template;
+	}
 
 }
