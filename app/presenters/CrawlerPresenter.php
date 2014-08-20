@@ -7,6 +7,7 @@
  * @author Vojtech Miksu <vojtech@miksu.cz>
  */
 use Nette\Diagnostics\Debugger;
+use Nette\Utils\Random;
 
 class CrawlerPresenter extends BasePresenter
 {
@@ -42,51 +43,51 @@ class CrawlerPresenter extends BasePresenter
 	}
 
 	// getting token from Facebook
-	public function actionToken($state)
+	public function actionToken($state, $code)
 	{
-		// only poeple on the list should be generating new tokens
-		if (!$this->context->token->checkAccess($_SERVER['REMOTE_ADDR']))
+		$tokenManager = $this->context->token;
+		$ip = $this->getHttpRequest()->getRemoteAddress();
+
+		if (!$tokenManager->checkAccess($ip))
 		{
 			echo "Oh sorry man, this is a private party!";
-			mail($this->context->token->getEmail(), 'Notice', 'The token is maybe invalid!');
-			$this->terminate();
+			mail($tokenManager->getEmail(), 'Notice', 'The token is maybe invalid!');
+			$this->error(NULL, 403);
 		}
 
-		// facebook example code...
-		$stoken = $this->session->getSection('token');
-		if (!isSet($_GET['code']))
+		$session = $this->session->getSection('crawler.token');
+		if ($code === NULL)
 		{
-			$stoken->state = md5(uniqid(rand(), TRUE)); //CSRF protection
-			$dialog_url = "https://www.facebook.com/dialog/oauth?client_id="
-				. $this->context->token->getAppId() . "&redirect_uri=" .
-				urlencode($this->link('//Crawler:token')) . "&scope=" .
-				$this->context->token->getAppPermissions() . "&state="
-				. $stoken->state;
-
-			echo("<script> top.location.href='" . $dialog_url . "'</script>");
-			$this->terminate();
+			$session->state = Random::generate();
+			$this->redirectUrl('https://www.facebook.com/dialog/oauth?' . http_build_query([
+				'client_id' => $tokenManager->getAppId(),
+				'redirect_uri' => $this->link('//Crawler:token'),
+				'scope' => $tokenManager->getAppPermissions(),
+				'state' => $session->state,
+			]));
 		}
 
-		if (isSet($stoken->state) && ($stoken->state === $_GET['state']))
+		if (empty($session->state) || $session->state !== $state)
 		{
-			$token_url = "https://graph.facebook.com/oauth/access_token?"
-				. "client_id=" . $this->context->token->getAppId() . "&redirect_uri=" .
-				urlencode($this->link('//Crawler:token'))
-				. "&client_secret=" . $this->context->token->getAppSecret() . "&code=" . $_GET['code'];
-
-			$response = file_get_contents($token_url);
-			$params = NULL;
-			parse_str($response, $params);
-
-			$date = new DateTime();
-			$date->add(new DateInterval('PT' . $params["expires"] . 'S'));
-			$this->context->token->saveToken($params['access_token'], $date);
-			echo "Thanks for your token :)";
+			echo "The state does not match. You may be a victim of CSRF.";
+			$this->error(NULL, 403);
 		}
-		else
-		{
-			echo("The state does not match. You may be a victim of CSRF.");
-		}
+
+		$response = file_get_contents('https://graph.facebook.com/oauth/access_token?' . http_build_query([
+			'client_id' => $tokenManager->getAppId(),
+			'client_secret' => $tokenManager->getAppSecret(),
+			'redirect_uri' => $this->link('//Crawler:token'),
+			'code' => $code,
+		]));
+
+		$params = NULL;
+		parse_str($response, $params);
+
+		$date = new DateTime();
+		$date->add(new DateInterval('PT' . $params['expires'] . 'S'));
+		$tokenManager->saveToken($params['access_token'], $date);
+
+		echo "Thanks for your token :)";
 		$this->terminate();
 	}
 
