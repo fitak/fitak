@@ -66,17 +66,19 @@ class Token extends BaseModel
 		return $this->permissions;
 	}
 
+	/**
+	 * Checks if given IP address is whitelisted.
+	 *
+	 * @param  string $ip
+	 * @return bool
+	 */
 	public function checkAccess($ip)
 	{
-		$result = $this->db->query("SELECT id
-                                    FROM ip
-                                    WHERE ip = %s", $ip);
-		if (count($result))
-		{
-			return TRUE;
-		}
-
-		return FALSE;
+		return (bool) $this->db->fetchSingle('
+			SELECT COUNT(*)
+			FROM ip
+			WHERE ip = %s', $ip
+		);
 	}
 
 }
