@@ -20,27 +20,35 @@ class Token extends BaseModel
 		return $this->admin_email;
 	}
 
+	/**
+	 * Returns a valid token or FALSE if no valid token is available.
+	 *
+	 * @return string|FALSE
+	 */
 	public function getToken()
 	{
-		$result = $this->db->query("SELECT token, expiration
-                                    FROM tokens
-                                    WHERE expiration > %t LIMIT 1", new DateTime);
-		if (!count($result))
-		{
-			return NULL;
-		}
-
-		return $result->fetchSingle();
+		return $this->db->fetchSingle('
+			SELECT token
+			FROM tokens
+			WHERE expiration > NOW()
+			LIMIT 1
+        ');
 	}
 
-	public function saveToken($token, $date)
+	/**
+	 * Saves new token to database.
+	 *
+	 * @param  string $token
+	 * @param  DateTime $date
+	 * @return void
+	 */
+	public function saveToken($token, DateTime $date)
 	{
-		$arr = [
+		$this->db->query('TRUNCATE tokens');
+		$this->db->query('INSERT INTO tokens', [
 			'token' => $token,
 			'expiration' => $date,
-		];
-		$this->db->query('TRUNCATE tokens');
-		$this->db->query('INSERT INTO tokens', $arr);
+		]);
 	}
 
 	public function getAppSecret()
