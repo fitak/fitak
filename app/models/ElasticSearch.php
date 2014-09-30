@@ -87,7 +87,7 @@ class ElasticSearch extends Client
 		$this->indices()->putMapping($args);
 	}
 
-	public function fulltextSearch($query, $length, $offset)
+	public function fulltextSearch($query, $length, $offset, $groups = [])
 	{
 		$args = [
 			'index' => self::INDEX,
@@ -122,6 +122,15 @@ class ElasticSearch extends Client
 				],
 			]
 		];
+		if ($groups)
+		{
+			$args['body']['filter'] = [
+				'terms' => [
+					'group' => $groups,
+					'execution' => 'bool',
+				]
+			];
+		}
 
 		return $this->search($args);
 	}

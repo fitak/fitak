@@ -216,7 +216,7 @@ class Data extends BaseModel
 
 	public function searchFulltext(SearchRequest $request, $length, $offset)
 	{
-		$response = $this->elastic->fulltextSearch($request->query, $length, $offset);
+		$response = $this->elastic->fulltextSearch($request->query, $length, $offset, $request->groups);
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
