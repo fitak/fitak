@@ -113,14 +113,5 @@
             topic.find('.comment').toggle();
             return false;
         });
-
-        var keywords = {$highlightKeywords};
-        var message = $('.message');
-	    var options = {
-		    color: ''
-	    };
-        for (var i = 0; i < keywords.length; i++) {
-            message.highlight(keywords[i]);
-        }
     });
 </script>
