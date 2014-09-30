@@ -87,23 +87,30 @@ class ElasticSearch extends Client
 		$this->indices()->putMapping($args);
 	}
 
-	public function fulltextSearch($type, $query, array $in = NULL)
+	public function fulltextSearch($query)
 	{
-		if (!$in)
-		{
-			$in = '_all';
-		}
 		$args = [
 			'index' => self::INDEX,
-			'type' => $type,
+			'type' => self::TYPE_CONTENT,
 			'body' => [
-				'fields' => [],
+				'fields' => ['is_topic'],
 				'from' => 0,
 				'size' => 10,
 				'query' => [
-					'multi_match' => [
-						'query' => $query,
-						'fields' => $in,
+					'bool' => [
+						'must' => [
+							'multi_match' => [
+								'query' => $query,
+								'fields' => ['message'],
+							],
+						],
+						'should' => [
+							'match' => [
+								'is_topic' => [
+									'query' => true,
+								],
+							],
+						]
 					]
 				],
 				'highlight' => [
