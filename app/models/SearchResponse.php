@@ -19,13 +19,20 @@ class SearchResponse extends Object implements Iterator
 	private $key = 0;
 
 	/**
+	 * @var int
+	 */
+	private $total;
+
+	/**
 	 * @param array $topics
 	 * @param array $highlights
+	 * @param int $total
 	 */
-	public function __construct($topics, array $highlights)
+	public function __construct($topics, array $highlights, $total)
 	{
 		$this->topics = array_values($topics);
 		$this->highlights = $highlights;
+		$this->total = $total;
 	}
 
 	/**
@@ -105,6 +112,14 @@ class SearchResponse extends Object implements Iterator
 	public function rewind()
 	{
 		$this->key = 0;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTotal()
+	{
+		return $this->total;
 	}
 
 }

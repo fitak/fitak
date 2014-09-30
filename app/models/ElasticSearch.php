@@ -87,15 +87,15 @@ class ElasticSearch extends Client
 		$this->indices()->putMapping($args);
 	}
 
-	public function fulltextSearch($query)
+	public function fulltextSearch($query, $length, $offset)
 	{
 		$args = [
 			'index' => self::INDEX,
 			'type' => self::TYPE_CONTENT,
 			'body' => [
-				'fields' => ['is_topic'],
-				'from' => 0,
-				'size' => 10,
+				'fields' => [],
+				'from' => $offset,
+				'size' => $length,
 				'query' => [
 					'bool' => [
 						'must' => [
