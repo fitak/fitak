@@ -20,7 +20,7 @@
         {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
 
         <div class="row message">
-            {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
+            {!$comment->message|escapeHtml|highlight:$topics->getHighlight($comment)|nl2br|tagsToLinks|urlsToLinks}
         </div>
     </div>
 {/define}
@@ -52,8 +52,7 @@
 	{*<span class="context" title='{foreach $topic->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$topic->likes ? $topic->likes : 0}x</span>*}
 
     <div class="row message">
-        {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
-
+        {!$topic->message|escapeHtml|highlight:$topics->getHighlight($topic)|nl2br|tagsToLinks|urlsToLinks}
 
         {if $topic->name}
             <blockquote style="margin-top:15px">

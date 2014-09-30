@@ -45,6 +45,9 @@ common:
 		groups:
 			class: Groups(@dibi.connection)
 
+		highlighter:
+			class: Highlighter
+
 		likes:
 			class: Likes(@dibi.connection)
 

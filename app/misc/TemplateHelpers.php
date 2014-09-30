@@ -10,10 +10,16 @@ class TemplateHelpers extends Nette\Object
     /** @var \Nextras\Application\LinkFactory */
     private $linkFactory;
 
-    public function __construct( Nextras\Application\LinkFactory $linkFactory, Tags $tagsModel )
+	/**
+	 * @var Highlighter
+	 */
+	private $highlighter;
+
+	public function __construct( Nextras\Application\LinkFactory $linkFactory, Tags $tagsModel, Highlighter $highlighter )
     {
         $this->tagsModel = $tagsModel;
         $this->linkFactory = $linkFactory;
+	    $this->highlighter = $highlighter;
     }
 
     public function loader( $name, $a = NULL, $b = NULL, $c = NULL )
@@ -23,6 +29,16 @@ class TemplateHelpers extends Nette\Object
             return $this->$name($a, $b, $c);
         }
     }
+
+	public function highlight( $input, $highlight )
+	{
+		if (!$highlight)
+		{
+			return $input;
+		}
+
+		return $this->highlighter->processHighlight($highlight);
+	}
 
     public function tagsToLinks( $item )
     {

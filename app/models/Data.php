@@ -217,14 +217,13 @@ class Data extends BaseModel
 	public function searchFulltext(SearchRequest $request, $length, $offset)
 	{
 		$response = $this->elastic->fulltextSearch(ElasticSearch::TYPE_CONTENT, $request->query, ['message']);
-		$ids = [];
+		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
-			$ids[] = $hit['_id'];
+			$map[$hit['_id']] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
 		}
 
 		$topics = $this->db->query('SELECT * FROM data WHERE id IN %in ORDER BY Field([id], ?)', array_keys($map), array_keys($map));
-
 		$result = $this->processRawResult($topics);
 		return new SearchResponse($result, $map);
 	}
