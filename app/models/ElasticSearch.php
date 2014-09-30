@@ -90,18 +90,6 @@ class ElasticSearch extends Client
 
 	public function fulltextSearch(SearchRequest $request, $limit, $offset)
 	{
-		if ($request->sortBy === SearchRequest::SORT_TIME)
-		{
-			return $this->searchByTime($request, $limit, $offset);
-		}
-		else
-		{
-			return $this->searchByScore($request, $limit, $offset);
-		}
-	}
-
-	public function searchByScore(SearchRequest $request, $limit, $offset)
-	{
 		$args = [
 			'index' => self::INDEX,
 			'type' => self::TYPE_CONTENT,
@@ -112,10 +100,12 @@ class ElasticSearch extends Client
 				'query' => [
 					'bool' => [
 						'must' => [
-							'multi_match' => [
-								'query' => $request->query,
-								'fields' => ['message'],
-							],
+							[
+								'multi_match' => [
+									'query' => $request->query,
+									'fields' => ['message'],
+								],
+							]
 						],
 						'should' => [
 							'match' => [
@@ -135,6 +125,14 @@ class ElasticSearch extends Client
 				]
 			]
 		];
+		if ($request->from)
+		{
+			$args['body']['query']['bool']['must'][] = [
+				'match' => [
+					'author' => $request->from,
+				]
+			];
+		}
 		if ($request->groups)
 		{
 			$args['body']['filter'] = [
@@ -144,44 +142,10 @@ class ElasticSearch extends Client
 				]
 			];
 		}
-
-		return $this->search($args);
-	}
-
-	public function searchByTime(SearchRequest $request, $limit, $offset)
-	{
-		$args = [
-			'index' => self::INDEX,
-			'type' => self::TYPE_CONTENT,
-			'body' => [
-				'fields' => [],
-				'from' => $offset,
-				'size' => $limit,
-				'query' => [
-					'multi_match' => [
-						'query' => $request->query,
-						'fields' => ['message'],
-					],
-				],
-				'sort' => [
-					'created_time' => 'desc',
-				],
-				'highlight' => [
-					'pre_tags' => [self::HIGHLIGHT_START],
-					'post_tags' => [self::HIGHLIGHT_END],
-					'fields' => [
-						'message' => ['number_of_fragments' => 0], // return full string (defaults to substrings)
-					]
-				],
-			]
-		];
-		if ($request->groups)
+		if ($request->sortBy === SearchRequest::SORT_TIME)
 		{
-			$args['body']['filter'] = [
-				'terms' => [
-					'group' => $request->groups,
-					'execution' => 'bool',
-				]
+			$args['body']['sort'] = [
+				'created_time' => 'desc',
 			];
 		}
 
