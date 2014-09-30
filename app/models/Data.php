@@ -216,15 +216,7 @@ class Data extends BaseModel
 
 	public function searchFulltext(SearchRequest $request, $length, $offset)
 	{
-		if ($request->sortBy === SearchRequest::SORT_TIME)
-		{
-			$response = $this->elastic->fulltextSearchByTime($request->query, $length, $offset, $request->groups);
-		}
-		else
-		{
-			$response = $this->elastic->fulltextSearch($request->query, $length, $offset, $request->groups);
-		}
-
+		$response = $this->elastic->fulltextSearch($request, $length, $offset);
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{

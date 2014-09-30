@@ -88,7 +88,19 @@ class ElasticSearch extends Client
 		$this->indices()->putMapping($args);
 	}
 
-	public function fulltextSearch($query, $length, $offset, $groups = [])
+	public function fulltextSearch(SearchRequest $request, $limit, $offset)
+	{
+		if ($request->sortBy === SearchRequest::SORT_TIME)
+		{
+			return $this->searchByTime($request, $limit, $offset);
+		}
+		else
+		{
+			return $this->searchByScore($request, $limit, $offset);
+		}
+	}
+
+	public function searchByScore(SearchRequest $request, $limit, $offset)
 	{
 		$args = [
 			'index' => self::INDEX,
@@ -96,12 +108,12 @@ class ElasticSearch extends Client
 			'body' => [
 				'fields' => [],
 				'from' => $offset,
-				'size' => $length,
+				'size' => $limit,
 				'query' => [
 					'bool' => [
 						'must' => [
 							'multi_match' => [
-								'query' => $query,
+								'query' => $request->query,
 								'fields' => ['message'],
 							],
 						],
@@ -123,11 +135,11 @@ class ElasticSearch extends Client
 				]
 			]
 		];
-		if ($groups)
+		if ($request->groups)
 		{
 			$args['body']['filter'] = [
 				'terms' => [
-					'group' => $groups,
+					'group' => $request->groups,
 					'execution' => 'bool',
 				]
 			];
@@ -136,7 +148,7 @@ class ElasticSearch extends Client
 		return $this->search($args);
 	}
 
-	public function fulltextSearchByTime($query, $length, $offset, $groups = [])
+	public function searchByTime(SearchRequest $request, $limit, $offset)
 	{
 		$args = [
 			'index' => self::INDEX,
@@ -144,10 +156,10 @@ class ElasticSearch extends Client
 			'body' => [
 				'fields' => [],
 				'from' => $offset,
-				'size' => $length,
+				'size' => $limit,
 				'query' => [
 					'multi_match' => [
-						'query' => $query,
+						'query' => $request->query,
 						'fields' => ['message'],
 					],
 				],
@@ -163,11 +175,11 @@ class ElasticSearch extends Client
 				],
 			]
 		];
-		if ($groups)
+		if ($request->groups)
 		{
 			$args['body']['filter'] = [
 				'terms' => [
-					'group' => $groups,
+					'group' => $request->groups,
 					'execution' => 'bool',
 				]
 			];
