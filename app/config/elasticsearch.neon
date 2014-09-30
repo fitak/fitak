@@ -20,6 +20,16 @@ mappings:
 		index_analyzer: cs_icu_analyzer
 		search_analyzer: cs_icu_analyzer
 		properties:
+			author:
+				type: string
+				store: 'false'
+				boost: 3
 			message:
 				type: string
 				store: 'true'
+			isTopic:
+				type: boolean
+				store: 'false'
+			group:
+				type: long
+				store: 'false'
