@@ -34,6 +34,9 @@ mappings:
 			is_topic:
 				type: boolean
 				store: 'false'
+			likes:
+				type: integer
+				store: 'false'
 			group:
 				type: long
 				store: 'false'

@@ -15,7 +15,7 @@ echo "Indices recreated\n";
 $db = $container->getService('dibi.connection');
 $res = $db->query('
 	SELECT
-		[id], [message], [group_id],
+		[id], [message], [group_id], [likes],
 		If([parent_id] = 0, 1, 0) [is_topic],
 		Unix_Timestamp([created_time]) [timestamp],
 		[from_name] [author]
@@ -29,6 +29,7 @@ foreach ($res as $row)
 		'is_topic' => (bool) $row['is_topic'],
 		'created_time' => $row['timestamp'],
 		'group' => $row['group_id'],
+		'likes' => $row['likes'],
 	]);
 }
 

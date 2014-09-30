@@ -73,6 +73,7 @@ class Data extends BaseModel
 		    'is_topic' => TRUE,
 		    'created_time' => $arr['created_time'],
 		    'group' => $gid,
+		    'likes' => $likes,
 	    ]);
     }
 
@@ -89,6 +90,7 @@ class Data extends BaseModel
 
 	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
 		    'message' => $message,
+		    'likes' => $likes,
 	    ]);
     }
 
@@ -104,6 +106,7 @@ class Data extends BaseModel
 
 	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
 		    'message' => $message,
+		    'likes' => $likes,
 	    ]);
     }
 
@@ -128,6 +131,7 @@ class Data extends BaseModel
 		    'is_topic' => FALSE,
 		    'created_time' => $arr['created_time'],
 		    'group' => $gid,
+		    'likes' => $likes,
 	    ]);
     }
 
