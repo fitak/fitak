@@ -36,6 +36,4 @@ else
 	$container->router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', Route::SECURED);
 }
 
-
-// Configure and run the application!
-$container->application->run();
+return $container;
