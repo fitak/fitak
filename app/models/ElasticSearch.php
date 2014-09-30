@@ -45,6 +45,7 @@ class ElasticSearch extends Client
 	/**
 	 * @param string $type entity name
 	 * @param int $id entity id
+	 * @param int $timestamp
 	 * @param array $data
 	 * @return array
 	 */
@@ -112,6 +113,46 @@ class ElasticSearch extends Client
 							],
 						]
 					]
+				],
+				'highlight' => [
+					'pre_tags' => [self::HIGHLIGHT_START],
+					'post_tags' => [self::HIGHLIGHT_END],
+					'fields' => [
+						'message' => ['number_of_fragments' => 0], // return full string (defaults to substrings)
+					]
+				]
+			]
+		];
+		if ($groups)
+		{
+			$args['body']['filter'] = [
+				'terms' => [
+					'group' => $groups,
+					'execution' => 'bool',
+				]
+			];
+		}
+
+		return $this->search($args);
+	}
+
+	public function fulltextSearchByTime($query, $length, $offset, $groups = [])
+	{
+		$args = [
+			'index' => self::INDEX,
+			'type' => self::TYPE_CONTENT,
+			'body' => [
+				'fields' => [],
+				'from' => $offset,
+				'size' => $length,
+				'query' => [
+					'multi_match' => [
+						'query' => $query,
+						'fields' => ['message'],
+					],
+				],
+				'sort' => [
+					'created_time' => 'desc',
 				],
 				'highlight' => [
 					'pre_tags' => [self::HIGHLIGHT_START],

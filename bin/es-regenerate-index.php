@@ -17,8 +17,9 @@ $res = $db->query('
 	SELECT
 		[id], [message], [group_id],
 		If([parent_id] = 0, 1, 0) [is_topic],
+		Unix_Timestamp([created_time]) [timestamp],
 		[from_name] [author]
-	FROM [data] [d]
+	FROM [data]
 ')->fetchAll();
 foreach ($res as $row)
 {
@@ -26,6 +27,7 @@ foreach ($res as $row)
 		'message' => $row['message'],
 		'author' => $row['author'],
 		'is_topic' => (bool) $row['is_topic'],
+		'created_time' => $row['timestamp'],
 		'group' => $row['group_id'],
 	]);
 }

@@ -216,11 +216,24 @@ class Data extends BaseModel
 
 	public function searchFulltext(SearchRequest $request, $length, $offset)
 	{
-		$response = $this->elastic->fulltextSearch($request->query, $length, $offset, $request->groups);
+		if ($request->sortBy === SearchRequest::SORT_TIME)
+		{
+			$response = $this->elastic->fulltextSearchByTime($request->query, $length, $offset, $request->groups);
+		}
+		else
+		{
+			$response = $this->elastic->fulltextSearch($request->query, $length, $offset, $request->groups);
+		}
+
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
 			$map[$hit['_id']] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
+		}
+
+		if (!$map)
+		{
+			return new SearchResponse([], [], 0);
 		}
 
 		$topics = $this->db->query('SELECT * FROM data WHERE id IN %in ORDER BY Field([id], ?)', array_keys($map), array_keys($map));
