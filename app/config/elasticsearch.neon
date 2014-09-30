@@ -27,7 +27,8 @@ mappings:
 			message:
 				type: string
 				store: 'true'
-			isTopic:
+				boost: 1 # account for field length
+			is_topic:
 				type: boolean
 				store: 'false'
 			group:
