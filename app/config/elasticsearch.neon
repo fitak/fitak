@@ -1,0 +1,25 @@
+settings:
+	analysis:
+		analyzer:
+			cs_icu_analyzer:
+				type: custom
+				tokenizer: standard
+				filter: [icu_folding, cs_stop, cs_stem]
+		filter:
+			cs_stem:
+				type: stemmer
+				name: czech
+			cs_stop:
+				type: stop
+				stopwords: [_czech_]
+			cs_icu_collation:
+				type: icu_collation
+				language: cscs
+mappings:
+	content:
+		index_analyzer: cs_icu_analyzer
+		search_analyzer: cs_icu_analyzer
+		properties:
+			message:
+				type: string
+				store: 'true'
