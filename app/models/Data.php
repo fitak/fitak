@@ -64,7 +64,16 @@ class Data extends BaseModel
             'caption' => $caption,
             'description' => $description,
         );
-        $this->db->query( 'INSERT INTO data', $arr );
+
+	    $this->db->query( 'INSERT INTO data', $arr );
+
+	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
+		    'message' => $message,
+		    'author' => $from_name,
+		    'is_topic' => TRUE,
+		    'created_time' => $arr['created_time'],
+		    'group' => $gid,
+	    ]);
     }
 
     // update old topic
@@ -77,6 +86,10 @@ class Data extends BaseModel
             'likes' => $likes,
         );
         $this->db->query( 'UPDATE data SET', $arr, 'WHERE id = %i LIMIT 1', $id );
+
+	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
+		    'message' => $message,
+	    ]);
     }
 
     // update old comment
@@ -88,6 +101,10 @@ class Data extends BaseModel
         );
         $this->db->query( 'UPDATE data SET', $arr, '
                                      WHERE id = %i AND parent_id = %i LIMIT 1', $id, $pid );
+
+	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
+		    'message' => $message,
+	    ]);
     }
 
     // insert new comment
@@ -104,6 +121,14 @@ class Data extends BaseModel
             'from_name' => $from_name
         );
         $this->db->query( 'INSERT INTO data', $arr );
+
+	    $this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $id, [
+		    'message' => $message,
+		    'author' => $from_name,
+		    'is_topic' => FALSE,
+		    'created_time' => $arr['created_time'],
+		    'group' => $gid,
+	    ]);
     }
 
     // is there same comment (topic id, parent id) ?
