@@ -98,21 +98,30 @@ class ElasticSearch extends Client
 				'from' => $offset,
 				'size' => $limit,
 				'query' => [
-					'bool' => [
-						'must' => [
-							[
-								'multi_match' => [
-									'query' => $request->query,
-									'fields' => ['message'],
+					'function_score' => [
+						'query' => [
+							'bool' => [
+								'must' => [
+									[
+										'multi_match' => [
+											'query' => $request->query,
+											'fields' => ['message'],
+										],
+									]
 								],
+								'should' => [
+									'match' => [
+										'is_topic' => [
+											'query' => true,
+										],
+									],
+								]
 							]
 						],
-						'should' => [
-							'match' => [
-								'is_topic' => [
-									'query' => true,
-								],
-							],
+						'field_value_factor' => [
+							'field' => 'likes',
+							'factor' => 1.2,
+							'modifier' => 'log1p',
 						]
 					]
 				],
