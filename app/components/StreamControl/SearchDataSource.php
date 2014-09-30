@@ -17,7 +17,7 @@ class SearchDataSource extends Nette\Object implements IStreamDataSource
 
     public function getTopics( $count, $offset )
     {
-        return $this->dataModel->search( $this->request, $count, $offset );
+	    return $this->dataModel->searchFulltext( $this->request, $count, $offset );
     }
 
     public function getTotalCount()

@@ -7,6 +7,17 @@ class Data extends BaseModel
     // topics with these tags are not displayed (+ comments with such parents)
     private $mutedTags = array( 'mute' );
 
+	/**
+	 * @var ElasticSearch
+	 */
+	protected $elastic;
+
+	public function __construct(DibiConnection $connection, ElasticSearch $elastic)
+	{
+		parent::__construct($connection);
+		$this->elastic = $elastic;
+	}
+
     // get updated time at topic/comment by id
     public function getUpdatedTime( $id )
     {
@@ -16,22 +27,22 @@ class Data extends BaseModel
     }
 
     // insert new topic
-    public function insertTopic( $id, 
-                                 $gid, 
-                                 $pid, 
-                                 $message, 
-                                 $ctime, 
-                                 $utime, 
-                                 $comments, 
-                                 $likes, 
-                                 $from_id, 
+    public function insertTopic( $id,
+                                 $gid,
+                                 $pid,
+                                 $message,
+                                 $ctime,
+                                 $utime,
+                                 $comments,
+                                 $likes,
+                                 $from_id,
                                  $from_name,
-                                 $type, 
+                                 $type,
                                  $link,
-                                 $source, 
-                                 $picture, 
-                                 $name, 
-                                 $caption, 
+                                 $source,
+                                 $picture,
+                                 $name,
+                                 $caption,
                                  $description )
     {
         $arr = array(
@@ -133,6 +144,42 @@ class Data extends BaseModel
         return $sql->fetchSingle();
     }
 
+	protected function processRawResult($result)
+	{
+		$topicsIds = [];
+		$commentsIds = [];
+		foreach( $result as $item )
+		{
+			if( $item->parent_id )
+			{
+				$topicsIds[] = $item->parent_id;
+				$commentsIds[] = $item->id;
+			}
+			else
+			{
+				$topicsIds[] = $item->id;
+			}
+		}
+
+		$topicsResult = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
+			->from( "data" )
+			->leftJoin( "groups" )
+			->on( "data.group_id = groups.id" )
+			->where( "data.id IN %in", $topicsIds )
+			->fetchAssoc( "id" );
+
+		// sort topics the same way as original result was sorted
+		$topics = [];
+		foreach( $topicsIds as $topicId )
+		{
+			$topics[$topicId] = $topicsResult[$topicId];
+		}
+
+		$this->addComments( $topics, $commentsIds );
+
+		return $topics;
+	}
+
     // main search function
     // topics and comments are in the same data table, specific by parent_id column
     public function search( SearchRequest $request, $length, $offset )
@@ -164,39 +211,23 @@ class Data extends BaseModel
 
         $result = $sql->fetchAll( $offset, $length );
 
-        $topicsIds = array();
-        $commentsIds = array();
-        foreach( $result as $item )
-        {
-            if( $item->parent_id )
-            {
-                $topicsIds[] = $item->parent_id;
-                $commentsIds[] = $item->id;
-            }
-            else
-            {
-                $topicsIds[] = $item->id;
-            }
-        }
-
-        $topicsResult = $this->db->select( "data.*, groups.name AS group_name, groups.closed AS group_closed" )
-            ->from( "data" )
-            ->leftJoin( "groups" )
-            ->on( "data.group_id = groups.id" )
-            ->where( "data.id IN %in", $topicsIds )
-            ->fetchAssoc( "id" );
-
-        // sort topics the same way as original result was sorted
-        $topics = array();
-        foreach( $topicsIds as $topicId )
-        {
-            $topics[$topicId] = $topicsResult[$topicId];
-        }
-
-        $this->addComments( $topics, $commentsIds );
-
-        return $topics;
+        return $this->processRawResult($result);
     }
+
+	public function searchFulltext(SearchRequest $request, $length, $offset)
+	{
+		$response = $this->elastic->fulltextSearch(ElasticSearch::TYPE_CONTENT, $request->query, ['message']);
+		$ids = [];
+		foreach ($response['hits']['hits'] as $hit)
+		{
+			$ids[] = $hit['_id'];
+		}
+
+		$topics = $this->db->query('SELECT * FROM data WHERE id IN %in ORDER BY Field([id], ?)', array_keys($map), array_keys($map));
+
+		$result = $this->processRawResult($topics);
+		return new SearchResponse($result, $map);
+	}
 
     // number of results by search
     public function searchCount( SearchRequest $request )
