@@ -101,14 +101,6 @@ class ElasticSearch extends Client
 					'function_score' => [
 						'query' => [
 							'bool' => [
-								'must' => [
-									[
-										'multi_match' => [
-											'query' => $request->query,
-											'fields' => ['message'],
-										],
-									]
-								],
 								'should' => [
 									'match' => [
 										'is_topic' => [
@@ -134,9 +126,18 @@ class ElasticSearch extends Client
 				]
 			]
 		];
+		if ($request->query)
+		{
+			$args['body']['query']['function_score']['query']['bool']['must'][] = [
+				'multi_match' => [
+					'query' => $request->query,
+					'fields' => ['message'],
+				],
+			];
+		}
 		if ($request->from)
 		{
-			$args['body']['query']['bool']['must'][] = [
+			$args['body']['query']['function_score']['query']['bool']['must'][] = [
 				'match' => [
 					'author' => $request->from,
 				]
