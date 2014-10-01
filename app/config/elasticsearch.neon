@@ -11,7 +11,7 @@ settings:
 				name: czech
 			cs_stop:
 				type: stop
-				stopwords: [_czech_]
+				stopwords: [_czech_, bi, bie, bik, fi, fit, mi, mie, pi, pik]
 			cs_icu_collation:
 				type: icu_collation
 				language: cs
