@@ -1,1 +1,270 @@
+# Synonyms filter is applied after normalization and
+# folding, non-ascii characters will not be matched properly.
+#
+# Updating this file generally requires full reindexing.
+#
+
+
+# Slang terms, feel free to add anything
 cviceni, cviko
+vyucujici, cvicici
+programovani, programko
+e-learning, elearning
+mail, email, e-mail
+pivo, pivko, pivečko
+domaci ukol, du, domaci prace
+progtest, peklo, peklicko, hell
+os, operační systém
+
+
+# Course aliases
+# Generated from all pages at https://www.fit.cvut.cz/anketa
+
+bi-a2l, bia2l, a2l
+bi-ppr, bippr, ppr
+bi3dt, 3dt
+bia0z, a0z, bi-a0l, bia0l, a0l, bi-a1z, bia1z, a1z, bi-a1l, bia1l, a1l, bi-a2z, bia2z, a2z
+biaag, aag, bik-aag, bikaag
+biacm, acm
+biacm2, acm2
+biacm3, acm3
+biads, ads, bik-ads, bikads
+biadu, adu, bik-adu, bikadu
+biadw, adw, bik-adw, bikadw
+biand, and
+biang, ang
+biang1, ang1
+biapj, apj
+biaps, aps, bik-aps, bikaps
+biats, ats
+biawd, awd, bik-awd, bikawd
+bibez, bez, bik-bez, bikbez
+bibpzs, bpzs
+bicao, cao
+bidan, dan
+bidbs, dbs, bik-dbs, bikdbs
+bidnp, dnp
+biefa, efa, bik-efa, bikefa
+bieia, eia
+bieja, eja
+biekp, ekp
+biep1, ep1
+biep2, ep2
+biepd2, epd2, bik-epd2, bikepd2, bik-epd, bikepd, bi-epd, biepd
+bifip, fip
+biftr, ftr
+bigra, gra, bik-gra, bikgra
+biios, ios
+bijpo, jpo
+bik-ppr, bikppr, ppr
+bikcao, cao
+bikksa, ksa
+bikpa1, pa1
+bikpa2, pa2
+bikpai, pai
+bikpjp, pjp
+bikpjv, pjv
+bikprp, prp
+bikpsi, psi
+bikpst, pst
+biksap, sap
+biksi1, si1
+biksi12, si12
+biksi2, si2
+biksi22, si22
+bikskj, skj
+biksp1, sp1
+biksp2, sp2
+bikted, ted
+biktur, tur
+bikuos, uos
+bikvwm, vwm
+bikwt1, wt1
+bikwt2, wt2
+bikzdm, zdm
+bikzma, zma
+bikzsi, zsi
+bikzum, zum
+bikzwu, zwu
+bilin, lin, bik-lin, biklin
+biltk, ltk
+biltk2, ltk2
+bimek, mek, bik-mek, bikmek
+bimga, mga, bik-mga, bikmga
+bimik, mik
+bimlo, mlo, bik-mlo, bikmlo
+bimmp, mmp
+bimpp, mpp
+biomo, omo, bik-omo, bikomo
+biosy, osy, bik-osy, bikosy
+bipa1, pa1
+bipa2, pa2
+bipai, pai
+bipcs, pcs
+bipgr, pgr
+biphp, php
+bipjp, pjp
+bipjs, pjs
+bipjv, pjv
+bipma, pma
+bipno, pno
+biprp, prp
+biprr, prr
+bipsi, psi
+bipst, pst
+bipwt, pwt
+bipyt, pyt
+bisap, sap
+bisi1, si1
+bisi12, si12
+bisi2, si2
+bisi22, si22
+biskj, skj
+bisp1, sp1
+bisp2, sp2
+bisql, sql, bik-sql, biksql
+bisrc, src
+bisv, sv
+bited, ted
+bitis, tis
+bits1, ts1
+bits2, ts2
+bits4, ts4
+bitur, tur
+bitv1, tv1
+bitv2, tv2
+bitv3, tv3
+bitv4, tv4
+bitwa, twa
+biuos, uos
+bives, ves
+bivwm, vwm
+bivzd, vzd
+biwmm, wmm
+biwt1, wt1
+biwt2, wt2
+bixml, xml
+bizdm, zdm
+bizma, zma
+bizpi, zpi
+bizrs, zrs
+bizsi, zsi
+biztk, ztk
+biztk2, ztk2
+bizum, zum
+bizwu, zwu
+fianf, anf
+fifil, fil
+figno, gno
+fihte, hte
+fiksa, ksa
+fimpl, mpl
+fist1, st1
+fist2, st2
+fitbozp, bozp
+fiuli, uli
+mi-mpr, mimpr, mpr
+mi-sca, misca, sca
+miaak, aak
+miadm, admo
+miait, ait
+miath, ath
+miavy, avy
+mibhw, bhw
+mibpr, bpr
+mibps, bps
+micio, cio
+micpx, cpx
+middw, ddw
+midip, dip, diploma project, mi-dip, midip
+midpo, dpo
+midsp, dsp
+midsv, dsv
+midzo, dzo
+miedw, edw
+mievy, evy
+miflp, flp
+mifme, fme
+mifri, fri
+migen, gen
+mihmi2, hmi2, bi-hmi, bihmi, bik-hmi, bikhmi, fi-hmi, fihmi
+miibe, ibe
+miikm, ikm
+miivs, ivs
+mikdd, kdd
+mikod, kod
+mikry, kry
+mikyb, kyb
+mikyb1, 1
+mikyb1, kyb1
+milif, lif
+milom, lom
+mimai, mai
+mimas, mas
+mimcs, mcs
+mimdw, mdw
+mimep, mep
+mimky, mky
+mimpi, mpi
+mimsi, msi
+mimti, mti
+mimvi, mvi
+minfa, nfa
+minon, non
+minur, nur
+mipaa, paa
+mipal, pal
+mipam, pam
+mipap, pap
+mipar, par
+mipar1, 1
+mipar1, par1
+mipar2, par2
+mipdb, pdb
+mipdd, pdd
+mipis, pis
+mipoa, poa
+mippr2, ppr2
+miprc, prc
+miprm, prm
+mipsl, psl
+miric, ric
+miroz, roz
+mirri, rri
+mirts, rts
+mirub, rub
+mirun, run
+misas, sas
+misib, sib
+misim, sim
+misin, sin
+misoc, soc
+mispi, spi
+mispi-1, 1
+mispi1, spi1
+miswe, swe
+misyp, syp
+mites, tes
+mites-1, 1
+mites2, tes2
+mits1, ts1
+mits2, ts2
+mits4, ts4
+mitsp, tsp
+mivmw, vmw
+miw20, w20
+piakd, akd
+pianm, anm, pik-anm, pikanm
+piarb, arb
+pidro, dro
+pifme, fme
+piisw, isw
+pikpsc, psc
+pikscn, scn
+pikvap, vap
+pinsv, nsv
+pippa, ppa
+pipsc, psc
+piroz, roz
+piscn, scn
+pitgr, tgr
