@@ -168,6 +168,7 @@ class ElasticSearch extends Client
 	public function setupIndices()
 	{
 		$conf = file_get_contents($this->appDir . '/config/elasticsearch.neon');
+		$conf = str_replace('%rootDir%', __DIR__ . '/../..', $conf);
 		$args = Neon::decode($conf);
 		try
 		{

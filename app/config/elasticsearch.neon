@@ -4,7 +4,7 @@ settings:
 			cs_icu_analyzer:
 				type: custom
 				tokenizer: standard
-				filter: [icu_folding, cs_stop, cs_stem]
+				filter: [icu_folding, cs_stop, synonym, cs_stem]
 		filter:
 			cs_stem:
 				type: stemmer
@@ -14,7 +14,10 @@ settings:
 				stopwords: [_czech_]
 			cs_icu_collation:
 				type: icu_collation
-				language: cscs
+				language: cs
+			synonym:
+				type: synonym
+				synonyms_path: "%rootDir%/synonyms.solr"
 mappings:
 	content:
 		index_analyzer: cs_icu_analyzer
