@@ -18,6 +18,7 @@
 		"nette/nette": ">= 2.0.11",
 		"dibi/dibi": ">= 2.0.0",
 		"facebook/php-sdk": ">= 3.2.2",
-		"nextras/link-factory": "@dev"
+		"nextras/link-factory": "@dev",
+		"elasticsearch/elasticsearch": "~1.2"
 	}
 }
