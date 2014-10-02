@@ -18,13 +18,18 @@ class Data extends BaseModel
 		$this->elastic = $elastic;
 	}
 
-	// get updated time at topic/comment by id
+	/**
+	 * @param  int $id
+	 * @return DateTime|NULL|FALSE
+	 */
 	public function getUpdatedTime($id)
 	{
-		$result = $this->db->query("SELECT updated_time FROM data
-                                   WHERE id = %i LIMIT 1", $id);
-
-		return $result->fetchSingle();
+		return $this->db->fetchSingle('
+			SELECT updated_time
+			FROM data
+			WHERE id = %i', $id, '
+			LIMIT 1
+		');
 	}
 
 	// insert new topic

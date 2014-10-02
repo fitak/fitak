@@ -1,18 +1,16 @@
 <?php
+use Nette\Utils\Random;
+use Tracy\Debugger;
 
 /**
- * Description of CrawlerPresenter
  * Here is everything about getting data from Facebook...
  *
  * @author Vojtech Miksu <vojtech@miksu.cz>
  */
-use Nette\Diagnostics\Debugger;
-use Nette\Utils\Random;
-
 class CrawlerPresenter extends BasePresenter
 {
 
-	private $gid, $token, $nextPage, $cnt_inserted = 0, $cnt_updated = 0, $cnt_downloaded = 0;
+	private $gid, $token, $nextPage, $insertedCount = 0, $updatedCount = 0, $downloadedCount = 0;
 	private $facebook;
 
 	// getting data (topics, comments and likes) from Facebook groups
@@ -37,7 +35,7 @@ class CrawlerPresenter extends BasePresenter
 			$this->nextPage = NULL;
 			echo "<h2>Checking group: $group->name </h2>";
 			$this->startGrabbing();
-			$this->cnt_inserted = $this->cnt_updated = $this->cnt_downloaded = 0;
+			$this->insertedCount = $this->updatedCount = $this->downloadedCount = 0;
 		}
 		$this->terminate();
 	}
@@ -95,7 +93,7 @@ class CrawlerPresenter extends BasePresenter
 	{
 		while ($this->grabPage())
 		{
-			echo "Inserted: " . $this->cnt_inserted . " | Updated: " . $this->cnt_updated . "<br />";
+			echo "Inserted: " . $this->insertedCount . " | Updated: " . $this->updatedCount . "<br />";
 			//@ob_flush();
 			//@flush();
 		}
@@ -110,31 +108,25 @@ class CrawlerPresenter extends BasePresenter
 		if (!$this->nextPage)
 		{
 			echo "The last page";
-
 			return FALSE;
 		}
-		//echo "JSONS downloaded: " . $this->cnt_downloaded . "<br />";
-		//@ob_flush();
-		//@flush();
-		foreach ($data['data'] as $message)
+
+		foreach ($data['data'] as $post)
 		{
 			// fix timezone issue
-			$message['created_time'] = date(DATE_ISO8601, strtotime($message['created_time']));
-			$message['updated_time'] = date(DATE_ISO8601, strtotime($message['updated_time']));
+			$timezone = new DateTimeZone('Europe/Prague');
+			$post['created_time'] = (new DateTime($post['created_time']))->setTimezone($timezone);
+			$post['updated_time'] = (new DateTime($post['updated_time']))->setTimezone($timezone);
 
-			$ids = explode("_", $message['id']);
-			$datetime = NULL;
-			$datetime = $this->context->data->getUpdatedTime($ids[1]);
-
-			if (strtotime($datetime) == strtotime($message['updated_time']))
+			list($groupId, $postId) = explode('_', $post['id']);
+			$postUpdatedAt = $this->context->data->getUpdatedTime($postId);
+			if ($postUpdatedAt == $post['updated_time'])
 			{
-				echo $this->cnt_inserted . ' messages was saved and ' . $this->cnt_updated . '
-                    updated.<br />';
-
+				echo $this->insertedCount . ' messages was saved and ' . $this->updatedCount . ' updated.<br />';
 				return FALSE;
 			}
+
 			$mess = "";
-			$likes_count = 0;
 
 			$link = NULL;
 			$source = NULL;
@@ -143,61 +135,61 @@ class CrawlerPresenter extends BasePresenter
 			$caption = NULL;
 			$description = NULL;
 
-			if (isSet($message['message']))
+			if (isSet($post['message']))
 			{
-				$mess = $message['message'];
+				$mess = $post['message'];
 			}
 
 			$commentsNum = 0;
-			if (isSet ($message['comments']))
+			if (isSet ($post['comments']))
 			{
-				$commentsNum = count($message['comments']);
+				$commentsNum = count($post['comments']);
 			}
 
-			if (isSet ($message['link']))
+			if (isSet ($post['link']))
 			{
-				$link = $message['link'];
+				$link = $post['link'];
 			}
 
-			if (isSet ($message['source']))
+			if (isSet ($post['source']))
 			{
-				$source = $message['source'];
+				$source = $post['source'];
 			}
 
-			if (isSet ($message['picture']))
+			if (isSet ($post['picture']))
 			{
-				$picture = $message['picture'];
+				$picture = $post['picture'];
 			}
 
-			if (isSet ($message['name']))
+			if (isSet ($post['name']))
 			{
-				$name = $message['name'];
+				$name = $post['name'];
 			}
 
-			if (isSet ($message['caption']))
+			if (isSet ($post['caption']))
 			{
-				$caption = $message['caption'];
+				$caption = $post['caption'];
 			}
 
-			if (isSet ($message['description']))
+			if (isSet ($post['description']))
 			{
-				$description = $message['description'];
+				$description = $post['description'];
 			}
 
-			if (!$datetime)
+			if (!$postUpdatedAt)
 			{
 				$this->context->data->insertTopic(
-					$ids[1],
+					$postId,
 					$this->gid,
 					0,
 					$mess,
-					$message['created_time'],
-					$message['updated_time'],
+					$post['created_time'],
+					$post['updated_time'],
 					$commentsNum,
 					0,
-					$message['from']['id'],
-					$message['from']['name'],
-					$message['type'],
+					$post['from']['id'],
+					$post['from']['name'],
+					$post['type'],
 					$link,
 					$source,
 					$picture,
@@ -205,28 +197,30 @@ class CrawlerPresenter extends BasePresenter
 					$caption,
 					$description
 				);
-				$this->saveTags($mess, $ids[1]);
-				$this->cnt_inserted++;
+				$this->saveTags($mess, $postId);
+				$this->insertedCount++;
+
 			}
 			else
 			{
 				$this->context->data->updateTopic(
-					$ids[1],
+					$postId,
 					$mess,
-					$message['updated_time'],
+					$post['updated_time'],
 					$commentsNum,
-					0);
-				$this->cnt_updated++;
+					0
+				);
+				$this->updatedCount++;
 			}
 
-			if (isSet($message['comments']['data']) && count($message['comments']['data']))
+			if (isSet($post['comments']['data']) && count($post['comments']['data']))
 			{
-				$this->addComments($message['comments']['data'], $ids[1]);
+				$this->addComments($post['comments']['data'], $postId);
 
 				$next = FALSE;
-				if (isSet($message['comments']['paging']['next']))
+				if (isSet($post['comments']['paging']['next']))
 				{
-					$next = $message['comments']['paging']['next'];
+					$next = $post['comments']['paging']['next'];
 				}
 
 				while ($next)
@@ -236,7 +230,7 @@ class CrawlerPresenter extends BasePresenter
 					$next = FALSE;
 					if (isSet($extraComments['data']))
 					{
-						$this->addComments($extraComments['data'], $ids[1]);
+						$this->addComments($extraComments['data'], $postId);
 						if (isSet($extraComments['paging']['previous']))
 						{
 							$next = $extraComments['paging']['previous'];
@@ -266,12 +260,12 @@ class CrawlerPresenter extends BasePresenter
 			if ($this->context->data->existsComment($comment['id'], $topicId))
 			{
 				$this->context->data->updateComment($comment['id'], $topicId, $mess, $likes_count);
-				$this->cnt_updated++;
+				$this->updatedCount++;
 			}
 			else
 			{
 				$this->context->data->insertComment($comment['id'], $this->gid, $topicId, $mess, $comment['created_time'], $likes_count, $comment['from']['id'], $comment['from']['name']);
-				$this->cnt_inserted++;
+				$this->insertedCount++;
 			}
 		}
 	}
@@ -316,7 +310,7 @@ class CrawlerPresenter extends BasePresenter
 			$this->nextPage = NULL;
 		}
 
-		$this->cnt_downloaded++;
+		$this->downloadedCount++;
 
 		return $result;
 	}
