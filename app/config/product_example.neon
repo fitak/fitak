@@ -2,3 +2,9 @@ dibi:
 	database: DATABASENAME
 	user: USER
 	password: PASSWORD
+
+parameters:
+	elastic:
+		connectionParams:
+			# HTTP Auth to ElasticSearch node
+			auth: [username, password, "Basic"]

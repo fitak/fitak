@@ -1,0 +1,45 @@
+settings:
+	analysis:
+		analyzer:
+			cs_icu_analyzer:
+				type: custom
+				tokenizer: standard
+				filter: [icu_folding, cs_stop, synonym, cs_stem]
+		filter:
+			cs_stem:
+				type: stemmer
+				name: czech
+			cs_stop:
+				type: stop
+				stopwords: [_czech_, bi, bie, bik, fi, fit, mi, mie, pi, pik]
+			cs_icu_collation:
+				type: icu_collation
+				language: cs
+			synonym:
+				type: synonym
+				synonyms_path: "%rootDir%/synonyms.solr"
+mappings:
+	content:
+		index_analyzer: cs_icu_analyzer
+		search_analyzer: cs_icu_analyzer
+		properties:
+			created_time:
+				type: integer
+				store: 'false'
+			author:
+				type: string
+				store: 'false'
+				boost: 3
+			message:
+				type: string
+				store: 'true'
+				boost: 1 # account for field length
+			is_topic:
+				type: boolean
+				store: 'false'
+			likes:
+				type: integer
+				store: 'false'
+			group:
+				type: long
+				store: 'false'

@@ -30,12 +30,23 @@ common:
 		lazy: true
 		profiler: true
 
+	parameters:
+		elastic:
+			hosts:
+				- 127.0.0.1
+
 	services:
 		data:
 			class: Data(@dibi.connection)
 
+		elasticSearch:
+			class: ElasticSearch(%elastic%, %appDir%)
+
 		groups:
 			class: Groups(@dibi.connection)
+
+		highlighter:
+			class: Highlighter
 
 		likes:
 			class: Likes(@dibi.connection)

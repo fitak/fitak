@@ -3,6 +3,10 @@
 use Nette\Application\Routers\Route;
 use Nette\DI\CompilerExtension;
 
+// Fix tmp issues when app is invoked by server but
+// custom utils scripts are called by cron or user.
+umask(0);
+
 // Load Composer Autoloader
 require LIBS_DIR . '/autoload.php';
 
@@ -36,6 +40,4 @@ else
 	$container->router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', Route::SECURED);
 }
 
-
-// Configure and run the application!
-$container->application->run();
+return $container;
