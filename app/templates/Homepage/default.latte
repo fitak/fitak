@@ -12,14 +12,8 @@
 	    <button n:name="send" class="btn btn-primary" style="margin-top:10px"><i class="icon-search icon-white"></i> Vyhledat</button>
 	    </fieldset>
     {/form}
-<div class="row text-center cloud">
-    {if $trends}
-        <span n:foreach="$trends as $item" style="font-size:{!$item["size"]}em; margin-right: 15px;"><a n:href="Search:default 'tag:'.$item['name']">{$item["name"]}</a></span>
-    {else}
-        Žádné trendy v poslední době.
-    {/if}
-    </div>
 
+	{control tagCloud}
 
     {foreach $news as $message}
     	<div class="panel panel-info">

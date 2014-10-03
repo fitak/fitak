@@ -1,5 +1,7 @@
 <?php
 
+use Fitak\TagCloudControl;
+
 
 /**
  * @author     Vojtech Miksu <vojtech@miksu.cz>
@@ -9,7 +11,6 @@ class HomepagePresenter extends BasePresenter
 
 	public function renderDefault()
 	{
-		$this->template->trends = $this->context->tags->getTrends();
 		$this->template->news = $this->orm->news->findRecent();
 	}
 
@@ -19,6 +20,12 @@ class HomepagePresenter extends BasePresenter
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;
+	}
+
+	protected function createComponentTagCloud()
+	{
+		$trending = $this->orm->tags->findTrending();
+		return new TagCloudControl($trending);
 	}
 
 }

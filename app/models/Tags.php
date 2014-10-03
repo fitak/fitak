@@ -26,33 +26,6 @@ class Tags extends BaseModel
 		$this->db->query("UPDATE tags SET count = count + 1 WHERE id = %i LIMIT 1", $id);
 	}
 
-	// get cloud of tags
-	public function getTrends()
-	{
-		$result = $this->orm->tags->findTrending();
-
-		if (!count($result))
-		{
-			return NULL;
-		}
-
-		$maximum = $result[0]["count"];
-		$tagCloud = [];
-		foreach ($result as $key => $tag)
-		{
-			if ($tag->name == "" || $tag->name == "mute") continue;
-			$tagCloud[$key]["name"] = $tag->name;
-			$tagCloud[$key]["size"] = round(1 + ($tag->count * 100) / $maximum * 0.015, 1);
-		}
-
-		usort($tagCloud, function ($elem1, $elem2)
-		{
-			return strcmp($elem1['name'], $elem2['name']);
-		});
-
-		return $tagCloud;
-	}
-
 	// extract tags ([tag1][tag2]....) from the start of input
 	// return array(cleanTags, originalTags)
 	public function extractTags($input)
