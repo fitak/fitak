@@ -10,7 +10,8 @@ $configurator = new Nette\Configurator;
 $configurator->enableDebugger(__DIR__ . '/../log');
 $configurator->setTempDirectory(__DIR__ . '/../tmp');
 $configurator->createRobotLoader()->addDirectory(__DIR__)->register();
-$configurator->addConfig(__DIR__ . '/config/config.neon', $configurator::AUTO);
+$configurator->addConfig(__DIR__ . '/config/common.neon');
+$configurator->addConfig(__DIR__ . '/config/local.neon');
 $container = $configurator->createContainer();
 
 

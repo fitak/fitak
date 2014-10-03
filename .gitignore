@@ -1,6 +1,4 @@
-/app/config/devel.neon
-/app/config/fbparams.neon
-/app/config/product.neon
+/app/config/local.neon
 /log/
 /tmp/
 fitak.sublime-project

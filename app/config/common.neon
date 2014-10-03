@@ -1,0 +1,50 @@
+extensions:
+	dibi: Dibi\Bridges\Nette\DibiExtension22
+
+
+php:
+	date.timezone: Europe/Prague
+
+
+nette:
+	application:
+			errorPresenter: 'Error'
+
+	debugger:
+		strictMode: true
+
+	security:
+		debugger: true
+
+	session:
+		autoStart: smart
+		expiration: +14 days
+
+
+dibi:
+	driver: mysqli
+	charset: utf8
+	lazy: true
+	profiler: true
+
+
+parameters:
+	elastic:
+		hosts:
+			- 127.0.0.1
+
+services:
+	data: Data
+	elasticSearch: ElasticSearch(%elastic%, %appDir%)
+	groups: Groups
+	highlighter: Highlighter
+	likes: Likes
+	news: News
+	tags: Tags
+	token: Token(@dibi.connection, %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
+	searchQueryParser: SearchQueryParser
+	linkFactory: Nextras\Application\LinkFactory
+	templateHelpers: TemplateHelpers
+	templateFactory: TemplateFactory
+	routerFactory: RouterFactory(%productionMode%)
+	router: @routerFactory::create

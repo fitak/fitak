@@ -1,0 +1,22 @@
+dibi:
+	host: %database.host%
+	database: %database.database%
+	user: %database.user%
+	password: %database.password%
+
+
+parameters:
+	database:
+		host: localhost
+		user: root
+		password:
+		database: fitak.cz
+	fb:
+		appId: "APPID"
+		appSecret: APPSECRET
+		permissions: user_groups
+		adminEmail: "YOUR_EMAIL"
+	elastic:
+		connectionParams:
+			# HTTP Auth to ElasticSearch node on production
+			# auth: [username, password, "Basic"]

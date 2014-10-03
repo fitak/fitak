@@ -1,6 +1,0 @@
-parameters:
-		
-	app_id: "APPID"
-	permissions: read_stream
-	app_secret: APPSECRET
-	admin_email: "YOUR_EMAIL"
