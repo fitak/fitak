@@ -268,37 +268,4 @@ class Data extends BaseModel
 		return $topics;
 	}
 
-	// return array of variations for input word
-	public function getWordVariations($word)
-	{
-		$sNoBrackets = Strings::replace($word, "/[\\[\\](){}]/", "");
-
-		$keywords = array_merge(
-			[$word, $sNoBrackets],
-			explode("-", $sNoBrackets),
-			explode("_", $sNoBrackets),
-			explode(" ", $sNoBrackets),
-			Strings::split($sNoBrackets, "[ _-]")
-		);
-
-		foreach ($keywords as $index => $kw)
-		{
-			$keywords[$index] = Strings::trim($kw);
-			$keywords[$index] = Strings::replace($keywords[$index], '/^\+/', ''); // remove + operator
-			if (Strings::length($keywords[$index]) < 3)
-			{
-				unset($keywords[$index]);
-			}
-			else
-			{
-				$keywords[] = Strings::toAscii($keywords[$index]);
-			}
-		}
-
-		$keywords = array_unique($keywords);
-		$keywords = array_values($keywords);
-
-		return $keywords;
-	}
-
 }

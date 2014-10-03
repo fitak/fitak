@@ -23,7 +23,6 @@ class SearchPresenter extends BasePresenter
 
 		$dataModel = $this->context->data;
 		$this['stream']->dataSource = new SearchDataSource($dataModel, $this->searchRequest);
-		$this['stream']->keywords = $dataModel->getWordVariations($this->searchRequest->query);
 	}
 
 	public function renderDefault($s, $from = NULL, array $groups = NULL, $sortBy = NULL, $streamView = NULL)

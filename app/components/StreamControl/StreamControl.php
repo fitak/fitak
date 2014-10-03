@@ -8,9 +8,6 @@ class StreamControl extends UI\Control
 	/** @var IStreamDataSource */
 	public $dataSource;
 
-	/** @var array list of words which will be highlighted */
-	public $keywords = [];
-
 	/** @var int maximum number of topics on a single page */
 	public $topicsPerPage = 20;
 
@@ -29,7 +26,6 @@ class StreamControl extends UI\Control
 		$paginator = $this['paginator']->paginator;
 
 		$this->template->topics = $this->dataSource->getTopics($paginator->itemsPerPage, $paginator->offset);
-		$this->template->highlightKeywords = $this->keywords;
 		$this->template->render();
 	}
 
