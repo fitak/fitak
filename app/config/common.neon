@@ -10,6 +10,9 @@ nette:
 	application:
 			errorPresenter: 'Error'
 
+	container:
+		debugger: true
+
 	database:
 		dsn: "mysql:host=%database.host%;dbname=%database.database%"
 		user: %database.user%
