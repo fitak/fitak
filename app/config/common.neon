@@ -29,10 +29,10 @@ nette:
 
 
 dibi:
-	driver: mysqli
+	driver: pdo
 	charset: utf8
-	lazy: true
 	profiler: true
+	resource: @pdo
 
 
 parameters:
@@ -47,6 +47,7 @@ services:
 	highlighter: Highlighter
 	likes: Likes
 	news: News
+	pdo: @nette.database.default::getPdo()
 	tags: Tags
 	token: Token(@dibi.connection, %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
 	searchQueryParser: SearchQueryParser
