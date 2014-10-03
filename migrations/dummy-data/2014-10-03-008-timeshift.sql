@@ -1,0 +1,10 @@
+SET @TIMESHIFT = TIMESTAMPDIFF(SECOND, '2014-01-14', CURRENT_TIME);
+
+UPDATE `data`
+SET
+	`created_time` = TIMESTAMPADD(SECOND, @TIMESHIFT, `created_time`),
+	`updated_time` = TIMESTAMPADD(SECOND, @TIMESHIFT, `updated_time`);
+
+UPDATE `news`
+SET
+	`created` = TIMESTAMPADD(SECOND, @TIMESHIFT, '2014-12-07 14:07:12');
