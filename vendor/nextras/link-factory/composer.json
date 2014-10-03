@@ -1,0 +1,28 @@
+{
+	"name": "nextras/link-factory",
+	"type": "library",
+	"description": "Simple link factory independent of presenter.",
+	"license": ["MIT"],
+	"authors": [
+		{
+			"name": "Nextras Community",
+			"homepage": "https://github.com/nextras/link-factory/graphs/contributors"
+		}
+	],
+	"require": {
+		"php": "~5.4",
+		"nette/application": "~2.2"
+	},
+	"require-dev": {
+		"nette/tester": "~1.2",
+		"mockery/mockery": "~0.9"
+	},
+	"autoload": {
+		"psr-4": { "Nextras\\Application\\": "src/" }
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
+		}
+	}
+}
