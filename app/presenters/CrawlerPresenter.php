@@ -178,38 +178,37 @@ class CrawlerPresenter extends BasePresenter
 
 			if (!$postUpdatedAt)
 			{
-				$this->context->data->insertTopic(
-					$postId,
-					$this->gid,
-					0,
-					$mess,
-					$post['created_time'],
-					$post['updated_time'],
-					$commentsNum,
-					0,
-					$post['from']['id'],
-					$post['from']['name'],
-					$post['type'],
-					$link,
-					$source,
-					$picture,
-					$name,
-					$caption,
-					$description
-				);
+				$post = new Fitak\Post();
+				$post->id = $postId;
+				$post->group = $this->gid;
+				$post->message = $mess;
+				$post->createdTime = $post['created_time'];
+				$post->updatedTime = $post['updated_time'];
+				$post->commentsCount = $commentsNum;
+				$post->likesCount = 0;
+				$post->fromId = $post['from']['id'];
+				$post->fromName = $post['from']['name'];
+				$post->type = $post['type'];
+				$post->link = $link;
+				$post->source = $source;
+				$post->picture = $picture;
+				$post->name = $name;
+				$post->caption = $caption;
+				$post->description = $description;
+				$this->orm->posts->persistAndFlush($post); // todo: flush all posts at once
+
 				$this->saveTags($mess, $postId);
 				$this->insertedCount++;
 
 			}
 			else
 			{
-				$this->context->data->updateTopic(
-					$postId,
-					$mess,
-					$post['updated_time'],
-					$commentsNum,
-					0
-				);
+				/** @var Fitak\Post $post */
+				$post = $this->orm->posts->getById($postId);
+				$post->message = $mess;
+				$post->updatedTime = $post['updated_time'];
+				$post->commentsCount = $commentsNum;
+				$this->orm->posts->persistAndFlush($post); // todo: flush all posts at once
 				$this->updatedCount++;
 			}
 
@@ -257,14 +256,29 @@ class CrawlerPresenter extends BasePresenter
 			}
 			$likes_count = 0;
 
-			if ($this->context->data->existsComment($comment['id'], $topicId))
+			/** @var Fitak\Post $comment */
+			$comment = $this->orm->posts->getById($comment['id']);
+			if ($comment && $comment->parent == $topicId)
 			{
-				$this->context->data->updateComment($comment['id'], $topicId, $mess, $likes_count);
+				$comment->message = $mess;
+				$comment->likesCount = $likes_count;
+				$this->orm->posts->persistAndFlush($comment); // todo: flush all posts at once
+
 				$this->updatedCount++;
 			}
 			else
 			{
-				$this->context->data->insertComment($comment['id'], $this->gid, $topicId, $mess, $comment['created_time'], $likes_count, $comment['from']['id'], $comment['from']['name']);
+				$comment = new Fitak\Post();
+				$comment->id = $comment['id'];
+				$comment->group = $this->gid;
+				$comment->parent = $topicId;
+				$comment->message = $mess;
+				$comment->createdTime = $comment['created_time'];
+				$comment->likesCount = $likes_count;
+				$comment->fromId = $comment['from']['id'];
+				$comment->fromName = $comment['from']['name'];
+				$this->orm->posts->persistAndFlush($comment); // todo: flush all posts at once
+
 				$this->insertedCount++;
 			}
 		}

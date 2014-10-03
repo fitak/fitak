@@ -1,6 +1,7 @@
 extensions:
 	dibi: Dibi\Bridges\Nette\DibiExtension22
 	orm: Nextras\Orm\DI\OrmExtension
+	events: Kdyby\Events\DI\EventsExtension
 
 
 php:
@@ -51,6 +52,7 @@ parameters:
 services:
 	data: Data
 	elasticSearch: ElasticSearch(%elastic%, %appDir%)
+	elasticSearchUpdater: { class: Fitak\ElasticSearchUpdater, tags: [kdyby.subscriber] }
 	highlighter: Highlighter
 	likes: Likes
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
