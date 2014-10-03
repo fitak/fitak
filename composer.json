@@ -19,6 +19,7 @@
 		"nextras/orm": "~1.0@dev",
 		"nextras/migrations": "~2.3",
 		"nextras/link-factory": "~1.0",
+		"kdyby/events": "~2.2",
 		"elasticsearch/elasticsearch": "~1.2"
 	},
 	"config": {
