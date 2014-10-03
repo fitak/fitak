@@ -1,5 +1,7 @@
 <?php
 
+use Fitak\RepositoryContainer;
+
 
 /**
  * Base class for all application presenters.
@@ -12,10 +14,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	/** @var TemplateFactory */
 	protected $templateFactory;
 
-	public function __construct(TemplateFactory $templateFactory)
+	/** @var RepositoryContainer */
+	protected $orm;
+
+	public function __construct(TemplateFactory $templateFactory, RepositoryContainer $orm)
 	{
 		parent::__construct();
 		$this->templateFactory = $templateFactory;
+		$this->orm = $orm;
 	}
 
 	protected function createTemplate($class = NULL)
