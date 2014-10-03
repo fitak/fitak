@@ -8,10 +8,11 @@
 namespace Nette\Database\Table;
 
 use Nette,
-	Nette\Database\Connection,
-	Nette\Database\IReflection,
 	Nette\Database\ISupplementalDriver,
-	Nette\Database\SqlLiteral;
+	Nette\Database\SqlLiteral,
+	Nette\Database\IConventions,
+	Nette\Database\Context,
+	Nette\Database\IStructure;
 
 
 /**
@@ -23,14 +24,12 @@ use Nette,
  */
 class SqlBuilder extends Nette\Object
 {
-	/** @var Nette\Database\ISupplementalDriver */
-	private $driver;
 
 	/** @var string */
 	protected $tableName;
 
-	/** @var IReflection */
-	protected $databaseReflection;
+	/** @var IConventions */
+	protected $conventions;
 
 	/** @var string delimited table name */
 	protected $delimitedTable;
@@ -68,13 +67,33 @@ class SqlBuilder extends Nette\Object
 	/** @var string grouping condition */
 	protected $having = '';
 
+	/** @var ISupplementalDriver */
+	private $driver;
 
-	public function __construct($tableName, Connection $connection, IReflection $reflection)
+	/** @var IStructure */
+	private $structure;
+
+	/** @var array */
+	private $cacheTableList;
+
+
+	public function __construct($tableName, Context $context)
 	{
 		$this->tableName = $tableName;
-		$this->databaseReflection = $reflection;
-		$this->driver = $connection->getSupplementalDriver();
+		$this->driver = $context->getConnection()->getSupplementalDriver();
+		$this->conventions = $context->getConventions();
+		$this->structure = $context->getStructure();
+
 		$this->delimitedTable = $this->tryDelimite($tableName);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTableName()
+	{
+		return $this->tableName;
 	}
 
 
@@ -399,13 +418,8 @@ class SqlBuilder extends Nette\Object
 	public function parseJoinsCb(& $joins, $match)
 	{
 		$chain = $match['chain'];
-		if (!empty($chain[0]) && ($chain[0] !== '.' || $chain[0] !== ':')) {
+		if (!empty($chain[0]) && ($chain[0] !== '.' && $chain[0] !== ':')) {
 			$chain = '.' . $chain;  // unified chain format
-		}
-
-		$parent = $parentAlias = $this->tableName;
-		if ($chain == ".{$parent}") { // case-sensitive
-			return "{$parent}.{$match['column']}";
 		}
 
 		preg_match_all('~
@@ -415,26 +429,70 @@ class SqlBuilder extends Nette\Object
 			(?P<del> [.:])?(?P<key> (?&word))(\((?P<throughColumn> (?&word))\))?
 		~xi', $chain, $keyMatches, PREG_SET_ORDER);
 
+		$parent = $this->tableName;
+		$parentAlias = preg_replace('#^(.*\.)?(.*)$#', '$2', $this->tableName);
+
+		// join schema keyMatch and table keyMatch to schema.table keyMatch
+		if ($this->driver->isSupported(ISupplementalDriver::SUPPORT_SCHEMA) && count($keyMatches) > 1) {
+			$tables = $this->getCachedTableList();
+			if (!isset($tables[$keyMatches[0]['key']]) && isset($tables[$keyMatches[0]['key'] . '.' . $keyMatches[1]['key']])) {
+				$keyMatch = array_shift($keyMatches);
+				$keyMatches[0]['key'] = $keyMatch['key'] . '.' . $keyMatches[0]['key'];
+				$keyMatches[0]['del'] = $keyMatch['del'];
+			}
+		}
+
+		// do not make a join when referencing to the current table column - inner conditions
+		// check it only when not making backjoin on itself - outer condition
+		if ($keyMatches[0]['del'] === '.') {
+			if ($parent === $keyMatches[0]['key']) {
+				return "{$parent}.{$match['column']}";
+			} elseif ($parentAlias === $keyMatches[0]['key']) {
+				return "{$parentAlias}.{$match['column']}";
+			}
+		}
+
 		foreach ($keyMatches as $keyMatch) {
 			if ($keyMatch['del'] === ':') {
 				if (isset($keyMatch['throughColumn'])) {
 					$table = $keyMatch['key'];
-					list(, $primary) = $this->databaseReflection->getBelongsToReference($table, $keyMatch['throughColumn']);
+					$belongsTo = $this->conventions->getBelongsToReference($table, $keyMatch['throughColumn']);
+					if (!$belongsTo) {
+						throw new Nette\InvalidArgumentException("No reference found for \${$parent}->{$keyMatch['key']}.");
+					}
+					list(, $primary) = $belongsTo;
+
 				} else {
-					list($table, $primary) = $this->databaseReflection->getHasManyReference($parent, $keyMatch['key']);
+					$hasMany = $this->conventions->getHasManyReference($parent, $keyMatch['key']);
+					if (!$hasMany) {
+						throw new Nette\InvalidArgumentException("No reference found for \${$parent}->related({$keyMatch['key']}).");
+					}
+					list($table, $primary) = $hasMany;
 				}
-				$column = $this->databaseReflection->getPrimary($parent);
+				$column = $this->conventions->getPrimary($parent);
+
 			} else {
-				list($table, $column) = $this->databaseReflection->getBelongsToReference($parent, $keyMatch['key']);
-				$primary = $this->databaseReflection->getPrimary($table);
+				$belongsTo = $this->conventions->getBelongsToReference($parent, $keyMatch['key']);
+				if (!$belongsTo) {
+					throw new Nette\InvalidArgumentException("No reference found for \${$parent}->{$keyMatch['key']}.");
+				}
+				list($table, $column) = $belongsTo;
+				$primary = $this->conventions->getPrimary($table);
 			}
 
-			$joins[$table . $column] = array($table, $keyMatch['key'] ?: $table, $parentAlias, $column, $primary);
+			$tableAlias = $keyMatch['key'] ?: preg_replace('#^(.*\.)?(.*)$#', '$2', $table);
+
+			// if we are joining itself (parent table), we must alias joining table
+			if ($parent === $table) {
+				$tableAlias = $parentAlias . '_ref';
+			}
+
+			$joins[$tableAlias . $column] = array($table, $tableAlias, $parentAlias, $column, $primary);
 			$parent = $table;
-			$parentAlias = $keyMatch['key'];
+			$parentAlias = $tableAlias;
 		}
 
-		return ($keyMatch['key'] ?: $table) . ".{$match['column']}";
+		return $tableAlias . ".{$match['column']}";
 	}
 
 
@@ -493,6 +551,18 @@ class SqlBuilder extends Nette\Object
 		} else {
 			return $this->addWhere('(' . implode(', ', $columns) . ') IN', $parameters);
 		}
+	}
+
+
+	private function getCachedTableList()
+	{
+		if (!$this->cacheTableList) {
+			$this->cacheTableList = array_flip(array_map(function ($pair) {
+				return isset($pair['fullName']) ? $pair['fullName'] : $pair['name'];
+			}, $this->structure->getTables()));
+		}
+
+		return $this->cacheTableList;
 	}
 
 }

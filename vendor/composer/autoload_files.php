@@ -7,5 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     $vendorDir . '/tracy/tracy/src/shortcuts.php',
+    $vendorDir . '/nette/deprecated/src/shortcuts.php',
     $vendorDir . '/nette/nette/Nette/loader.php',
 );
