@@ -55,7 +55,6 @@ services:
 	highlighter: Highlighter
 	likes: Likes
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
-	news: News
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
 	token: Token(@dibi.connection, %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)

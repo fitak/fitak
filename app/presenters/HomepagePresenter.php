@@ -10,7 +10,7 @@ class HomepagePresenter extends BasePresenter
 	public function renderDefault()
 	{
 		$this->template->trends = $this->context->tags->getTrends();
-		$this->template->news = $this->context->news->getAllNews();
+		$this->template->news = $this->orm->news->findRecent();
 	}
 
 	protected function createComponentSearchForm()
