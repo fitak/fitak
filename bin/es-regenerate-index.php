@@ -7,21 +7,24 @@ use Nette\DI\Container;
 $container = require __DIR__ . '/../app/bootstrap.php';
 
 /** @var ElasticSearch $es */
-$es = $container->getService('elasticSearch');
+$es = $container->getByType(ElasticSearch::class);
 
 $es->setupIndices();
 echo "Indices recreated\n";
 
-/** @var DibiConnection $db */
-$db = $container->getService('dibi.connection');
+/** @var Nette\Database\Context $db */
+$db = $container->getByType(Nette\Database\Context::class);
+$db->getConnection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, FALSE);
+
 $res = $db->query('
 	SELECT
-		[id], [message], [group_id], [likes],
-		If([parent_id] = 0, 1, 0) [is_topic],
-		Unix_Timestamp([created_time]) [timestamp],
-		[from_name] [author]
-	FROM [data]
-')->fetchAll();
+		`id`, `message`, `group_id`, `likes`,
+		If(`parent_id` IS NULL, 1, 0) `is_topic`,
+		Unix_Timestamp(`created_time`) `timestamp`,
+		`from_name` `author`
+	FROM `data`
+');
+
 foreach ($res as $row)
 {
 	$es->addToIndex(ElasticSearch::TYPE_CONTENT, $row['id'], [
@@ -36,3 +39,4 @@ foreach ($res as $row)
 
 $c = count($res);
 echo "$c rows reindexed\n";
+echo round(memory_get_peak_usage() / 1024 / 1024, 2) . " MB used\n";
