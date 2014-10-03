@@ -29,13 +29,7 @@ class Tags extends BaseModel
 	// get cloud of tags
 	public function getTrends()
 	{
-		$result = $this->db->query("SELECT tags.name, count(tags.id) as count FROM data
-                                     INNER JOIN data_tags ON data.id = data_tags.data_id
-                                     INNER JOIN tags ON data_tags.tags_id = tags.id
-                                     WHERE data.created_time > DATE_SUB(now(), INTERVAL 2 WEEK)
-                                     GROUP BY tags.id
-                                     ORDER BY count(tags.id) DESC
-                                     LIMIT 25")->fetchAll();
+		$result = $this->orm->tags->findTrending();
 
 		if (!count($result))
 		{
