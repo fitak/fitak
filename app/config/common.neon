@@ -1,5 +1,6 @@
 extensions:
 	dibi: Dibi\Bridges\Nette\DibiExtension22
+	orm: Nextras\Orm\DI\OrmExtension
 
 
 php:
@@ -29,6 +30,10 @@ nette:
 	session:
 		autoStart: smart
 		expiration: +14 days
+
+
+orm:
+	model: Fitak\RepositoryContainer
 
 
 dibi:
