@@ -30,10 +30,8 @@ interface IRepository
 
 	/**
 	 * @param  IModel   $model
-	 * @return mixed
-	 * @todo: fireEvent?
 	 */
-	public function onModelAttach(IModel $model);
+	public function setModel(IModel $model);
 
 
 	/**
@@ -135,15 +133,24 @@ interface IRepository
 
 
 	/**
-	 * Flushes all persisted changes in repositories.
+	 * @param  IEntity|mixed    $entity
+	 * @param  bool             $recursive
+	 * @return IEntity
 	 */
-	public function flush();
+	public function remove($entity, $recursive = FALSE);
 
 
 	/**
-	 * @param  IEntity  $entity
+	 * @param  IEntity|mixed    $entity
+	 * @param  bool             $recursive
 	 * @return IEntity
 	 */
-	public function remove($entity);
+	public function removeAndFlush($entity, $recursive = FALSE);
+
+
+	/**
+	 * Flushes all persisted changes in repositories.
+	 */
+	public function flush();
 
 }

@@ -1938,66 +1938,6 @@
         ]
     },
     {
-        "name": "nextras/orm",
-        "version": "v1.0.0-beta2",
-        "version_normalized": "1.0.0.0-beta2",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/nextras/orm.git",
-            "reference": "1da2306db4520dee70073353e7b831135d5f59e8"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/nextras/orm/zipball/1da2306db4520dee70073353e7b831135d5f59e8",
-            "reference": "1da2306db4520dee70073353e7b831135d5f59e8",
-            "shasum": ""
-        },
-        "require": {
-            "nette/database": "~2.3@dev",
-            "nette/reflection": "~2.2",
-            "nette/utils": "~2.2",
-            "oodle/inflect": "~0.2",
-            "php": "~5.4"
-        },
-        "require-dev": {
-            "mockery/mockery": "~0.9@dev",
-            "nette/bootstrap": "~2.2",
-            "nette/robot-loader": "~2.2",
-            "nette/safe-stream": "~2.2",
-            "nette/tester": "~1.0",
-            "tracy/tracy": "~2.2"
-        },
-        "time": "2014-09-16 12:35:43",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Nextras\\Orm\\": "src/"
-            },
-            "classmap": [
-                "src/exceptions.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jan Skrasek",
-                "homepage": "http://jan.skrasek.com"
-            }
-        ],
-        "description": "ORM framework for Nette\\Database",
-        "homepage": "https://github.com/nextras/orm",
-        "keywords": [
-            "database",
-            "nette",
-            "nextras",
-            "orm"
-        ]
-    },
-    {
         "name": "nextras/migrations",
         "version": "v2.3.1",
         "version_normalized": "2.3.1.0",
@@ -2120,6 +2060,66 @@
         "keywords": [
             "kdyby",
             "nette"
+        ]
+    },
+    {
+        "name": "nextras/orm",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nextras/orm.git",
+            "reference": "7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nextras/orm/zipball/7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23",
+            "reference": "7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23",
+            "shasum": ""
+        },
+        "require": {
+            "nette/database": "~2.3@dev",
+            "nette/reflection": "~2.2",
+            "nette/utils": "~2.2",
+            "oodle/inflect": "~0.2",
+            "php": "~5.4"
+        },
+        "require-dev": {
+            "mockery/mockery": "~0.9@dev",
+            "nette/bootstrap": "~2.2",
+            "nette/robot-loader": "~2.2",
+            "nette/safe-stream": "~2.2",
+            "nette/tester": "~1.0",
+            "tracy/tracy": "~2.2"
+        },
+        "time": "2014-09-30 18:34:31",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Nextras\\Orm\\": "src/"
+            },
+            "classmap": [
+                "src/exceptions.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jan Skrasek",
+                "homepage": "http://jan.skrasek.com"
+            }
+        ],
+        "description": "ORM framework for Nette\\Database",
+        "homepage": "https://github.com/nextras/orm",
+        "keywords": [
+            "database",
+            "nette",
+            "nextras",
+            "orm"
         ]
     }
 ]

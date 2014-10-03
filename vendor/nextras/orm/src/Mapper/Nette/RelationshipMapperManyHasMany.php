@@ -120,7 +120,7 @@ class RelationshipMapperManyHasMany extends Object implements IRelationshipMappe
 		$builder->addSelect(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyTo");
 		$builder->addSelect(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom");
 
-		if ($builder->getLimit() || $builder->getLimit() !== 1) {
+		if ($builder->getLimit() && $builder->getLimit() !== 1) {
 			$sqls = $args = [];
 			foreach ($values as $value) {
 				$builderPart = clone $builder;
@@ -194,16 +194,32 @@ class RelationshipMapperManyHasMany extends Object implements IRelationshipMappe
 	private function fetchCounts(SqlBuilder $builder, array $values)
 	{
 		$builder = clone $builder;
-		$builder->addWhere(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom", $values);
 		$builder->addSelect(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom");
-		$builder->addSelect("COUNT(:{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyTo) AS count");
-		$builder->setGroup(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom");
 		$builder->setOrder([], []);
 
-		$result = $this->context->queryArgs($builder->buildSelectQuery(), $builder->getParameters());
+		if ($builder->getLimit() || $builder->getOffset()) {
+			$sqls = [];
+			$args = [];
+			foreach ($values as $value) {
+				$build = clone $builder;
+
+				$sqls[] = "SELECT ? as {$this->primaryKeyFrom}, COUNT(*) AS count FROM (" . $build->buildSelectQuery() . ') temp';
+				$args[] = $value;
+				$args = array_merge($args, $build->getParameters());
+			}
+
+			$sql = '(' . implode(') UNION ALL (', $sqls) . ')';
+			$result = $this->context->queryArgs($sql, $args)->fetchAll();
+
+		} else {
+			$builder->addWhere(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom", $values);
+			$builder->addSelect("COUNT(:{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyTo) AS count");
+			$builder->setGroup(":{$this->joinTable}($this->primaryKeyTo).$this->primaryKeyFrom");
+			$result = $this->context->queryArgs($builder->buildSelectQuery(), $builder->getParameters())->fetchAll();
+		}
 
 		$counts = [];
-		foreach ($result->fetchAll() as $row) {
+		foreach ($result as $row) {
 			$counts[$row->{$this->primaryKeyFrom}] = $row['count'];
 		}
 		return $counts;
@@ -227,7 +243,7 @@ class RelationshipMapperManyHasMany extends Object implements IRelationshipMappe
 		$this->mapperOne->beginTransaction();
 		$list = $this->buildList($parent, $remove);
 		$builder = new SqlBuilder($this->joinTable, $this->context);
-		$builder->addWhere(array_keys(reset($list)), $list);
+		$builder->addWhere(array_keys(reset($list)), array_map('array_values', $list));
 		$this->context->queryArgs($builder->buildDeleteQuery(), $builder->getParameters());
 	}
 

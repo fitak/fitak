@@ -13,6 +13,7 @@ namespace Nextras\Orm\Repository;
 
 use Inflect\Inflect;
 use Nette\Object;
+use Nette\Utils\ObjectMixin;
 use Nextras\Orm\DI\EntityDependencyProvider;
 use Nextras\Orm\Entity\Collection\ICollection;
 use Nextras\Orm\Entity\IEntity;
@@ -27,6 +28,30 @@ use Nextras\Orm\InvalidStateException;
 
 abstract class Repository extends Object implements IRepository
 {
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onBeforePersist = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onAfterPersist = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onBeforeInsert = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onAfterInsert = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onBeforeUpdate = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onAfterUpdate = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onBeforeRemove = [];
+
+	/** @var array of callbacks with (IEntity $entity) arguments */
+	public $onAfterRemove = [];
+
 	/** @var IMapper */
 	protected $mapper;
 
@@ -43,10 +68,7 @@ abstract class Repository extends Object implements IRepository
 	private $proxyMethods;
 
 	/** @var array */
-	private $isPersisting = [];
-
-	/** @var EntityDependencyProvider */
-	private $dependencyProvider;
+	private $isProcessing = [];
 
 	/** @var MetadataStorage */
 	private $metadataStorage;
@@ -59,10 +81,8 @@ abstract class Repository extends Object implements IRepository
 	public function __construct(IMapper $mapper, EntityDependencyProvider $dependencyProvider = NULL)
 	{
 		$this->mapper = $mapper;
-		$this->dependencyProvider = $dependencyProvider;
-
 		$this->mapper->setRepository($this);
-		$this->identityMap = new IdentityMap($this);
+		$this->identityMap = new IdentityMap($this, $dependencyProvider);
 
 		$annotations = $this->reflection->getAnnotations();
 		if (isset($annotations['method'])) {
@@ -83,7 +103,7 @@ abstract class Repository extends Object implements IRepository
 	}
 
 
-	public function onModelAttach(IModel $model)
+	public function setModel(IModel $model)
 	{
 		if ($this->model && $this->model !== $model) {
 			throw new InvalidStateException('Repository is already attached.');
@@ -158,9 +178,6 @@ abstract class Repository extends Object implements IRepository
 	{
 		if (!$entity->getRepository(FALSE)) {
 			$this->identityMap->attach($entity);
-			if ($this->dependencyProvider) {
-				$this->dependencyProvider->injectDependencies($entity);
-			}
 		}
 	}
 
@@ -197,11 +214,11 @@ abstract class Repository extends Object implements IRepository
 	public function persist(IEntity $entity, $recursive = TRUE)
 	{
 		$this->identityMap->check($entity);
-		if (isset($this->isPersisting[spl_object_hash($entity)])) {
+		if (isset($this->isProcessing[spl_object_hash($entity)])) {
 			return $entity;
 		}
 
-		$this->isPersisting[spl_object_hash($entity)] = TRUE;
+		$this->isProcessing[spl_object_hash($entity)] = TRUE;
 
 		$this->attach($entity);
 		$relationships = [];
@@ -217,23 +234,37 @@ abstract class Repository extends Object implements IRepository
 		}
 
 		if ($entity->isModified()) {
+			$isPersisted = $entity->isPersisted();
+			$this->fireEvent($entity, 'onBeforePersist');
+			$this->fireEvent($entity, $isPersisted ? 'onBeforeUpdate' : 'onBeforeInsert');
+
 			$id = $this->mapper->persist($entity);
 			$entity->fireEvent('onPersist', [$id]);
+
+			$this->fireEvent($entity, $isPersisted ? 'onAfterUpdate' : 'onAfterInsert');
+			$this->fireEvent($entity, 'onAfterPersist');
 		}
 
 		foreach ($relationships as $relationship) {
 			$relationship->persist($recursive);
 		}
 
-		unset($this->isPersisting[spl_object_hash($entity)]);
+		unset($this->isProcessing[spl_object_hash($entity)]);
 		return $entity;
 	}
 
 
-	public function remove($entity)
+	public function remove($entity, $recursive = FALSE)
 	{
 		$entity = $entity instanceof IEntity ? $entity : $this->getById($entity);
 		$this->identityMap->check($entity);
+
+		if (isset($this->isProcessing[spl_object_hash($entity)])) {
+			return $entity;
+		}
+
+		$this->isProcessing[spl_object_hash($entity)] = TRUE;
+		$this->fireEvent($entity, 'onBeforeRemove');
 
 		foreach ($entity->getMetadata()->getProperties() as $property) {
 			if ($property->relationshipType) {
@@ -243,24 +274,33 @@ abstract class Repository extends Object implements IRepository
 					PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED,
 				])) {
 					$entity->getProperty($property->name)->set(NULL, TRUE);
-				} else {
+
+				} elseif ($property->relationshipType === PropertyMetadata::RELATIONSHIP_MANY_HAS_MANY)	{
 					$entity->getValue($property->name)->set([]);
+
+				} else {
+					$reverseRepository = $this->model->getRepository($property->relationshipRepository);
+					$reverseProperty = $reverseRepository->getEntityMetadata()->getProperty($property->relationshipProperty);
+
+					if ($reverseProperty->isNullable || !$recursive) {
+						$entity->getValue($property->name)->set([]);
+					} else {
+						foreach ($entity->getValue($property->name) as $reverseEntity) {
+							$reverseRepository->remove($reverseEntity, $recursive);
+						}
+					}
 				}
 			}
 		}
 
-		if ($entity->isPersisted() || $entity->getRepository(FALSE)) {
-			$entity->fireEvent('onBeforeRemove');
-
-			if ($entity->isPersisted()) {
-				$this->mapper->remove($entity);
-				$this->identityMap->remove($entity->getPersistedId());
-			}
-
-			$this->identityMap->detach($entity);
-			$entity->fireEvent('onAfterRemove');
+		if ($entity->isPersisted()) {
+			$this->mapper->remove($entity);
+			$this->identityMap->remove($entity->getPersistedId());
 		}
 
+		$this->identityMap->detach($entity);
+		$this->fireEvent($entity, 'onAfterRemove');
+		unset($this->isProcessing[spl_object_hash($entity)]);
 		return $entity;
 	}
 
@@ -279,9 +319,9 @@ abstract class Repository extends Object implements IRepository
 	}
 
 
-	public function removeAndFlush(IEntity $entity)
+	public function removeAndFlush($entity, $recursive = FALSE)
 	{
-		$this->remove($entity);
+		$this->remove($entity, $recursive);
 		$this->flush();
 		return $entity;
 	}
@@ -296,7 +336,7 @@ abstract class Repository extends Object implements IRepository
 
 			$result = call_user_func_array([$this->mapper, $method], $args);
 
-			if (!($result instanceof ICollection || $result instanceof IEntity)) {
+			if (!($result instanceof ICollection || $result instanceof IEntity || $result === NULL || $result === FALSE)) {
 				$result = $this->mapper->toCollection($result);
 			}
 
@@ -305,6 +345,17 @@ abstract class Repository extends Object implements IRepository
 		} else {
 			return parent::__call($method, $args);
 		}
+	}
+
+
+	protected function fireEvent(IEntity $entity, $event)
+	{
+		if (!property_exists($this, $event)) {
+			throw new InvalidArgumentException("Event '{$event}' is not defined.");
+		}
+
+		$entity->fireEvent($event);
+		ObjectMixin::call($this, $event, [$entity]);
 	}
 
 }
