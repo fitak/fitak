@@ -49,6 +49,7 @@ services:
 	groups: Groups
 	highlighter: Highlighter
 	likes: Likes
+	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
 	news: News
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
