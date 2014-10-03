@@ -58,7 +58,6 @@ services:
 	elasticSearch: ElasticSearch(%elastic%, %appDir%)
 	elasticSearchUpdater: { class: Fitak\ElasticSearchUpdater, tags: [kdyby.subscriber] }
 	highlighter: Highlighter
-	likes: Likes
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
