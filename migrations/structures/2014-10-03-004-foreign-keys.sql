@@ -14,12 +14,12 @@ SET `parent_id` = NULL
 WHERE `parent_id` = 0;
 
 ALTER TABLE `data`
-ADD FOREIGN KEY (`parent_id`) REFERENCES `data` (`id`),
-ADD FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
+ADD FOREIGN KEY `data_ibfk_1` (`parent_id`) REFERENCES `data` (`id`),
+ADD FOREIGN KEY `data_ibfk_2` (`group_id`) REFERENCES `groups` (`id`);
 
 ALTER TABLE `data_tags`
-ADD FOREIGN KEY (`data_id`) REFERENCES `data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD FOREIGN KEY (`tags_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ADD FOREIGN KEY `data_tags_ibfk_1` (`data_id`) REFERENCES `data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD FOREIGN KEY `data_tags_ibfk_2` (`tags_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `likes`
-ADD FOREIGN KEY (`message_id`) REFERENCES `data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ADD FOREIGN KEY `likes_ibfk_1` (`message_id`) REFERENCES `data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
