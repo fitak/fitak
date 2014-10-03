@@ -1,12 +1,12 @@
 <?php
 
-use Nette\Application\UI\Form,
-	Nette\ComponentModel\IContainer;
+use Fitak\RepositoryContainer;
+use Nette\Application\UI\Form;
 
 class SearchForm extends Form
 {
 
-	public function __construct(Groups $groups, $advanced = TRUE)
+	public function __construct(RepositoryContainer $orm, $advanced = TRUE)
 	{
 		parent::__construct();
 
@@ -22,11 +22,7 @@ class SearchForm extends Form
 
 			$this->addText('from', 'Autor:');
 
-			$this->addContainer('groups');
-			foreach ($groups->getList() as $group)
-			{
-				$this['groups']->addCheckbox($group->id, $group->name);
-			}
+			$this->addCheckboxList('groups', 'Skupiny', $orm->groups->findList());
 		}
 
 		$this->addSubmit('send', 'Vyhledat');

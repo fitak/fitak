@@ -43,18 +43,14 @@ class SearchPresenter extends BasePresenter
 	{
 		if ($this->searchRequest->groups)
 		{
-			$groups = array_fill_keys($this->searchRequest->groups, TRUE);
+			$groups = $this->searchRequest->groups;
 		}
 		else
 		{
-			$groups = [];
-			foreach ($this->context->groups->getList() as $group)
-			{
-				$groups[$group->id] = TRUE;
-			}
+			$groups = $this->orm->groups->findAll()->fetchPairs(NULL, 'id');
 		}
 
-		$form = new SearchForm($this->context->groups);
+		$form = new SearchForm($this->orm);
 		$form->setDefaults(
 			[
 				's' => $this->getParameter('s'),

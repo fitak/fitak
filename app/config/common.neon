@@ -51,7 +51,6 @@ parameters:
 services:
 	data: Data
 	elasticSearch: ElasticSearch(%elastic%, %appDir%)
-	groups: Groups
 	highlighter: Highlighter
 	likes: Likes
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)

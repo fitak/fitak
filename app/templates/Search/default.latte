@@ -37,12 +37,9 @@
 				</div>
 
 				<div class="form-group">
-				{foreach $form['groups']->controls as $checkbox}
+				{foreach $form['groups']->items as $key => $label}
 				<div class="checkbox">
-					{label "groups-$checkbox->name"}
-						{input "groups-$checkbox->name"}
-						{$form["groups-$checkbox->name"]->label[0]}
-					{/label}
+					{label groups:$key} {input groups:$key} {$label}{/label}
 				</div>
 				{/foreach}
 				</div>

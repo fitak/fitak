@@ -15,7 +15,7 @@ class HomepagePresenter extends BasePresenter
 
 	protected function createComponentSearchForm()
 	{
-		$form = new SearchForm($this->context->groups, $advanced = FALSE);
+		$form = new SearchForm($this->orm, $advanced = FALSE);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;

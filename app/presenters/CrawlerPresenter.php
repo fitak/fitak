@@ -29,7 +29,7 @@ class CrawlerPresenter extends BasePresenter
 		$this->facebook = new Facebook($config);
 		$this->facebook->setAccessToken($this->token);
 
-		foreach ($this->context->groups->getList() as $group)
+		foreach ($this->orm->groups->findAll() as $group)
 		{
 			$this->gid = $group->id;
 			$this->nextPage = NULL;

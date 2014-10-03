@@ -27,7 +27,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	protected function createTemplate($class = NULL)
 	{
 		$template = $this->templateFactory->createTemplate($this);
-		$template->groupList = $this->context->groups->getList();
+		$template->groupList = $this->orm->groups->findAllSorted();
 
 		return $template;
 	}

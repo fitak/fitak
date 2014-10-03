@@ -10,7 +10,7 @@ class AboutPresenter extends BasePresenter
 	public function renderDefault()
 	{
 		$this->template->count = $this->context->data->getCount();
-		$this->template->groups = $this->context->groups->getList();
+		$this->template->groups = $this->orm->groups->findAllSorted();
 	}
 
 }
