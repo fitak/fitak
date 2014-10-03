@@ -10,6 +10,13 @@ nette:
 	application:
 			errorPresenter: 'Error'
 
+	database:
+		dsn: "mysql:host=%database.host%;dbname=%database.database%"
+		user: %database.user%
+		password: %database.password%
+		debugger: true
+		explain: true
+
 	debugger:
 		strictMode: true
 
