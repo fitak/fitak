@@ -13,7 +13,7 @@ nette:
 			errorPresenter: 'Error'
 
 	container:
-		debugger: true
+		debugger: false
 
 	database:
 		dsn: "mysql:host=%database.host%;dbname=%database.database%"
@@ -35,6 +35,10 @@ nette:
 
 orm:
 	model: Fitak\RepositoryContainer
+
+
+events:
+	debugger: false
 
 
 dibi:
