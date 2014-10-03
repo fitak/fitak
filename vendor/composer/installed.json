@@ -1996,5 +1996,48 @@
             "nextras",
             "orm"
         ]
+    },
+    {
+        "name": "nextras/migrations",
+        "version": "v2.3.1",
+        "version_normalized": "2.3.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nextras/migrations.git",
+            "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nextras/migrations/zipball/447666d228e466aa704c37c0c8a28bf11f1afd13",
+            "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13",
+            "shasum": ""
+        },
+        "require": {
+            "nette/database": "~2.2",
+            "php": "~5.3"
+        },
+        "require-dev": {
+            "mockery/mockery": "~0.8",
+            "nette/tester": "~1.0.0",
+            "php": "~5.4"
+        },
+        "time": "2014-08-19 20:17:04",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Nextras\\Migrations\\": "src/"
+            },
+            "classmap": [
+                "src/exceptions.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "description": "Simple database migrations runner"
     }
 ]

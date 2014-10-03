@@ -1,0 +1,80 @@
+body {
+	font-size: 22px;
+	font-family: Calibri, sans-serif;
+	padding: 0;
+	margin: 0;
+}
+
+h1 {
+	font-size: 40px;
+	font-weight: normal;
+	color: white;
+	background: #00509E;
+	margin: 0;
+	padding: 10px 30px;
+}
+
+h2 {
+	color: #444;
+	font-size: 28px;
+	font-weight: normal;
+	margin: 10px 0 0;
+	padding: 10px 30px;
+}
+
+a {
+	text-decoration: none;
+	color: #00509E;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+ul {
+	font-size: 15px;
+	margin: 0 0 0 60px;
+	padding: 0;
+}
+
+ul li a {
+	font-size: 22px;
+	margin-left: 10px;
+}
+
+.error-message {
+	color: red;
+}
+
+.mode {
+	padding-bottom: 20px;
+}
+
+.mode-1 {
+	background: rgb(254, 192, 192);
+}
+
+.output {
+	margin-top: 20px;
+}
+
+.output > div {
+	font-family: Consolas, monospace;
+	line-height: 32px;
+	white-space: pre;
+	padding: 0 30px;
+}
+
+.output .success, .output .error {
+	color: white;
+	padding: 5px 30px;
+	margin-top: 20px;
+}
+
+.output .error {
+	background-color: #CD1818;
+}
+
+.output .success {
+	background-color: #00A700;
+}

@@ -1,0 +1,23 @@
+{
+	"name": "nextras/migrations",
+	"description": "Simple database migrations runner",
+	"type": "library",
+	"require": {
+		"php": "~5.3",
+		"nette/database": "~2.2"
+	},
+	"require-dev": {
+		"php": "~5.4",
+		"nette/tester": "~1.0.0",
+		"mockery/mockery": "~0.8"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.3-dev"
+		}
+	},
+	"autoload": {
+		"psr-4": { "Nextras\\Migrations\\": "src/" },
+		"classmap": ["src/exceptions.php"]
+	}
+}
