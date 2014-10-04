@@ -99,7 +99,7 @@ class ArrayCollection implements ICollection
 			return $current;
 		}
 
-		return FALSE;
+		return NULL;
 	}
 
 
@@ -158,6 +158,12 @@ class ArrayCollection implements ICollection
 	public function count()
 	{
 		return $this->getEntityCount($this->relationshipParent);
+	}
+
+
+	public function countStored()
+	{
+		return $this->count();
 	}
 
 

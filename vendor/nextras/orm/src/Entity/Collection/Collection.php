@@ -90,7 +90,7 @@ class Collection implements ICollection
 			return $current;
 		}
 
-		return FALSE;
+		return NULL;
 	}
 
 
@@ -141,6 +141,12 @@ class Collection implements ICollection
 
 
 	public function count()
+	{
+		return iterator_count($this->getIterator());
+	}
+
+
+	public function countStored()
 	{
 		return $this->getEntityCount($this->relationshipParent);
 	}

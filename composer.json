@@ -14,12 +14,12 @@
 		"php": "~5.5",
 		"nette/nette": "~2.3@dev",
 		"nette/database": "~2.3@dev",
-		"dibi/dibi": "~2.2",
-		"facebook/php-sdk": "~3.2",
-		"nextras/orm": "@dev",
+		"nextras/orm": "~1.0@dev",
 		"nextras/migrations": "~2.3",
 		"nextras/link-factory": "~1.0",
 		"kdyby/events": "~2.2",
+		"dibi/dibi": "~2.2",
+		"facebook/php-sdk": "~3.2",
 		"elasticsearch/elasticsearch": "~1.2"
 	},
 	"config": {

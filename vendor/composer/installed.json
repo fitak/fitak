@@ -1747,12 +1747,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/nette/database.git",
-            "reference": "546c7a34e4d06a9e73c7d56b8e4d5a19de7abb11"
+            "reference": "28dff3697e3c3e26f1367aaf7590d5c9e11dc4fe"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nette/database/zipball/546c7a34e4d06a9e73c7d56b8e4d5a19de7abb11",
-            "reference": "546c7a34e4d06a9e73c7d56b8e4d5a19de7abb11",
+            "url": "https://api.github.com/repos/nette/database/zipball/28dff3697e3c3e26f1367aaf7590d5c9e11dc4fe",
+            "reference": "28dff3697e3c3e26f1367aaf7590d5c9e11dc4fe",
             "shasum": ""
         },
         "require": {
@@ -1768,7 +1768,7 @@
             "mockery/mockery": "~0.9.1",
             "nette/tester": "~1.0"
         },
-        "time": "2014-09-29 20:46:11",
+        "time": "2014-10-04 08:28:28",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -2069,12 +2069,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/nextras/orm.git",
-            "reference": "7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23"
+            "reference": "e60418250ad055611b9b65a139166a760e708660"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nextras/orm/zipball/7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23",
-            "reference": "7885295e3b6a3bfc92b52db96eeb4bc0da9a0a23",
+            "url": "https://api.github.com/repos/nextras/orm/zipball/e60418250ad055611b9b65a139166a760e708660",
+            "reference": "e60418250ad055611b9b65a139166a760e708660",
             "shasum": ""
         },
         "require": {
@@ -2085,15 +2085,20 @@
             "php": "~5.4"
         },
         "require-dev": {
-            "mockery/mockery": "~0.9@dev",
+            "mockery/mockery": "~0.9",
             "nette/bootstrap": "~2.2",
             "nette/robot-loader": "~2.2",
             "nette/safe-stream": "~2.2",
-            "nette/tester": "~1.0",
+            "nette/tester": "~1.3",
             "tracy/tracy": "~2.2"
         },
-        "time": "2014-09-30 18:34:31",
+        "time": "2014-10-04 08:40:39",
         "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0-dev"
+            }
+        },
         "installation-source": "dist",
         "autoload": {
             "psr-4": {

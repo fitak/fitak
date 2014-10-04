@@ -14,14 +14,16 @@ use Nette\Database\Context;
 use Nette\Database\IConventions;
 use Nette\Database\IStructure;
 use Nette\Database\ResultSet;
+use Nette\Database\Table\Selection;
+use Nette\Database\Table\SqlBuilder;
 use Nextras\Orm\Entity\Collection\ArrayCollection;
 use Nextras\Orm\Entity\Collection\Collection;
 use Nextras\Orm\Entity\IEntity;
+use Nextras\Orm\Entity\PersistanceHelper;
 use Nextras\Orm\Entity\Reflection\PropertyMetadata;
 use Nextras\Orm\InvalidArgumentException;
 use Nextras\Orm\Mapper\BaseMapper;
 use Nextras\Orm\Mapper\IMapper;
-use Nextras\Orm\Relationships\IRelationshipCollection;
 use Nextras\Orm\StorageReflection\UnderscoredDbStorageReflection;
 
 
@@ -60,6 +62,12 @@ class NetteMapper extends BaseMapper
 	}
 
 
+	public function table()
+	{
+		return $this->databaseContext->table($this->getTableName());
+	}
+
+
 	public function builder()
 	{
 		return new SqlBuilder($this->getTableName(), $this->databaseContext);
@@ -75,9 +83,11 @@ class NetteMapper extends BaseMapper
 	public function toCollection($arg)
 	{
 		if ($arg instanceof SqlBuilder) {
-			return new Collection(
-				new SqlBuilderCollectionMapper($this->getRepository(), $this->databaseContext, $arg)
-			);
+			return new Collection(new SqlBuilderCollectionMapper($this->getRepository(), $this->databaseContext, $arg));
+
+		} elseif ($arg instanceof Selection) {
+			return new Collection(new SqlBuilderCollectionMapper($this->getRepository(), $this->databaseContext, $arg->getSqlBuilder()));
+
 		} elseif (is_array($arg) || $arg instanceof ResultSet) {
 			$data = [];
 			$repository = $this->getRepository();
@@ -86,7 +96,7 @@ class NetteMapper extends BaseMapper
 			}
 
 		} else {
-			throw new InvalidArgumentException('NetteMapper could convert only array|SqlBuilder|ResultSet argument, recieved "' . gettype($arg) . '".');
+			throw new InvalidArgumentException('NetteMapper could convert only array|Selection|SqlBuilder|ResultSet argument, recieved "' . gettype($arg) . '".');
 		}
 
 		return new ArrayCollection($data);
@@ -248,16 +258,27 @@ class NetteMapper extends BaseMapper
 		}
 
 		$this->beginTransaction();
-		$id = $entity->getValue('id', TRUE);
-		$data = $entity->toArray(IEntity::TO_ARRAY_LOADED_RELATIONSHIP_AS_IS);
 
-		$storageProperties = $entity->getMetadata()->getStorageProperties();
-		foreach ($data as $key => $value) {
-			if (!in_array($key, $storageProperties, TRUE) || $value instanceof IRelationshipCollection) {
-				unset($data[$key]);
+		$data = [];
+		$id = $entity->getValue('id', TRUE);
+		$metadata = $entity->getMetadata();
+
+		foreach (PersistanceHelper::toArray($entity) as $key => $value) {
+			$property = $metadata->getProperty($key);
+			if ($property->relationshipType && (
+					$property->relationshipType === PropertyMetadata::RELATIONSHIP_ONE_HAS_MANY
+					|| $property->relationshipType === PropertyMetadata::RELATIONSHIP_MANY_HAS_MANY
+					|| ($property->relationshipType === PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED && !$property->relationshipIsMain)
+				)
+			) {
+				continue;
 			}
+
+			$value = $entity->getValue($key);
 			if ($value instanceof IEntity)  {
 				$data[$key] = $value->id;
+			} else {
+				$data[$key] = $value;
 			}
 		}
 

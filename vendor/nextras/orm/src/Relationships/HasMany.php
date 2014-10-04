@@ -150,18 +150,24 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	}
 
 
-	public function count($collectionName = NULL)
+	public function count()
+	{
+		return iterator_count($this->getIterator());
+	}
+
+
+	public function countStored()
 	{
 		/** @var ICollection $collection */
-		$collection = $this->collection === NULL && !$this->toAdd && !$this->toRemove ? $this->getCachedCollection($collectionName) : $this->getCollection();
+		$collection = $this->collection === NULL && !$this->toAdd && !$this->toRemove ? $this->getCachedCollection(NULL) : $this->getCollection();
 		return $collection->getEntityCount($this->parent);
 	}
 
 
-	public function getIterator($collectionName = NULL)
+	public function getIterator()
 	{
 		/** @var ICollection $collection */
-		$collection = $this->collection === NULL && !$this->toAdd && !$this->toRemove ? $this->getCachedCollection($collectionName) : $this->getCollection();
+		$collection = $this->collection === NULL && !$this->toAdd && !$this->toRemove ? $this->getCachedCollection(NULL) : $this->getCollection();
 		return $collection->getEntityIterator($this->parent);
 	}
 
