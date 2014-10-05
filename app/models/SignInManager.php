@@ -11,14 +11,14 @@ class SignInManager extends Nette\Object
 	/** @var RepositoryContainer */
 	private $orm;
 
-	/** @var Nette\Http\UserStorage */
+	/** @var Nette\Security\IUserStorage */
 	private $userStorage;
 
 	/**
-	 * @param RepositoryContainer    $orm
-	 * @param Nette\Http\UserStorage $userStorage
+	 * @param RepositoryContainer         $orm
+	 * @param Nette\Security\IUserStorage $userStorage
 	 */
-	public function __construct(RepositoryContainer $orm, Nette\Http\UserStorage $userStorage)
+	public function __construct(RepositoryContainer $orm, Nette\Security\IUserStorage $userStorage)
 	{
 		$this->orm = $orm;
 		$this->userStorage = $userStorage;
