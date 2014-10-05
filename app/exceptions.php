@@ -12,6 +12,11 @@ namespace
 	{
 
 	}
+
+	class ImplementationException extends \LogicException
+	{
+
+	}
 }
 
 namespace Fitak
