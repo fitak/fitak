@@ -61,7 +61,7 @@ services:
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
-	token: Token(@dibi.connection, %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
+	token: Token(..., ..., %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
 	templateHelpers: TemplateHelpers

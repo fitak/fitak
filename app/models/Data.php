@@ -1,5 +1,7 @@
 <?php
-use Nette\Utils\Strings;
+
+use Fitak\RepositoryContainer;
+
 
 class Data extends BaseModel
 {
@@ -12,9 +14,9 @@ class Data extends BaseModel
 	 */
 	protected $elastic;
 
-	public function __construct(DibiConnection $connection, ElasticSearch $elastic)
+	public function __construct(DibiConnection $connection, RepositoryContainer $orm, ElasticSearch $elastic)
 	{
-		parent::__construct($connection);
+		parent::__construct($connection, $orm);
 		$this->elastic = $elastic;
 	}
 

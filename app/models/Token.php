@@ -1,14 +1,16 @@
 <?php
 
+use Fitak\RepositoryContainer;
+
 
 class Token extends BaseModel
 {
 
 	private $app_id, $permissions, $app_secret, $admin_email;
 
-	public function __construct(DibiConnection $connection, $app_id, $permissions, $app_secret, $admin_email)
+	public function __construct(DibiConnection $connection, RepositoryContainer $orm, $app_id, $permissions, $app_secret, $admin_email)
 	{
-		parent::__construct($connection);
+		parent::__construct($connection, $orm);
 		$this->app_id = $app_id;
 		$this->permissions = $permissions;
 		$this->app_secret = $app_secret;
