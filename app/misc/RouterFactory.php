@@ -18,15 +18,12 @@ class RouterFactory extends Nette\Object
 	 */
 	public function create()
 	{
-		$router = new RouteList();
-		$router[] = new Route('index.php', 'Homepage:default', Route::ONE_WAY);
+		$flags = $this->useHttps ? Route::SECURED : 0;
 
-		$flags = $this->useHttps ? [Route::ONE_WAY, Route::SECURED] : [0];
-		foreach ($flags as $flag)
-		{
-			$router[] = new Route('stream/', 'Search:stream', $flag);
-			$router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', $flag);
-		}
+		$router = new RouteList();
+		$router[] = new Route('index.php', 'Homepage:default', $flags | Route::ONE_WAY);
+		$router[] = new Route('stream/', 'Search:stream', $flags);
+		$router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', $flags);
 
 		return $router;
 	}
