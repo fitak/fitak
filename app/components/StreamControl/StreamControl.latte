@@ -20,7 +20,7 @@
         {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
 
         <div class="row message">
-            {!$comment->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
+            {!$comment->message|escapeHtml|nl2br|urlsToLinks|tagsToLinks}
         </div>
     </div>
 {/define}
@@ -52,7 +52,7 @@
 	{*<span class="context" title='{foreach $topic->likesData as $like}{$like->from_name}{sep}&#13;{/sep}{/foreach}'><strong>Líbí se:</strong> {$topic->likes ? $topic->likes : 0}x</span>*}
 
     <div class="row message">
-        {!$topic->message|escapeHtml|nl2br|tagsToLinks|urlsToLinks}
+        {!$topic->message|escapeHtml|nl2br|urlsToLinks|tagsToLinks}
 
 
         {if $topic->name}
