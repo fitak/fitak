@@ -30,7 +30,7 @@ nette:
 
 	session:
 		autoStart: smart
-		expiration: +14 days
+		expiration: +90 days
 
 
 orm:

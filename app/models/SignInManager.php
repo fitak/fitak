@@ -58,6 +58,7 @@ class SignInManager extends Nette\Object
 	public function signInWithoutPassword(User $user)
 	{
 		$identity = new Nette\Security\Identity($user->id);
+		$this->userStorage->setExpiration('+ 90 days', Nette\Security\IUserStorage::CLEAR_IDENTITY);
 		$this->userStorage->setIdentity($identity);
 		$this->userStorage->setAuthenticated(TRUE);
 	}
