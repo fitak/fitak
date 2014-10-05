@@ -213,7 +213,10 @@ class ElasticSearch extends Client
 			'to', 'jako', 'za', 'zpět', 'ze', 'do', 'pro', 'je', 'na', 'atd', 'atp',
 			'jakmile', 'přičemž', 'já', 'on', 'ona', 'ono', 'oni', 'ony', 'my', 'vy',
 			'jí', 'ji', 'mě', 'mne', 'jemu', 'tomu', 'těm', 'těmu', 'němu', 'němuž',
-			'jehož', 'jíž', 'jelikož', 'jež', 'jakož', 'načež'
+			'jehož', 'jíž', 'jelikož', 'jež', 'jakož', 'načež',
+
+			// Application stop words
+			'bi', 'bie', 'bik', 'fi', 'fit', 'mi', 'mie', 'pi', 'pik',
 		];
 	}
 
