@@ -7,8 +7,22 @@
 class SearchPresenter extends BasePresenter
 {
 
+	/** @var Nette\Security\IUserStorage @inject */
+	public $userStorage;
+
 	/** @var SearchRequest */
 	private $searchRequest;
+
+	protected function startup()
+	{
+		parent::startup();
+
+		if (!$this->userStorage->isAuthenticated())
+		{
+			$this->flashMessage('Pro přístup k obsahu je nutné se přihlásit.');
+			$this->redirect('Auth:signIn');
+		}
+	}
 
 	public function actionDefault($s, $from = NULL, array $groups = NULL, $sortBy = NULL, $streamView = NULL)
 	{
