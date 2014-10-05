@@ -68,5 +68,5 @@ services:
 	linkFactory: Nextras\Application\LinkFactory
 	templateHelpers: TemplateHelpers
 	templateFactory: TemplateFactory
-	routerFactory: RouterFactory(%productionMode%)
+	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create

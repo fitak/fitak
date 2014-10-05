@@ -13,3 +13,5 @@ parameters:
 		connectionParams:
 			# HTTP Auth to ElasticSearch node on production
 			# auth: [username, password, "Basic"]
+	router:
+		useHttps: %productionMode%
