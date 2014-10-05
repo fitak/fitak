@@ -9,7 +9,7 @@ class AboutPresenter extends BasePresenter
 
 	public function renderDefault()
 	{
-		$this->template->count = $this->context->data->getCount();
+		$this->template->count = $this->orm->posts->findAll()->countStored();
 		$this->template->groups = $this->orm->groups->findAllSorted();
 	}
 
