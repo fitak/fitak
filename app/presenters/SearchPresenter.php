@@ -20,7 +20,7 @@ class SearchPresenter extends BasePresenter
 		if (!$this->userStorage->isAuthenticated())
 		{
 			$this->flashMessage('Pro přístup k obsahu je nutné se přihlásit.');
-			$this->redirect('Auth:signIn');
+			$this->redirect('Auth:signIn', ['backlink' => $this->storeRequest()]);
 		}
 	}
 

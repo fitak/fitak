@@ -19,6 +19,9 @@ class AuthPresenter extends BasePresenter
 	/** @var SignUpManager @inject */
 	public $signUpManager;
 
+	/** @var string @persistent */
+	public $backlink;
+
 
 // === sign in =========================================================================================================
 
@@ -41,6 +44,7 @@ class AuthPresenter extends BasePresenter
 		try
 		{
 			$this->signInManager->signIn($values['email'], $values['password']);
+			$this->restoreRequest($this->backlink);
 			$this->redirect('Homepage:');
 		}
 		catch (AuthenticationException $e)
