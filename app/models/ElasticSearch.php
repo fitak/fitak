@@ -126,11 +126,12 @@ class ElasticSearch extends Client
 				]
 			]
 		];
-		if ($request->query)
+		if ($request->tags || $request->query)
 		{
+			$query = trim(implode(' ', $request->tags) . ' ' . $request->query);
 			$args['body']['query']['function_score']['query']['bool']['must'][] = [
 				'multi_match' => [
-					'query' => $request->query,
+					'query' => $query,
 					'fields' => ['message'],
 				],
 			];
