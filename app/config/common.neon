@@ -62,6 +62,8 @@ services:
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
 	token: Token(..., ..., %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
+	signInManager: Fitak\SignInManager
+	signUpManager: Fitak\SignUpManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
 	templateHelpers: TemplateHelpers

@@ -1,13 +1,23 @@
 <?php
 
-
-class NotSupportedException extends \LogicException
+namespace
 {
+	class NotSupportedException extends \LogicException
+	{
 
+	}
+
+
+	class DeprecatedException extends NotSupportedException
+	{
+
+	}
 }
 
-
-class DeprecatedException extends NotSupportedException
+namespace Fitak
 {
+	class DuplicateEntryException extends \RuntimeException
+	{
 
+	}
 }
