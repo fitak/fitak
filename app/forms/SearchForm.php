@@ -15,9 +15,13 @@ class SearchForm extends Form
 
 		if ($advanced)
 		{
-			$this->addSelect('sortBy', 'Seřadit podle:', [
-				SearchRequest::SORT_TIME => 'času',
-				SearchRequest::SORT_RELEVANCE => 'relevance',
+			$today = strtotime('today');
+			$day = 24 * 3600;
+			$this->addSelect('since', 'Časové omezení', [
+				0 => 'bez omezení',
+				($today - 2 * $day) => 'poslední 2 dny',
+				($today - 14 * $day) => 'poslední 2 týdny',
+				($today - 60 * $day) => 'poslední 2 měsíce',
 			]);
 
 			$this->addText('from', 'Autor:');
@@ -33,11 +37,11 @@ class SearchForm extends Form
 		$values = $form->getValues(TRUE);
 		$params = ['s' => $values['s']];
 
-		if (isSet($values['sortBy']))
+		if (isSet($values['since']))
 		{
-			if ($values['sortBy'] === SearchRequest::SORT_RELEVANCE)
+			if ($values['since'] > 0)
 			{
-				$params['sortBy'] = $values['sortBy'];
+				$params['since'] = $values['since'];
 			}
 
 			if ($values['groups'] !== array_filter($values['groups']))

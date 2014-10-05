@@ -24,7 +24,7 @@ class SearchPresenter extends BasePresenter
 		}
 	}
 
-	public function actionDefault($s, $from = NULL, array $groups = NULL, $sortBy = NULL, $streamView = NULL)
+	public function actionDefault($s, $from = NULL, array $groups = NULL, $since = NULL, $streamView = NULL)
 	{
 		$parsed = $this->context->searchQueryParser->parseQuery($s);
 
@@ -33,13 +33,13 @@ class SearchPresenter extends BasePresenter
 		$this->searchRequest->tags = $parsed['tags'];
 		$this->searchRequest->from = $from;
 		$this->searchRequest->groups = ($groups ? array_map('strval', $groups) : NULL);
-		$this->searchRequest->sortBy = ($sortBy === SearchRequest::SORT_RELEVANCE) ? $sortBy : SearchRequest::SORT_TIME;
+		$this->searchRequest->since = (int) $since;
 
 		$dataModel = $this->context->data;
 		$this['stream']->dataSource = new SearchDataSource($dataModel, $this->searchRequest);
 	}
 
-	public function renderDefault($s, $from = NULL, array $groups = NULL, $sortBy = NULL, $streamView = NULL)
+	public function renderDefault($s, $from = NULL, array $groups = NULL, $since = NULL, $streamView = NULL)
 	{
 		$this->template->advancedSearch = FALSE;
 		$this->template->advancedSearch = (($this->searchRequest->from || $this->searchRequest->groups) && !$streamView);
@@ -67,6 +67,7 @@ class SearchPresenter extends BasePresenter
 		$form->setDefaults(
 			[
 				's' => $this->getParameter('s'),
+				'since' => $this->getParameter('since', 0),
 				'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
 				'groups' => $groups,
 			]

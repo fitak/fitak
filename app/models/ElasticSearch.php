@@ -153,10 +153,15 @@ class ElasticSearch extends Client
 				]
 			];
 		}
-		if ($request->sortBy === SearchRequest::SORT_TIME)
+
+		if ($request->since > 0)
 		{
-			$args['body']['sort'] = [
-				'created_time' => 'desc',
+			$args['body']['filter'] = [
+				'numeric_range' => [
+					'created_time' => [
+						'gte' => $request->since,
+					]
+				]
 			];
 		}
 

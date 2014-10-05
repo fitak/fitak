@@ -118,13 +118,9 @@ class Data extends BaseModel
 		$this->addSearchCondition($sql, $request);
 
 		// sort by time or relevance
-		if ($request->sortBy === SearchRequest::SORT_RELEVANCE && $request->query != "")
+		if ($request->query != "")
 		{
 			$sql->orderBy("MATCH(data.message) AGAINST (%s) DESC", $request->query);
-		}
-		else
-		{
-			$sql->orderBy("data.created_time DESC");
 		}
 
 		$result = $sql->fetchAll($offset, $length);
@@ -228,6 +224,11 @@ class Data extends BaseModel
 		if (count($request->groups))
 		{
 			$sql->where("data.group_id IN %in", $request->groups);
+		}
+
+		if ($request->since > 0)
+		{
+			$sql->where("data.created_at >= %t", $request->since);
 		}
 	}
 
