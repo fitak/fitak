@@ -74,3 +74,4 @@ services:
 	templateFactory: TemplateFactory
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
+	keyValueStorage: KeyValueStorage
