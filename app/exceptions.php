@@ -25,4 +25,9 @@ namespace Fitak
 	{
 
 	}
+
+	class InvalidAccessTokenException extends \RuntimeException
+	{
+
+	}
 }

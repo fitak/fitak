@@ -6,9 +6,8 @@ parameters:
 		database: fitak.cz
 	fb:
 		appId: "APPID"
-		appSecret: APPSECRET
-		permissions: user_groups
-		adminEmail: "YOUR_EMAIL"
+		appSecret: "APPSECRET"
+		permissions: [offline_access, user_groups, read_stream]
 	elastic:
 #		connectionParams:
 #			HTTP Auth to ElasticSearch node on production
