@@ -3,33 +3,33 @@
 	<img src="{$basePath}/img/logo.png" alt="Fitak.cz" title="Fitak.cz" style="max-width: 100%;">
 </div>
 <div class="row text-center">
-    {form searchForm}
-    	<fieldset>
-	    <ul class="unstyled" n:if="$form->hasErrors()">
+	{form searchForm}
+		<fieldset>
+		<ul class="unstyled" n:if="$form->hasErrors()">
 			<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>
-	    </ul>
-	    {input s, class => 'form-control'}
-	    <button n:name="send" class="btn btn-primary" style="margin-top:10px"><i class="icon-search icon-white"></i> Vyhledat</button>
-	    </fieldset>
-    {/form}
+		</ul>
+		{input s, class => 'form-control'}
+		<button n:name="send" class="btn btn-primary" style="margin-top:10px"><i class="icon-search icon-white"></i> Vyhledat</button>
+		</fieldset>
+	{/form}
 
 	{control tagCloud}
 
-    {foreach $news as $message}
-    	<div class="panel panel-info">
-    		<div class="panel-heading">
-   		    	<h3 class="panel-title">Info</h3>
-  			</div>
-    		{!$message->message}
-    	</div>
-    {/foreach}
+	{foreach $news as $message}
+		<div class="panel panel-info">
+			<div class="panel-heading">
+					<h3 class="panel-title">Info</h3>
+			</div>
+			{!$message->message}
+		</div>
+	{/foreach}
 
-    <script type="text/javascript">
+	<script type="text/javascript">
 		$(document).ready(function() {
-		    $('#options').click(function() {
-			    $("#incComments").slideToggle();
-		    });
+			$('#options').click(function() {
+				$("#incComments").slideToggle();
+			});
 		});
-    </script>
+	</script>
 </div>
 {/block}
