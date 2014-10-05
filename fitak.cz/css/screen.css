@@ -130,3 +130,8 @@ a[href^="error:"] {
 {
 	text-decoration: none;
 }
+
+form table th label {
+	padding-right: 10px;
+	text-align: left;
+}
