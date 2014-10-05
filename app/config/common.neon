@@ -44,6 +44,7 @@ console:
 	url: http://fitak.dev/
 	commands:
 		- Bin\Commands\Elastic\Reindex
+		- Bin\Commands\Crawler\Facebook
 
 dibi:
 	driver: pdo
@@ -75,3 +76,4 @@ services:
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
 	keyValueStorage: KeyValueStorage
+	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%)
