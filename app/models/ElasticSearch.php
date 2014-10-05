@@ -110,11 +110,11 @@ class ElasticSearch extends Client
 								]
 							]
 						],
-						'field_value_factor' => [
-							'field' => 'likes',
-							'factor' => 1.2,
-							'modifier' => 'log1p',
-						]
+//						'field_value_factor' => [
+//							'field' => 'likes',
+//							'factor' => 1.2,
+//							'modifier' => 'log1p',
+//						]
 					]
 				],
 				'highlight' => [
