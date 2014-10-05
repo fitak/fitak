@@ -8,7 +8,7 @@ use Nextras\Orm\Relationships\ManyHasMany;
 
 /**
  * @property string             $name
- * @property int                $count
+ * @property-read int           $count  {default 0}
  *
  * @property ManyHasMany|Post[] $posts  {m:n PostsRepository $tags}
  */

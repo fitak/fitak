@@ -1,29 +1,16 @@
 <?php
 
+use Fitak\Tag;
 use Nette\Utils\Strings;
 
 class Tags extends BaseModel
 {
 
-	public function saveTag($tag, $message_id)
+	public function saveTag($tagName, $postId)
 	{
-		$result = $this->db->query("SELECT id FROM tags WHERE name = %s LIMIT 1", $tag);
-		$id = $result->fetchSingle();
-		if (!$id)
-		{
-			$args = [
-				'name' => $tag,
-				'count' => 1
-			];
-			$this->db->query("INSERT INTO tags", $args);
-			$id = $this->db->insertId();
-		}
-		$args = [
-			'tags_id' => $id,
-			'data_id' => $message_id
-		];
-		$this->db->query("INSERT INTO data_tags", $args);
-		$this->db->query("UPDATE tags SET count = count + 1 WHERE id = %i LIMIT 1", $id);
+		$tag = $this->orm->tags->getByNameOrCreate($tagName);
+		$tag->posts->add($postId);
+		$this->orm->tags->persistAndFlush($tag);
 	}
 
 	// extract tags ([tag1][tag2]....) from the start of input
