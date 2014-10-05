@@ -10,8 +10,8 @@ parameters:
 		permissions: user_groups
 		adminEmail: "YOUR_EMAIL"
 	elastic:
-		connectionParams:
-			# HTTP Auth to ElasticSearch node on production
-			# auth: [username, password, "Basic"]
+#		connectionParams:
+#			HTTP Auth to ElasticSearch node on production
+#			auth: [username, password, "Basic"]
 	router:
 		useHttps: %productionMode%
