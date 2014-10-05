@@ -157,7 +157,7 @@ class ElasticSearch extends Client
 		if ($request->since > 0)
 		{
 			$args['body']['filter'] = [
-				'numeric_range' => [
+				'range' => [
 					'created_time' => [
 						'gte' => $request->since,
 					]
