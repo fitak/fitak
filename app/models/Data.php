@@ -41,7 +41,7 @@ class Data extends BaseModel
 			->from("data")
 			->leftJoin("groups")
 			->on("data.group_id = groups.id")
-			->where("data.parent_id = 0")
+			->where("data.parent_id IS NULL")
 			->where("data.id NOT IN %in", $this->getMatchedIdByTags($this->mutedTags))
 			->orderBy("data.created_time DESC")
 			->limit($length)
@@ -57,7 +57,7 @@ class Data extends BaseModel
 	public function getCount($justTopics = FALSE)
 	{
 		$sql = $this->db->select("count(*)")->from("data");
-		if ($justTopics) $sql->where("parent_id = 0");
+		if ($justTopics) $sql->where("parent_id IS NULL");
 
 		return $sql->fetchSingle();
 	}
@@ -202,7 +202,7 @@ class Data extends BaseModel
 		if ($request->query == "" && $request->from == "")
 		{
 			// limit results to topics
-			$sql->where("data.parent_id = 0");
+			$sql->where("data.parent_id IS NULL");
 		}
 		else
 		{
