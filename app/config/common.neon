@@ -2,7 +2,7 @@ extensions:
 	dibi: Dibi\Bridges\Nette\DibiExtension22
 	orm: Nextras\Orm\DI\OrmExtension
 	events: Kdyby\Events\DI\EventsExtension
-
+	console: Kdyby\Console\DI\ConsoleExtension
 
 php:
 	date.timezone: Europe/Prague
@@ -40,6 +40,10 @@ orm:
 events:
 	debugger: false
 
+console:
+	url: http://fitak.dev/
+	commands:
+		- Bin\Commands\Elastic\Reindex
 
 dibi:
 	driver: pdo
