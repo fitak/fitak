@@ -1,0 +1,32 @@
+{
+	"name": "nextras/static-router",
+	"type": "library",
+	"description": "Simple static router for Nette Framework",
+	"keywords": ["nette", "router", "nextras"],
+	"homepage": "https://github.com/nextras/static-router",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Nextras Community",
+			"homepage": "https://github.com/nextras/static-router/graphs/contributors"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/nextras/static-router/issues"
+	},
+	"require": {
+		"php": "~5.3",
+		"nette/application": "~2.2"
+	},
+	"require-dev": {
+		"nette/tester": "~1.3"
+	},
+	"autoload": {
+		"psr-4": { "Nextras\\Routing\\": "src/" }
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
+		}
+	}
+}

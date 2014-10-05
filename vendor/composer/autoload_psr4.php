@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Nextras\\Routing\\' => array($vendorDir . '/nextras/static-router/src'),
     'Nextras\\Orm\\' => array($vendorDir . '/nextras/orm/src'),
     'Nextras\\Migrations\\' => array($vendorDir . '/nextras/migrations/src'),
     'Nextras\\Application\\' => array($vendorDir . '/nextras/link-factory/src'),

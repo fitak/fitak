@@ -1,0 +1,100 @@
+<?php
+
+namespace Nextras\Routing;
+
+use Nette;
+use Nette\Application\IRouter;
+use Nette\Application\Request as AppRequest;
+use Nette\Http\IRequest as HttpRequest;
+use Nette\Http\Url;
+
+
+/**
+ * Simple static router.
+ */
+class StaticRouter extends Nette\Object implements IRouter
+{
+	/** @var array (Presenter:action => slug) */
+	private $tableOut;
+
+	/** @var int */
+	private $flags;
+
+
+	/**
+	 * @param array $routingTable Presenter:action => slug
+	 * @param int   $flags        IRouter::ONE_WAY, IRouter::SECURED
+	 */
+	public function __construct(array $routingTable, $flags = 0)
+	{
+		$this->tableOut = $routingTable;
+		$this->flags = $flags;
+	}
+
+
+	/**
+	 * Maps HTTP request to a Request object.
+	 *
+	 * @return AppRequest|NULL
+	 */
+	public function match(HttpRequest $httpRequest)
+	{
+		$url = $httpRequest->getUrl();
+		$slug = rtrim(substr($url->getPath(), strlen($url->getBasePath())), '/');
+		foreach ($this->tableOut as $destination2 => $slug2) {
+			if ($slug === rtrim($slug2, '/')) {
+				$destination = $destination2;
+				break;
+			}
+		}
+
+		if (!isset($destination)) {
+			return NULL;
+		}
+
+		$params = $httpRequest->getQuery();
+		list($presenter, $params['action']) = explode(':', $destination);
+
+		return new AppRequest(
+			$presenter,
+			$httpRequest->getMethod(),
+			$params,
+			$httpRequest->getPost(),
+			$httpRequest->getFiles(),
+			array(AppRequest::SECURED => $httpRequest->isSecured())
+		);
+	}
+
+
+	/**
+	 * Constructs absolute URL from Request object.
+	 *
+	 * @return string|NULL
+	 */
+	public function constructUrl(AppRequest $appRequest, Url $refUrl)
+	{
+		if ($this->flags & self::ONE_WAY) {
+			return NULL;
+		}
+
+		$presenter = $appRequest->getPresenterName();
+		$params = $appRequest->getParameters();
+		if (!isset($params['action']) || !is_string($params['action'])) {
+			return NULL;
+		}
+
+		$key = $presenter . ':' . $params['action'];
+		if (!isset($this->tableOut[$key])) {
+			return NULL;
+		}
+
+		unset($params['action']);
+		$schema = ($this->flags & self::SECURED ? 'https' : 'http') . '://';
+		$slug = $this->tableOut[$key];
+		$query = (($tmp = http_build_query($params)) ? '?' . $tmp : '');
+		$url = $schema . $refUrl->getAuthority() . $refUrl->getBasePath() . $slug . $query;
+
+		return $url;
+	}
+
+}

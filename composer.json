@@ -17,6 +17,7 @@
 		"nextras/orm": "~1.0@dev",
 		"nextras/migrations": "~2.3",
 		"nextras/link-factory": "~1.0",
+		"nextras/static-router": "~1.0@dev",
 		"kdyby/events": "~2.2",
 		"dibi/dibi": "~2.2",
 		"facebook/php-sdk": "~3.2",

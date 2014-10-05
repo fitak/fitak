@@ -798,6 +798,7 @@ return array(
     'Nextras\\Orm\\TestHelper\\OrmTestsExtension' => $vendorDir . '/nextras/orm/src/TestHelper/OrmTestsExtension.php',
     'Nextras\\Orm\\TestHelper\\TestCaseEntityTrait' => $vendorDir . '/nextras/orm/src/TestHelper/TestCaseEntityTrait.php',
     'Nextras\\Orm\\TestHelper\\TestMapper' => $vendorDir . '/nextras/orm/src/TestHelper/TestMapper.php',
+    'Nextras\\Routing\\StaticRouter' => $vendorDir . '/nextras/static-router/src/StaticRouter.php',
     'Pimple\\Container' => $vendorDir . '/pimple/pimple/src/Pimple/Container.php',
     'Pimple\\ServiceProviderInterface' => $vendorDir . '/pimple/pimple/src/Pimple/ServiceProviderInterface.php',
     'Psr\\Log\\AbstractLogger' => $vendorDir . '/psr/log/Psr/Log/AbstractLogger.php',
