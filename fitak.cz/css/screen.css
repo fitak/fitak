@@ -135,3 +135,8 @@ form table th label {
 	padding-right: 10px;
 	text-align: left;
 }
+
+form .error {
+	color: #e00000;
+	font-weight: bold;
+}
