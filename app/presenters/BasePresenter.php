@@ -11,18 +11,11 @@ use Fitak\RepositoryContainer;
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
-	/** @var TemplateFactory */
-	protected $templateFactory;
+	/** @var TemplateFactory @inject */
+	public $templateFactory;
 
-	/** @var RepositoryContainer */
-	protected $orm;
-
-	public function __construct(TemplateFactory $templateFactory, RepositoryContainer $orm)
-	{
-		parent::__construct();
-		$this->templateFactory = $templateFactory;
-		$this->orm = $orm;
-	}
+	/** @var RepositoryContainer @inject */
+	public $orm;
 
 	protected function createTemplate($class = NULL)
 	{
