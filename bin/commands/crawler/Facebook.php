@@ -155,7 +155,18 @@ class Facebook extends Command
 		$post->parent = $parentTopic->id;
 		$post->group = $group->id;
 
-		$this->orm->posts->persist($post);
+		try
+		{
+			$this->orm->posts->persist($post);
+		}
+		catch (\PDOException $e)
+		{
+			if ($e->getCode() != 23000)
+			{
+				throw $e;
+			}
+			// otherwise ignore, fb returned same post multiple times
+		}
 	}
 
 }
