@@ -7,9 +7,11 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
+    'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'Pimple' => array($vendorDir . '/pimple/pimple/src'),
     'Kdyby\\Events\\' => array($vendorDir . '/kdyby/events/src'),
+    'Kdyby\\Console\\' => array($vendorDir . '/kdyby/console/src'),
     'Inflect' => array($vendorDir . '/oodle/inflect/src'),
     'Guzzle\\Stream' => array($vendorDir . '/guzzle/stream'),
     'Guzzle\\Parser' => array($vendorDir . '/guzzle/parser'),

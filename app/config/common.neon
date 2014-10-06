@@ -2,7 +2,7 @@ extensions:
 	dibi: Dibi\Bridges\Nette\DibiExtension22
 	orm: Nextras\Orm\DI\OrmExtension
 	events: Kdyby\Events\DI\EventsExtension
-
+	console: Kdyby\Console\DI\ConsoleExtension
 
 php:
 	date.timezone: Europe/Prague
@@ -40,6 +40,12 @@ orm:
 events:
 	debugger: false
 
+console:
+	url: http://fitak.dev/
+	commands:
+		- Bin\Commands\Auth\Facebook
+		- Bin\Commands\Crawler\Facebook
+		- Bin\Commands\Elastic\Reindex
 
 dibi:
 	driver: pdo
@@ -61,7 +67,6 @@ services:
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
-	token: Token(..., ..., %fb.appId%, %fb.permissions%, %fb.appSecret%, %fb.adminEmail%)
 	signInManager: Fitak\SignInManager
 	signUpManager: Fitak\SignUpManager
 	searchQueryParser: SearchQueryParser
@@ -70,3 +75,5 @@ services:
 	templateFactory: TemplateFactory
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
+	keyValueStorage: KeyValueStorage
+	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%)

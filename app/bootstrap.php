@@ -9,7 +9,10 @@ require __DIR__ . '/../vendor/autoload.php';
 $configurator = new Nette\Configurator;
 $configurator->enableDebugger(__DIR__ . '/../log');
 $configurator->setTempDirectory(__DIR__ . '/../tmp');
-$configurator->createRobotLoader()->addDirectory(__DIR__)->register();
+$configurator->createRobotLoader()
+	->addDirectory(__DIR__)
+	->addDirectory(__DIR__ . '/../bin')
+	->register();
 $configurator->addConfig(__DIR__ . '/config/common.neon');
 $configurator->addConfig(__DIR__ . '/config/local.neon');
 $container = $configurator->createContainer();

@@ -12,11 +12,21 @@ namespace
 	{
 
 	}
+
+	class ImplementationException extends \LogicException
+	{
+
+	}
 }
 
 namespace Fitak
 {
 	class DuplicateEntryException extends \RuntimeException
+	{
+
+	}
+
+	class InvalidAccessTokenException extends \RuntimeException
 	{
 
 	}
