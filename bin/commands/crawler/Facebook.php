@@ -63,11 +63,25 @@ class Facebook extends Command
 
 			foreach ($fb->getGroupFeedSince($group->id, $since) as $post)
 			{
+				if ($this->out->isVerbose() && !$this->out->isVeryVerbose())
+				{
+					$this->out->writeln("    <info>post $post->id ($post->created_time)</info>");
+				}
+
 				$this->indexPost($group, $post);
+				if ($this->out->isVeryVerbose())
+				{
+					$this->out->write("p");
+				}
+
 				if (property_exists($post, 'comments'))
 				{
 					foreach ($post->comments->data as $comment)
 					{
+						if ($this->out->isVeryVerbose())
+						{
+							$this->out->write("c");
+						}
 						$this->indexComment($group, $comment, $post);
 					}
 				}
