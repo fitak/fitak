@@ -43,8 +43,9 @@ events:
 console:
 	url: http://fitak.dev/
 	commands:
-		- Bin\Commands\Elastic\Reindex
+		- Bin\Commands\Auth\Facebook
 		- Bin\Commands\Crawler\Facebook
+		- Bin\Commands\Elastic\Reindex
 
 dibi:
 	driver: pdo
