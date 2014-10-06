@@ -47,20 +47,6 @@
 			</div>
 			</fieldset>
 		{/form}
-
-		<script type="text/javascript">
-			$(document).ready(function () {
-				$('.toggle-search-advanced').on('click', function () {
-					var advSearch = $('.search-advanced');
-					var currentSymbol = advSearch.is(':hidden') ? "\u25ba" : "\u25bc";
-					var newSymbol = advSearch.is(':hidden') ? "\u25bc" : "\u25ba";
-					var link = $(this);
-					link.text(link.text().replace(currentSymbol, newSymbol));
-					advSearch.slideToggle(0);
-					return false;
-				});
-			});
-		</script>
 	</div>
 
 	{control stream}

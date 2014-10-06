@@ -104,14 +104,3 @@
 </div>
 
 {control paginator}
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('.show-comments, .hide-comments').on('click', function() {
-            var topic = $(this).closest('.topic');
-            topic.find('.show-comments, .hide-comments').toggle();
-            topic.find('.comment').toggle();
-            return false;
-        });
-    });
-</script>

@@ -5,7 +5,7 @@ var uglify = require('gulp-uglify');
 
 var config = {
 	cssFiles: './fitak.cz/css/**/*.css',
-	jsFiles: ['./fitak.cz/js/jquery-2.1.1.js', './fitak.cz/js/**/*.js'],
+	jsFiles: ['./fitak.cz/js/libs/jquery-2.1.1.js', './fitak.cz/js/**/*.js'],
 	outputDir:'./fitak.cz/build/'
 };
 
