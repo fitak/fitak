@@ -6,6 +6,7 @@ use Fitak\Crawler\Facebook as FbCrawler;
 use Bin\Commands\Command;
 use ElasticSearch;
 use Facebook\Entities\AccessToken;
+use Fitak\DuplicateEntryException;
 use Fitak\InvalidAccessTokenException;
 use Fitak\Post;
 use Fitak\RepositoryContainer;
@@ -149,7 +150,14 @@ class Facebook extends Command
 		$post->parent = $parentTopic->id;
 		$post->group = $group->id;
 
-		$this->orm->posts->persist($post);
+		try
+		{
+			$this->orm->posts->persist($post);
+		}
+		catch (DuplicateEntryException $e)
+		{
+			// otherwise ignore, fb returned same post multiple times
+		}
 	}
 
 }
