@@ -1,4 +1,5 @@
 /app/config/local.neon
+/fitak.cz/build
 /log/
 /tmp/
 fitak.sublime-project

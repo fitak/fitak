@@ -19,14 +19,8 @@
 	<title>Fiťák.cz</title>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" media="screen,projection,tv" href="{$basePath}/css/bootstrap.min.css" type="text/css">
-	<link rel="stylesheet" media="screen,projection,tv" href="{$basePath}/css/fontello.css" type="text/css">
-	<link rel="stylesheet" media="screen,projection,tv" href="{$basePath}/css/screen.css" type="text/css">
+	<link rel="stylesheet" href="{$basePath}/build/compiled.css" type="text/css">
 	<link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
-
-	<script type="text/javascript" src="{$basePath}/js/jquery-2.1.1.min.js"></script>
-	<script type="text/javascript" src="{$basePath}/js/netteForms.js"></script>
-	<script type="text/javascript" src="{$basePath}/js/bootstrap.min.js"></script>
 	{block head}{/block}
 	<script type="text/javascript">
 	 var _gaq = _gaq || [];
@@ -84,6 +78,8 @@
 	{include #content}
 
 	</div>
+
+	<script src="{$basePath}/build/compiled.js"></script>
 
 </body>
 </html>
