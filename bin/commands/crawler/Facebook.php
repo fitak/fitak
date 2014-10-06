@@ -80,10 +80,14 @@ class Facebook extends Command
 	 */
 	private function indexGroup(FbCrawler $fb, $group, $since)
 	{
-		$this->out->writeln("<info>Processing '$group->name' ($group->id)</info>");
+		$this->out->writeln("<info>Processing '$group->name'</info>");
 
 		foreach ($fb->getGroupFeedSince($group->id, $since) as $post)
 		{
+			if ($this->out->isVerbose() && !$this->out->isVeryVerbose())
+			{
+				$this->out->writeln("    <info>post $post->id ($post->created_time)</info>");
+			}
 			$this->indexEntry($group, $post, NULL);
 
 			$comments = isset($post->comments) ? $post->comments->data : [];
@@ -101,6 +105,11 @@ class Facebook extends Command
 	 */
 	protected function indexEntry($group, $entry, $parentTopic = NULL)
 	{
+		if ($this->out->isVeryVerbose())
+		{
+			$this->out->write($parentTopic ? 'c' : 'p');
+		}
+
 		$post = new Post;
 
 		$post->id = preg_replace('~^\d+_~', '', $entry->id);
