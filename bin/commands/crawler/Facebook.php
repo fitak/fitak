@@ -5,11 +5,11 @@ namespace Bin\Commands\Crawler;
 use Fitak\Crawler\Facebook as FbCrawler;
 use Bin\Commands\Command;
 use ElasticSearch;
+use Facebook\Entities\AccessToken;
+use Fitak\InvalidAccessTokenException;
 use Fitak\Post;
 use Fitak\RepositoryContainer;
 use KeyValueStorage;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
 
 
 class Facebook extends Command
@@ -34,23 +34,28 @@ class Facebook extends Command
 
 	public function invoke(FbCrawler $fb, KeyValueStorage $kvs)
 	{
-		$accessToken = $kvs->get($kvs::FACEBOOK_ACCESS_TOKEN);
-		if (!$accessToken)
+		$code = $kvs->get($kvs::FACEBOOK_ACCESS_TOKEN);
+		$expires = $kvs->get($kvs::FACEBOOK_ACCESS_TOKEN_EXPIRES);
+		$accessToken = new AccessToken($code, $expires);
+
+		if (!$code || $accessToken->getExpiresAt()->getTimestamp() <= time())
 		{
-			$url = $fb->getLoginUrl();
-			$this->out->writeln('<info>Open the following url in browser and authenticate:</info>');
-			$this->out->writeln("  $url");
-			$this->out->writeln("<info>Once you are done and redirected to http://copy.this.url, copy the full url and paste it here.</info>\n");
+			throw new InvalidAccessTokenException("Authenticate by invoking 'auth:facebook'");
+		}
 
-			$helper = new QuestionHelper();
-			$question = new Question('Return url: ');
-			$url = $helper->ask($this->in, $this->out, $question);
-
-			$accessToken = $fb->getAccessTokenFromUrl($url);
-			$this->out->writeln("<info>Got access token $accessToken</info>");
-
+		if (!$accessToken->isLongLived() || $accessToken->getExpiresAt()->getTimestamp() < strToTime('+1 week'))
+		{
+			$accessToken = $accessToken->extend();
+			$this->out->writeln("<info>Extended access token</info>");
 			$kvs->save($kvs::FACEBOOK_ACCESS_TOKEN, $accessToken);
 		}
+
+		if ($this->out->isVerbose())
+		{
+			$expires = $accessToken->getExpiresAt()->format('Y-m-d H:i');
+			$this->out->writeln("Token expires at $expires");
+		}
+
 		$fb->setSession($accessToken);
 
 		$timestamp = time();

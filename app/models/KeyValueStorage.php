@@ -7,6 +7,7 @@ class KeyValueStorage
 {
 
 	const FACEBOOK_ACCESS_TOKEN = 'facebook.access_token';
+	const FACEBOOK_ACCESS_TOKEN_EXPIRES = 'facebook.access_token_expires';
 	const CRAWLER_SINCE = 'crawler.since';
 
 	/**
@@ -24,7 +25,7 @@ class KeyValueStorage
 		$this->db->query('
 			INSERT INTO `key_value` (`key`, `value`) VALUES (?, ?)
 			ON DUPLICATE KEY UPDATE `value` = ?
-		', $key, $value, $key);
+		', $key, (string) $value, $value);
 	}
 
 	/**
