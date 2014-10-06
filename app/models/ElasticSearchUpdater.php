@@ -38,7 +38,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 				'message' => $post->message,
 				'author' => $post->fromName,
 				'is_topic' => ($post->parent === NULL),
-				'created_time' => $post->createdTime,
+				'created_time' => $post->createdTime->getTimestamp(),
 				'group' => $post->group->id,
 				'likes' => $post->likesCount,
 			]);
