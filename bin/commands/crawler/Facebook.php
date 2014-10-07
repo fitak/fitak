@@ -62,15 +62,9 @@ class Facebook extends Command
 		$timestamp = time();
 		$since = $kvs->get($kvs::CRAWLER_SINCE);
 
-		$flushCounter = 0;
 		foreach ($this->orm->groups->findAll() as $group)
 		{
 			$this->indexGroup($fb, $group, $since);
-
-			if (++$flushCounter > 50)
-			{
-				$this->orm->flush();
-			}
 		}
 
 		// We are saving timestamp from before the crawl so
@@ -88,6 +82,7 @@ class Facebook extends Command
 	{
 		$this->out->writeln("<info>Processing '$group->name'</info>");
 
+		$flushCounter = 0;
 		foreach ($fb->getGroupFeedSince($group->id, $since) as $post)
 		{
 			if ($this->out->isVerbose() && !$this->out->isVeryVerbose())
@@ -100,6 +95,12 @@ class Facebook extends Command
 			foreach ($comments as $comment)
 			{
 				$this->indexEntry($group, $comment, $post);
+			}
+
+			if (++$flushCounter > 50)
+			{
+				$this->orm->flush();
+				$flushCounter = 0;
 			}
 		}
 	}
