@@ -1,7 +1,7 @@
 /app/config/local.neon
-/fitak.cz/build
 /log/
 /tmp/
+/www/build
 fitak.sublime-project
 fitak.sublime-workspace
 .DS_Store
