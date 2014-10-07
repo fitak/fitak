@@ -48,7 +48,7 @@ var config = {
 	cssFiles: './fitak.cz/css/**/*.css',
 	jsFiles: ['./fitak.cz/js/libs/jquery-2.1.1.js', './fitak.cz/js/**/*.js'],
 	latteFiles: './app/**/*.latte',
-	keepClasses: ['label', 'label-info'],
+	keepClasses: ['label', 'label-info', 'open'],
 	outputDir:'./fitak.cz/build/'
 };
 
