@@ -5,6 +5,10 @@ settings:
 				type: custom
 				tokenizer: standard
 				filter: [icu_folding, cs_stop, synonym, cs_stem]
+			cs_tag_analyzer:
+				type: custom
+				tokenizer: whitespace
+				filter: [icu_folding, synonym]
 		filter:
 			cs_stem:
 				type: stemmer
@@ -33,6 +37,8 @@ mappings:
 			tags:
 				type: string # accepts array of strings
 				store: 'false'
+				index_analyzer: cs_tag_analyzer
+				search_analyzer: cs_tag_analyzer
 			message: # without tags, for search
 				type: string
 				store: 'false'
