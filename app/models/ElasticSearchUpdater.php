@@ -30,18 +30,31 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 		];
 	}
 
+	private function getDefaultData(Post $post)
+	{
+		$message = trim(implode(', ', [
+			$post->getMessageWithoutTags(),
+			$post->description,
+			$post->caption,
+		]));
+		return [
+			'tags' => $post->getParsedTags()[0],
+			'message' => $message,
+			'message_raw' => $post->message,
+			'likes' => $post->likesCount,
+		];
+	}
+
 	public function onAfterInsert(Orm\Entity\IEntity $post)
 	{
 		if ($post instanceof Post)
 		{
 			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
-				'message' => $post->message,
 				'author' => $post->fromName,
 				'is_topic' => ($post->parent === NULL),
 				'created_time' => $post->createdTime->getTimestamp(),
 				'group' => $post->group->id,
-				'likes' => $post->likesCount,
-			]);
+			] + $this->getDefaultData($post));
 		}
 	}
 
@@ -49,10 +62,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 	{
 		if ($post instanceof Post)
 		{
-			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
-				'message' => $post->message,
-				'likes' => $post->likesCount,
-			]);
+			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, $this->getDefaultData($post));
 		}
 	}
 

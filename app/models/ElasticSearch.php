@@ -116,18 +116,24 @@ class ElasticSearch extends Client
 					'pre_tags' => [self::HIGHLIGHT_START],
 					'post_tags' => [self::HIGHLIGHT_END],
 					'fields' => [
-						'message' => ['number_of_fragments' => 0], // return full string (defaults to substrings)
+						'message_raw' => ['number_of_fragments' => 0], // return full string (defaults to substrings)
 					]
 				]
 			]
 		];
-		if ($request->tags || $request->query)
+		if ($request->tags)
 		{
-			$query = trim(implode(' ', $request->tags) . ' ' . $request->query);
 			$args['body']['query']['function_score']['query']['bool']['must'][] = [
-				'multi_match' => [
-					'query' => $query,
-					'fields' => ['message'],
+				'match' => [
+					'tags' => implode(' ', $request->tags),
+				],
+			];
+		}
+		if ($request->query)
+		{
+			$args['body']['query']['function_score']['query']['bool']['must'][] = [
+				'match' => [
+					'message' => $request->query,
 				],
 			];
 		}

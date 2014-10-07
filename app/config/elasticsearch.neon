@@ -30,10 +30,15 @@ mappings:
 				type: string
 				store: 'false'
 				boost: 3
-			message:
+			tags:
+				type: string # accepts array of strings
+				store: 'false'
+			message: # without tags, for search
+				type: string
+				store: 'false'
+			message_raw: # with tags, for highlight
 				type: string
 				store: 'true'
-				boost: 1 # account for field length
 			is_topic:
 				type: boolean
 				store: 'false'
