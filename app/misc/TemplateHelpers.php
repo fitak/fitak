@@ -1,5 +1,4 @@
 <?php
-use Nette\Utils\Strings;
 
 class TemplateHelpers extends Nette\Object
 {

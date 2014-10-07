@@ -4,6 +4,7 @@ use Fitak\SignInManager;
 use Fitak\SignUpManager;
 use Fitak\DuplicateEmailException;
 use Fitak\InvalidSignUpTokenException;
+use Fitak\User;
 use Fitak\UserAlreadyActivatedException;
 use Nette\Application\UI;
 use Nette\Security\AuthenticationException;
@@ -49,6 +50,7 @@ class AuthPresenter extends BasePresenter
 		}
 		catch (AuthenticationException $e)
 		{
+			/** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
 			if ($e->getCode() === IAuthenticator::IDENTITY_NOT_FOUND)
 			{
 				$form['email']->addError('S tímto e-mailem tu není nikdo zaregistrovaný.');
@@ -110,12 +112,14 @@ class AuthPresenter extends BasePresenter
 		}
 		catch (DuplicateEmailException $e)
 		{
+			/** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
 			$form['email']->addError('S tímto mailem je tu již někdo zaregistrovaný.');
 		}
 	}
 
 	public function actionSignUpConfirm($userId, $token)
 	{
+		/** @var User $user */
 		$user = $this->orm->users->getById($userId);
 		if (!$user) $this->error();
 

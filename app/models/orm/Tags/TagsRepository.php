@@ -7,6 +7,7 @@ use Nextras\Orm;
 
 /**
  * @method Tag getByName(string $name)
+ * @property-read TagsMapper $mapper
  */
 class TagsRepository extends Orm\Repository\Repository
 {

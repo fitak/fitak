@@ -23,6 +23,7 @@ class Data extends BaseModel
 	// get all topics + comments
 	public function getAllTopics($length, $offset)
 	{
+		/** @var DibiFluent $sql */
 		$sql = $this->db->select("data.*, groups.name AS group_name, groups.closed AS group_closed")
 			->from("data")
 			->leftJoin("groups")

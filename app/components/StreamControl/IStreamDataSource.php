@@ -7,8 +7,8 @@ interface IStreamDataSource
 	/**
 	 * Returns list of topic with their comments.
 	 *
-	 * @param  int number of topics to return
-	 * @param  int offset for pagination
+	 * @param  int $count number of topics to return
+	 * @param  int $offset offset for pagination
 	 * @return array (topicId => topic)
 	 */
 	public function getTopics($count, $offset);
