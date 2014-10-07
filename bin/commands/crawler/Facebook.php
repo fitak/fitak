@@ -11,6 +11,7 @@ use Fitak\InvalidAccessTokenException;
 use Fitak\Post;
 use Fitak\RepositoryContainer;
 use KeyValueStorage;
+use Tags;
 
 
 class Facebook extends Command
@@ -27,6 +28,12 @@ class Facebook extends Command
 	 * @inject
 	 */
 	public $orm;
+
+	/**
+	 * @var Tags
+	 * @inject
+	 */
+	public $tagParser;
 
 	protected function configure()
 	{
@@ -123,6 +130,7 @@ class Facebook extends Command
 		}
 
 		$post = new Post;
+		$post->tagParser = $this->tagParser;
 
 		$post->id = $this->parseId($entry->id);
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
@@ -155,6 +163,11 @@ class Facebook extends Command
 		$this->orm->posts->attach($post);
 		$post->parent = $this->parseId($parentTopic->id);
 		$post->group = $group->id;
+
+		foreach ($post->getParsedTags()[0] as $tag)
+		{
+			$post->tags->add($this->orm->tags->getByNameOrCreate($tag));
+		}
 
 		try
 		{
