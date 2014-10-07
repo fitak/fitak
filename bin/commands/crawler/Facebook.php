@@ -105,6 +105,11 @@ class Facebook extends Command
 		}
 	}
 
+	private function parseId($longId)
+	{
+		return preg_replace('~^\d+_~', '', $longId);
+	}
+
 	/**
 	 * @param \StdClass $group
 	 * @param \StdClass $entry
@@ -119,7 +124,7 @@ class Facebook extends Command
 
 		$post = new Post;
 
-		$post->id = preg_replace('~^\d+_~', '', $entry->id);
+		$post->id = $this->parseId($entry->id);
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
@@ -148,7 +153,7 @@ class Facebook extends Command
 		}
 
 		$this->orm->posts->attach($post);
-		$post->parent = $parentTopic->id;
+		$post->parent = $this->parseId($parentTopic->id);
 		$post->group = $group->id;
 
 		try
