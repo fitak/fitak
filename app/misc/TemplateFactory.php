@@ -1,33 +1,34 @@
 <?php
 
+use Fitak\TemplateFilters;
 
 class TemplateFactory extends Nette\Object
 {
 
 	/** @var \Nette\Bridges\ApplicationLatte\TemplateFactory */
-	private $templateFactory;
+	private $baseFactory;
 
-	/** @var TemplateHelpers */
-	private $templateHelpers;
+	/** @var TemplateFilters */
+	private $filters;
 
 	/**
-	 * @param \Nette\Bridges\ApplicationLatte\TemplateFactory $templateFactory
-	 * @param TemplateHelpers $templateHelpers
+	 * @param \Nette\Bridges\ApplicationLatte\TemplateFactory $baseFactory
+	 * @param TemplateFilters $filters
 	 */
 	public function __construct(
-		Nette\Bridges\ApplicationLatte\TemplateFactory $templateFactory,
-		TemplateHelpers $templateHelpers
+		Nette\Bridges\ApplicationLatte\TemplateFactory $baseFactory,
+		TemplateFilters $filters
 	) {
-		$this->templateFactory = $templateFactory;
-		$this->templateHelpers = $templateHelpers;
+		$this->baseFactory = $baseFactory;
+		$this->filters = $filters;
 	}
 
 
 	public function createTemplate(Nette\Application\UI\Control $control)
 	{
-		$template = $this->templateFactory->createTemplate($control);
+		$template = $this->baseFactory->createTemplate($control);
 		$latte = $template->getLatte();
-		$latte->addFilter(NULL, [$this->templateHelpers, 'loader']);
+		$latte->addFilter(NULL, [$this->filters, 'loader']);
 
 		return $template;
 	}

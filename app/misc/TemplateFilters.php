@@ -1,20 +1,26 @@
 <?php
 
-class TemplateHelpers extends Nette\Object
+namespace Fitak;
+
+use Highlighter;
+use Nette;
+use Nextras\Application\LinkFactory;
+use Tags;
+
+
+class TemplateFilters extends Nette\Object
 {
 
 	/** @var Tags */
 	private $tagsModel;
 
-	/** @var \Nextras\Application\LinkFactory */
+	/** @var LinkFactory */
 	private $linkFactory;
 
-	/**
-	 * @var Highlighter
-	 */
+	/** @var Highlighter */
 	private $highlighter;
 
-	public function __construct(Nextras\Application\LinkFactory $linkFactory, Tags $tagsModel, Highlighter $highlighter)
+	public function __construct(LinkFactory $linkFactory, Tags $tagsModel, Highlighter $highlighter)
 	{
 		$this->tagsModel = $tagsModel;
 		$this->linkFactory = $linkFactory;

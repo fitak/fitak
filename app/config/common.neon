@@ -71,7 +71,7 @@ services:
 	signUpManager: Fitak\SignUpManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
-	templateHelpers: TemplateHelpers
+	templateFilters: Fitak\TemplateFilters
 	templateFactory: TemplateFactory
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
