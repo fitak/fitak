@@ -72,7 +72,7 @@ services:
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
 	templateFilters: Fitak\TemplateFilters
-	templateFactory: TemplateFactory
+	templateFactory: Fitak\TemplateFactory
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
 	keyValueStorage: KeyValueStorage

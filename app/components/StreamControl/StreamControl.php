@@ -1,5 +1,6 @@
 <?php
 
+use Fitak\TemplateFactory;
 use Nette\Application\UI;
 
 class StreamControl extends UI\Control

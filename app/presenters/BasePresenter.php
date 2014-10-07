@@ -1,6 +1,7 @@
 <?php
 
 use Fitak\RepositoryContainer;
+use Fitak\TemplateFactory;
 
 
 /**
