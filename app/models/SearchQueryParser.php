@@ -4,6 +4,15 @@ use Nette\Utils\Strings;
 class SearchQueryParser extends Nette\Object
 {
 
+	/** @var Tags */
+	public $tagParser;
+
+	public function __construct(Tags $tagParser)
+	{
+		$this->tagParser = $tagParser;
+	}
+
+
 	/**
 	 * Parse search query.
 	 *
@@ -17,10 +26,10 @@ class SearchQueryParser extends Nette\Object
 		$input = Strings::replace($input, '/\s+/', ' ');
 
 		// extract tags
-		$matches = Strings::matchAll($input, '/(?<=^|\s)tag:\s*(?<tag_list>[\pL\d_-]+(?:\s*,\s*(?&tag_list))?)/u');
+		list($rawTags, $query) = $this->tagParser->separateMessage($input);
+		$tags = $this->tagParser->parse($rawTags)[0];
+		$matches = Strings::matchAll($query, '/(?<=^|\s)tag:\s*(?<tag_list>[\pL\d_-]+(?:\s*,\s*(?&tag_list))?)/u');
 
-		$tags = [];
-		$query = $input;
 		foreach ($matches as $m)
 		{
 			$tmp = Strings::split($m['tag_list'], '/\s*,\s*/');
