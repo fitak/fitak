@@ -5,8 +5,9 @@ namespace Bin\Commands\Elastic;
 use Bin\Commands\Command;
 use ElasticSearch;
 use Fitak\ElasticSearchUpdater;
-use Fitak\RepositoryContainer;
+use Nette\Database\Context as Database;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Tags;
 
 
 class Reindex extends Command
@@ -19,22 +20,60 @@ class Reindex extends Command
 			->setDescription('Drops current index, sets new mapping and add all data to index');
 	}
 
-	public function invoke(ElasticSearch $elastic, RepositoryContainer $orm, ElasticSearchUpdater $updater)
+	public function invoke(ElasticSearch $elastic, Database $db, Tags $tagParser)
 	{
 		$this->out->writeln('<info>Erasing index...</info>');
 		$elastic->setupIndices();
 		$this->out->writeln('<info>Mapping recreated</info>');
 
 		$this->out->writeln('<info>Indexing...</info>');
-		$posts = $orm->posts->findAll();
 
-		$pb = new ProgressBar($this->out, $posts->count());
+		$rows = $db->query('
+			SELECT
+				`id`, `message`, `group_id`, `likes`, `description`, `caption`,
+				If(`parent_id` IS NULL, 1, 0) `is_topic`,
+				Unix_Timestamp(`created_time`) `timestamp`,
+				`from_name`
+			FROM `data`
+		');
+
+		$pb = new ProgressBar($this->out, $rows->getRowCount());
 		$pb->start();
-		foreach ($posts as $post)
+
+		$flushCounter = 0;
+		$data = [];
+		foreach ($rows as $row)
 		{
-			$updater->onAfterInsert($post);
+			$message = trim(implode(', ', [
+				$tagParser->parse($row['message']),
+				$row['description'],
+				$row['caption'],
+			]));
+			$data[] = [
+				'tags' => $tagParser->extractTags($row['message'])[0],
+				'message' => $message,
+				'message_raw' => $row['message'],
+				'likes' => $row['likes'],
+				'author' => $row['from_name'],
+				'is_topic' => $row['is_topic'],
+				'created_time' => $row['timestamp'],
+				'group' => $row['group_id'],
+			];
+
 			$pb->advance();
+
+			if (++$flushCounter > 200)
+			{
+				$elastic->addToIndexBulk(ElasticSearch::TYPE_CONTENT, $data);
+				$data = [];
+				$flushCounter = 0;
+			}
 		}
+		if ($data)
+		{
+			$elastic->addToIndexBulk(ElasticSearch::TYPE_CONTENT, $data);
+		}
+
 		$pb->finish();
 		$this->out->writeln(''); // fix progress bar not breaking line
 

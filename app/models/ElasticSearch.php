@@ -58,6 +58,31 @@ class ElasticSearch extends Client
 		]);
 	}
 
+	/**
+	 * @param string $type
+	 * @param array $rows [integer $id, array $data]
+	 */
+	public function addToIndexBulk($type, $rows)
+	{
+		$params = [
+			'index' => $this->index,
+			'type' => $type,
+			'body' => [],
+		];
+		foreach ($rows as $row)
+		{
+			$params['body'][] = [
+				'index' => [
+					'_id' => $row['id'],
+				]
+			];
+			unset($row['id']);
+			$params['body'][] = $row;
+		}
+
+		$this->bulk($params);
+	}
+
 	public function update($args)
 	{
 		throw new DeprecatedException('Use updateDoc or updateScript instead');
