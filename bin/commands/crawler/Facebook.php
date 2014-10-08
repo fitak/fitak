@@ -2,6 +2,7 @@
 
 namespace Bin\Commands\Crawler;
 
+use Facebook\FacebookRequestException;
 use Fitak\Crawler\Facebook as FbCrawler;
 use Bin\Commands\Command;
 use ElasticSearch;
@@ -68,7 +69,21 @@ class Facebook extends Command
 
 		foreach ($this->orm->groups->findAll() as $group)
 		{
-			$this->indexGroup($fb, $group, $kvs);
+			try
+			{
+				$this->indexGroup($fb, $group, $kvs);
+			}
+			catch (FacebookRequestException $e)
+			{
+				if ($e->getCode() === 2)
+				{
+					// This is a transient facebook error.
+					// Seems it happens upon requesting old records.
+					$this->out->writeln('<error>Transient facebook error, skipping this group</error>');
+					continue;
+				}
+				throw $e;
+			}
 		}
 	}
 
