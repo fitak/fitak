@@ -129,16 +129,11 @@ class ElasticSearch extends Client
 									'match' => [
 										'is_topic' => [
 											'query' => TRUE,
-										],
-									],
+										]
+									]
 								]
 							]
-						],
-//						'field_value_factor' => [
-//							'field' => 'likes',
-//							'factor' => 1.2,
-//							'modifier' => 'log1p',
-//						]
+						]
 					]
 				],
 				'highlight' => [

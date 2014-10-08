@@ -18,7 +18,6 @@ use Tags;
  * @property DateTime          $createdTime
  * @property DateTime          $updatedTime
  * @property int|NULL          $commentsCount
- * @property int|NULL          $likesCount
  * @property string            $fromName
  * @property int               $fromId
  * @property string            $type     {enum self::TYPE_*}

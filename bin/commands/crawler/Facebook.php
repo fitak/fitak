@@ -158,7 +158,6 @@ class Facebook extends Command
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
 		//$post->commentsCount; // TODO deprecate
-		$post->likesCount = $entry->like_count ?: count($entry->likes);
 		$post->fromName = $entry->from->name;
 		$post->fromId = $entry->from->id;
 		$post->caption = strpos($entry->caption, 'Attachment Unavailable') === FALSE ? $entry->caption : NULL;

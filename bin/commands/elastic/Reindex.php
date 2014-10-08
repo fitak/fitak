@@ -30,7 +30,7 @@ class Reindex extends Command
 
 		$rows = $db->query('
 			SELECT
-				`id`, `message`, `group_id`, `likes`, `description`, `caption`,
+				`id`, `message`, `group_id`, `description`, `caption`,
 				If(`parent_id` IS NULL, 1, 0) `is_topic`,
 				Unix_Timestamp(`updated_time`) `timestamp`,
 				`from_name`
@@ -54,7 +54,6 @@ class Reindex extends Command
 				'tags' => $tagParser->extractTags($row['message'])[0],
 				'message' => $message,
 				'message_raw' => $row['message'],
-				'likes' => $row['likes'],
 				'author' => $row['from_name'],
 				'is_topic' => $row['is_topic'],
 				'updated_time' => $row['timestamp'],
