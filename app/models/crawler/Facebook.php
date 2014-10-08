@@ -127,4 +127,39 @@ class Facebook
 		while ($req);
 	}
 
+	/**
+	 * @param \StdClass $post
+	 * @throws FacebookRequestException
+	 * @return \StdClass[]
+	 */
+	public function getComments($post)
+	{
+		if (!isset($post->comments))
+		{
+			return;
+		}
+
+		foreach ($post->comments->data as $comment)
+		{
+			yield $comment;
+		}
+
+		$res = new FacebookResponse(new FacebookRequest($this->fbs, 'GET', "/$post->id/comments"), $post->comments, NULL);
+		$req = $res->getRequestForNextPage();
+
+		while ($req)
+		{
+			$res = $req->execute();
+
+			/** @var \StdClass $raw */
+			$raw = $res->getResponse();
+			foreach ($raw->data as $entry)
+			{
+				yield $entry;
+			}
+
+			$req = $res->getRequestForNextPage();
+		}
+	}
+
 }

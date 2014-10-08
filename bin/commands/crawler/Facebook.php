@@ -98,8 +98,7 @@ class Facebook extends Command
 			}
 			$this->indexEntry($group, $post, NULL);
 
-			$comments = isset($post->comments) ? $post->comments->data : [];
-			foreach ($comments as $comment)
+			foreach ($fb->getComments($post) as $comment)
 			{
 				$this->indexEntry($group, $comment, $post);
 			}
