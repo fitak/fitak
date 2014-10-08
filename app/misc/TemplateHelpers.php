@@ -58,7 +58,7 @@ class TemplateHelpers extends Nette\Object
 	public function urlsToLinks($input)
 	{
 		// define an url regular exression pattern:
-		$urlPattern = '/(https?:\/\/|www.)(www.)?([-a-z0-9]*[a-z0-9]\.)(\bcom\b|\bbiz\b|\bgov\b|\bmil\b|\bnet\b|\borg\  b|[a-z][a-z]|[a-z][a-z]\.[a-z][a-z])\/?([a-zA-Z0-9]*)?([a-zA-Z0-9_\-\.\?=\/&%#;~\+]*)?/';
+		$urlPattern = '/(https?:\/\/|www.)(www.)?([-a-z0-9]*[a-z0-9]\.)(\bcom\b|\bbiz\b|\bgov\b|\bmil\b|\bnet\b|\borg\  b|[a-z][a-z]|[a-z][a-z]\.[a-z][a-z])\/?([a-zA-Z0-9]*)?([a-zA-Z0-9_\-\.\?=\/&%#!;~\+]*)?/';
 		// get all matches
 		preg_match_all($urlPattern, $input, $temp);
 		$temp = $temp[0]; // an array of all urls
