@@ -22,7 +22,7 @@ class Tags extends BaseModel
 		$match = Strings::match($input, '/^\s*(?<tag_list>\[\s*[\pL\d._-]+\s*\](?:\s*(?&tag_list))?)(?<message>.*)/u');
 		if (!$match)
 		{
-			return [NULL, NULL];
+			return [NULL, $input];
 		}
 		return [$match['tag_list'], $match['message']];
 	}
@@ -35,7 +35,7 @@ class Tags extends BaseModel
 	{
 		if (!$input)
 		{
-			return [];
+			return [[], []];
 		}
 
 		$tags = Strings::trim($input, '[] ');
