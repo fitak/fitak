@@ -9,8 +9,6 @@ parameters:
 		appSecret: "APPSECRET"
 		permissions: [offline_access, user_groups, read_stream]
 	elastic:
-#		connectionParams:
-#			HTTP Auth to ElasticSearch node on production
-#			auth: [username, password, "Basic"]
+		index: fitak
 	router:
 		useHttps: %productionMode%

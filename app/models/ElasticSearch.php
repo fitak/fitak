@@ -8,8 +8,6 @@ use Nette\Neon\Neon;
 class ElasticSearch extends Client
 {
 
-	const INDEX = 'fitak';
-
 	const TYPE_CONTENT = 'content';
 
 	const HIGHLIGHT_START = '{{%highlight%}}';
@@ -21,8 +19,14 @@ class ElasticSearch extends Client
 	/** @var callable[] */
 	public $onEvent;
 
+	/** @var string */
+	private $index;
+
 	public function __construct(array $params, $appDir)
 	{
+		$this->index = $params['index'];
+		unset($params['index']);
+
 		parent::__construct($params);
 
 		$this->appDir = $appDir;
@@ -47,7 +51,7 @@ class ElasticSearch extends Client
 	public function addToIndex($type, $id, array $data)
 	{
 		return parent::index([
-			'index' => self::INDEX,
+			'index' => $this->index,
 			'type' => $type,
 			'id' => $id,
 			'body' => $data,
@@ -62,7 +66,7 @@ class ElasticSearch extends Client
 	public function updateDoc($type, $id, array $data)
 	{
 		return parent::update([
-			'index' => self::INDEX,
+			'index' => $this->index,
 			'type' => $type,
 			'id' => $id,
 			'body' => [
@@ -74,7 +78,7 @@ class ElasticSearch extends Client
 	public function addMapping($type, array $fields)
 	{
 		$args = [
-			'index' => self::INDEX,
+			'index' => $this->index,
 			'type' => $type,
 			'body' => [
 				'properties' => $fields,
@@ -86,7 +90,7 @@ class ElasticSearch extends Client
 	public function fulltextSearch(SearchRequest $request, $limit, $offset)
 	{
 		$args = [
-			'index' => self::INDEX,
+			'index' => $this->index,
 			'type' => self::TYPE_CONTENT,
 			'body' => [
 				'fields' => [],
@@ -180,7 +184,7 @@ class ElasticSearch extends Client
 		try
 		{
 			$this->indices()->delete([
-				'index' => self::INDEX,
+				'index' => $this->index,
 			]);
 		}
 		catch (Missing404Exception $e)
@@ -189,7 +193,7 @@ class ElasticSearch extends Client
 		}
 
 		$this->indices()->create([
-			'index' => self::INDEX,
+			'index' => $this->index,
 			'body' => $args
 		]);
 	}
