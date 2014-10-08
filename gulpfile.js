@@ -3,6 +3,7 @@ var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var postcss = require('gulp-postcss');
+var hashManifest = require('gulp-hash-manifest');
 
 var removeUselessCss = function (css, options) {
 	css.eachRule(function (rule) {
@@ -45,11 +46,11 @@ var getClassSet = function (cb) {
 };
 
 var config = {
-	cssFiles: './fitak.cz/css/**/*.css',
-	jsFiles: ['./fitak.cz/js/libs/jquery-2.1.1.js', './fitak.cz/js/**/*.js'],
+	cssFiles: './www/css/**/*.css',
+	jsFiles: ['./www/js/libs/jquery-2.1.1.js', './www/js/**/*.js'],
 	latteFiles: './app/**/*.latte',
 	keepClasses: ['label', 'label-info', 'open'],
-	outputDir:'./fitak.cz/build/'
+	outputDir:'./www/build'
 };
 
 gulp.task('default', ['compile-css', 'compile-js'], function () {
@@ -93,4 +94,11 @@ gulp.task('compile-js-dev', function () {
 	return gulp.src(config.jsFiles)
 		.pipe(concat('compiled.js'))
 		.pipe(gulp.dest(config.outputDir));
+});
+
+gulp.task('hash-manifest', function () {
+	return gulp.src(config.outputDir + '/*')
+		.pipe(hashManifest())
+		.pipe(concat('hash.txt'))
+		.pipe(gulp.dest(config.outputDir))
 });
