@@ -41,25 +41,9 @@ class TemplateFilters extends Nette\Object
 		return $this->highlighter->processHighlight($highlight);
 	}
 
-	public function tagsToLinks($item)
-	{
-		$tags = $this->tagsModel->extractTags($item);
-
-		if ($tags)
-		{
-			foreach ($tags[0] as $index => $tag)
-			{
-				$url = $this->linkFactory->link('Search:default', ['s' => 'tag:' . $tag]);
-				$item = str_replace('[' . $tags[1][$index] . ']', "<a href=\"$url\"><span class=\"label label-info\">$tag</span></a> ", $item);
-			}
-		}
-
-		return $item;
-	}
-
 	public function urlsToLinks($input)
 	{
-		// define an url regular exression pattern:
+		// define an url regular expression pattern:
 		$urlPattern = '/(https?:\/\/|www.)(www.)?([-a-z0-9]*[a-z0-9]\.)(\bcom\b|\bbiz\b|\bgov\b|\bmil\b|\bnet\b|\borg\  b|[a-z][a-z]|[a-z][a-z]\.[a-z][a-z])\/?([a-zA-Z0-9]*)?([a-zA-Z0-9_\-\.\?=\/&%#!;~\+]*)?/';
 		// get all matches
 		preg_match_all($urlPattern, $input, $temp);
