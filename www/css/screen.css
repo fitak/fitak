@@ -140,3 +140,10 @@ form .error {
 	color: #e00000;
 	font-weight: bold;
 }
+
+/* fix blur font on Windows in Chrome */
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+	-webkit-transform: none;
+	transform: none;
+}
