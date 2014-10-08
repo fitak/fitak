@@ -188,7 +188,7 @@ class ElasticSearch extends Client
 		{
 			$args['body']['filter'] = [
 				'range' => [
-					'created_time' => [
+					'updated_time' => [
 						'gte' => $request->since,
 					]
 				]

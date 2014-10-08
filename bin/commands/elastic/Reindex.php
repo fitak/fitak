@@ -32,7 +32,7 @@ class Reindex extends Command
 			SELECT
 				`id`, `message`, `group_id`, `likes`, `description`, `caption`,
 				If(`parent_id` IS NULL, 1, 0) `is_topic`,
-				Unix_Timestamp(`created_time`) `timestamp`,
+				Unix_Timestamp(`updated_time`) `timestamp`,
 				`from_name`
 			FROM `data`
 		');
@@ -57,7 +57,7 @@ class Reindex extends Command
 				'likes' => $row['likes'],
 				'author' => $row['from_name'],
 				'is_topic' => $row['is_topic'],
-				'created_time' => $row['timestamp'],
+				'updated_time' => $row['timestamp'],
 				'group' => $row['group_id'],
 			];
 

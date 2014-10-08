@@ -27,7 +27,7 @@ mappings:
 		index_analyzer: cs_icu_analyzer
 		search_analyzer: cs_icu_analyzer
 		properties:
-			created_time:
+			updated_time:
 				type: integer
 				store: 'false'
 			author:

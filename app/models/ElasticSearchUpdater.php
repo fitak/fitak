@@ -52,7 +52,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
 				'author' => $post->fromName,
 				'is_topic' => ($post->parent === NULL),
-				'created_time' => $post->createdTime->getTimestamp(),
+				'updated_time' => $post->updatedTime->getTimestamp(),
 				'group' => $post->group->id,
 			] + $this->getDefaultData($post));
 		}
