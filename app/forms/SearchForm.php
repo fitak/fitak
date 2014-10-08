@@ -6,6 +6,8 @@ use Nette\Application\UI\Form;
 class SearchForm extends Form
 {
 
+	const SEMESTER = 'semester';
+
 	public function __construct(RepositoryContainer $orm, $advanced = TRUE)
 	{
 		parent::__construct();
@@ -15,13 +17,13 @@ class SearchForm extends Form
 
 		if ($advanced)
 		{
-			$today = strtotime('today');
 			$day = 24 * 3600;
-			$this->addSelect('since', 'Časové omezení', [
+			$this->addSelect('limit', 'Časové omezení', [
 				0 => 'bez omezení',
-				($today - 2 * $day) => 'poslední 2 dny',
-				($today - 14 * $day) => 'poslední 2 týdny',
-				($today - 60 * $day) => 'poslední 2 měsíce',
+				(2 * $day) => 'poslední 2 dny',
+				(14 * $day) => 'poslední 2 týdny',
+				(61 * $day) => 'poslední 2 měsíce',
+				self::SEMESTER => 'probíhající semestr',
 			]);
 
 			$this->addText('from', 'Autor:');
@@ -37,11 +39,11 @@ class SearchForm extends Form
 		$values = $form->getValues(TRUE);
 		$params = ['s' => $values['s']];
 
-		if (isSet($values['since']))
+		if (isSet($values['limit']))
 		{
-			if ($values['since'] > 0)
+			if ($values['limit'])
 			{
-				$params['since'] = $values['since'];
+				$params['limit'] = $values['limit'];
 			}
 
 			if ($values['groups'] !== array_filter($values['groups']))
