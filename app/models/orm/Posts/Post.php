@@ -51,15 +51,33 @@ class Post extends Orm\Entity\Entity
 	 */
 	public function getParsedTags()
 	{
+		if ($this->isComment())
+		{
+			return [[], []];
+		}
+
 		return $this->tagParser->extractTags($this->message);
 	}
 
 	/**
-	 * @return string[]
+	 * @return string
 	 */
 	public function getMessageWithoutTags()
 	{
+		if ($this->isComment())
+		{
+			return $this->message;
+		}
+
 		return Strings::trim($this->tagParser->separateMessage($this->message)[1]);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isComment()
+	{
+		return (bool) $this->parent;
 	}
 
 }

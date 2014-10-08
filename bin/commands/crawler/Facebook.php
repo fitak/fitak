@@ -164,9 +164,12 @@ class Facebook extends Command
 		$post->parent = $this->parseId($parentTopic->id);
 		$post->group = $group->id;
 
-		foreach ($post->getParsedTags()[0] as $tag)
+		if (!$post->parent)
 		{
-			$post->tags->add($this->orm->tags->getByNameOrCreate($tag));
+			foreach ($post->getParsedTags()[0] as $tag)
+			{
+				$post->tags->add($this->orm->tags->getByNameOrCreate($tag));
+			}
 		}
 
 		try
