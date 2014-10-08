@@ -71,6 +71,10 @@ services:
 	signUpManager: Fitak\SignUpManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
+	templateMacrosFactory:
+		implement: Fitak\ITemplateMacrosFactory
+		arguments: [%compiler%, ..., %productionMode%, %wwwDir%/build/hash.txt]
+		parameters: [Latte\Compiler compiler]
 	templateFilters: Fitak\TemplateFilters
 	templateFactory: Fitak\TemplateFactory
 	routerFactory: RouterFactory(%router.useHttps%)

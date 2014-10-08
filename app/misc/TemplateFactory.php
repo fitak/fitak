@@ -15,17 +15,24 @@ class TemplateFactory extends Nette\Object
 	/** @var TemplateFilters */
 	private $filters;
 
-	public function __construct(NetteTemplateFactory $baseFactory, TemplateFilters $filters)
+	/** @var ITemplateMacrosFactory */
+	private $macrosFactory;
+
+	public function __construct(NetteTemplateFactory $baseFactory, TemplateFilters $filters, ITemplateMacrosFactory $macrosFactory)
 	{
 		$this->baseFactory = $baseFactory;
 		$this->filters = $filters;
+		$this->macrosFactory = $macrosFactory;
 	}
 
 	public function createTemplate(Nette\Application\UI\Control $control)
 	{
 		$template = $this->baseFactory->createTemplate($control);
 		$latte = $template->getLatte();
+		$compiler = $latte->getCompiler();
+
 		$this->filters->register($latte);
+		$this->macrosFactory->create($compiler)->register();
 
 		return $template;
 	}

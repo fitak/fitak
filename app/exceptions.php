@@ -30,4 +30,9 @@ namespace Fitak
 	{
 
 	}
+
+	class InvalidStateException extends \RuntimeException
+	{
+
+	}
 }
