@@ -19,7 +19,7 @@ class Tags extends BaseModel
 	 */
 	public function separateMessage($input)
 	{
-		$match = Strings::match($input, '/^\s*(?<tag_list>\[\s*[\pL\d._-]+\s*\](?:\s*(?&tag_list))?)(?<message>.*)/u');
+		$match = Strings::match($input, '/^\s*(?<tag_list>\[\s*[\pL\d._-]+\s*\](?:\s*(?&tag_list))?)(?<message>.*)$/us');
 		if (!$match)
 		{
 			return [NULL, $input];
