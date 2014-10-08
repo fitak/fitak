@@ -66,28 +66,24 @@ class Facebook extends Command
 
 		$fb->setSession($accessToken);
 
-		$timestamp = time();
-		$since = $kvs->get($kvs::CRAWLER_SINCE);
-
 		foreach ($this->orm->groups->findAll() as $group)
 		{
-			$this->indexGroup($fb, $group, $since);
+			$this->indexGroup($fb, $group, $kvs);
 		}
-
-		// We are saving timestamp from before the crawl so
-		// on next iteration we might get some duplicates but
-		// we will never lose any posts if crawler is stopped
-		$kvs->save($kvs::CRAWLER_SINCE, $timestamp);
 	}
 
 	/**
 	 * @param FbCrawler $fb
 	 * @param \StdClass $group
-	 * @param int $since timestamp
+	 * @param KeyValueStorage $kvs
 	 */
-	private function indexGroup(FbCrawler $fb, $group, $since)
+	private function indexGroup(FbCrawler $fb, $group, KeyValueStorage $kvs)
 	{
 		$this->out->writeln("<info>Processing '$group->name'</info>");
+
+		$timestamp = time();
+		$key = $kvs::CRAWLER_SINCE . '.' . $group->id;
+		$since = $kvs->get($key);
 
 		$flushCounter = 0;
 		foreach ($fb->getGroupFeedSince($group->id, $since) as $post)
@@ -109,6 +105,11 @@ class Facebook extends Command
 				$flushCounter = 0;
 			}
 		}
+
+		// We are saving timestamp from before the crawl so
+		// on next iteration we might get some duplicates but
+		// we will never lose any posts if crawler is stopped
+		$kvs->save($key, $timestamp);
 	}
 
 	private function parseId($longId)
