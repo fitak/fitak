@@ -27,11 +27,12 @@ class TemplateFilters extends Nette\Object
 		$this->highlighter = $highlighter;
 	}
 
-	public function loader($name, $a = NULL, $b = NULL, $c = NULL)
+	public function register(\Latte\Engine $latte)
 	{
-		if (method_exists($this, $name))
+		foreach (get_class_methods($this) as $method)
 		{
-			return $this->$name($a, $b, $c);
+			if ($method === __METHOD__) continue;
+			$latte->addFilter($method, [$this, $method]);
 		}
 	}
 

@@ -25,7 +25,7 @@ class TemplateFactory extends Nette\Object
 	{
 		$template = $this->baseFactory->createTemplate($control);
 		$latte = $template->getLatte();
-		$latte->addFilter(NULL, [$this->filters, 'loader']);
+		$this->filters->register($latte);
 
 		return $template;
 	}
