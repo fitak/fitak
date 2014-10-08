@@ -51,7 +51,7 @@ class TemplateMacros extends MacroSet
 	public function macroAsset(MacroNode $node, PhpWriter $writer)
 	{
 		$word = $node->tokenizer->fetchWord();
-		$basePath = '/' . trim($this->httpRequest->getUrl()->getBasePath(), '/');
+		$basePath = preg_replace('#https?://[^/]+#A', '', rtrim($this->httpRequest->getUrl()->getBaseUrl(), '/'));
 
 		if ($this->productionMode)
 		{
