@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var postcss = require('gulp-postcss');
@@ -55,13 +54,11 @@ var config = {
 	outputDir:'./www/build'
 };
 
-gulp.task('default', ['compile-css', 'compile-js'], function () {
+gulp.task('default', ['compile-css', 'compile-js', 'hash-manifest']);
 
-});
-
-gulp.task('watch', ['compile-css-dev', 'compile-js-dev'], function () {
-	gulp.watch(config.cssFiles, ['compile-css-dev']);
-	gulp.watch(config.jsFiles, ['compile-js-dev']);
+gulp.task('watch', ['compile-css', 'compile-js', 'hash-manifest'], function () {
+	gulp.watch(config.cssFiles, ['compile-css']);
+	gulp.watch(config.jsFiles, ['compile-js']);
 });
 
 gulp.task('compile-css', function (cb) {
@@ -76,16 +73,6 @@ gulp.task('compile-css', function (cb) {
 	});
 });
 
-gulp.task('compile-css-dev', function (cb) {
-	getClassSet(function (classSet) {
-		gulp.src(config.cssFiles)
-			.pipe(concat('compiled.css'))
-			.pipe(postcss([removeUselessCss], {classSet: classSet}))
-			.pipe(gulp.dest(config.outputDir))
-			.on('end', cb);
-	});
-});
-
 gulp.task('compile-js', function () {
 	return gulp.src(config.jsFiles)
 		.pipe(sourcemaps.init())
@@ -95,13 +82,7 @@ gulp.task('compile-js', function () {
 		.pipe(gulp.dest(config.outputDir));
 });
 
-gulp.task('compile-js-dev', function () {
-	return gulp.src(config.jsFiles)
-		.pipe(concat('compiled.js'))
-		.pipe(gulp.dest(config.outputDir));
-});
-
-gulp.task('hash-manifest', function () {
+gulp.task('hash-manifest', ['compile-css', 'compile-js'], function () {
 	return gulp.src(config.outputDir + '/*')
 		.pipe(hashManifest())
 		.pipe(concat('hash.txt'))
