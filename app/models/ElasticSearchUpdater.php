@@ -32,16 +32,14 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 
 	private function getDefaultData(Post $post)
 	{
-		$message = trim(implode(', ', [
-			$post->getMessageWithoutTags(),
+		$addons = trim(implode(', ', [
 			$post->description,
 			$post->caption,
 		]));
 		return [
 			'tags' => $post->getParsedTags()[0],
-			'message' => $message,
-			'message_raw' => $post->message,
-			'likes' => $post->likesCount,
+			'message' => $post->getMessageWithoutTags(),
+			'message_addons' => $addons,
 		];
 	}
 

@@ -44,16 +44,15 @@ class Reindex extends Command
 		$data = [];
 		foreach ($rows as $row)
 		{
-			$message = trim(implode(' ', [
-				$tagParser->separateMessage($row['message'])[1],
+			$addons = trim(implode(' ', [
 				$row['description'],
 				$row['caption'],
 			]));
 			$data[] = [
 				'id' => $row['id'],
 				'tags' => $tagParser->extractTags($row['message'])[0],
-				'message' => $message,
-				'message_raw' => $row['message'],
+				'message' => $tagParser->separateMessage($row['message'])[1],
+				'message_addons' => $addons,
 				'author' => $row['from_name'],
 				'is_topic' => $row['is_topic'],
 				'updated_time' => $row['timestamp'],

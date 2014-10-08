@@ -17,10 +17,8 @@
             </div>
         </div>
 
-        {*<strong>Líbí se:</strong> {$comment->likes ? $comment->likes : 0}x*}
-
         <div class="row message">
-            {!$comment->message|escapeHtml|highlight:$topics->getHighlight($comment)|nl2br|tagsToLinks|urlsToLinks}
+            {$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
         </div>
     </div>
 {/define}
@@ -50,7 +48,10 @@
     </div>
 
     <div class="row message">
-        {!$topic->message|escapeHtml|highlight:$topics->getHighlight($topic)|nl2br|tagsToLinks|urlsToLinks}
+        <a n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
+            <span class="label label-info">{$tag}</span>
+		</a>
+        {$topics->getHighlight($topic)|noescape|highlight|nl2br|urlsToLinks}
 
 		<blockquote n:tag-if="$topic->name" style="margin-top:15px">
 			<strong n:if="$topic->name">

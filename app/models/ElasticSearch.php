@@ -148,7 +148,7 @@ class ElasticSearch extends Client
 					'post_tags' => [self::HIGHLIGHT_END],
 					'fields' => [
 						// Return original message with highlights
-						'message_raw' => ['number_of_fragments' => 0],
+						'message' => ['number_of_fragments' => 0],
 					]
 				],
 			]
@@ -159,35 +159,31 @@ class ElasticSearch extends Client
 		if ($request->tags)
 		{
 			$boolQuery['must'][] = [
-				'match' => [
-					'tags' => implode(' ', $request->tags),
-				],
+				'match' => ['tags' => implode(' ', $request->tags),],
 			];
 		}
 		if ($request->query)
 		{
 			$boolQuery['must'][] = [
-				'match' => [
-					'message' => $request->query,
-				],
+				'match' => ['message' => $request->query,],
 			];
+			$boolQuery['should'][] = [
+				'match' => ['message_addons' => $request->query,],
+			];
+
 			if (!$request->tags)
 			{
 				// Improve score if query matches tags
 				// but no tags were specified by user
 				$boolQuery['should'][] = [
-					'match' => [
-						'tags' => $request->query,
-					]
+					'match' => ['tags' => $request->query,]
 				];
 			}
 		}
 		if ($request->from)
 		{
 			$boolQuery['must'][] = [
-				'match' => [
-					'author' => $request->from,
-				]
+				'match' => ['author' => $request->from,]
 			];
 		}
 

@@ -39,12 +39,12 @@ mappings:
 				store: 'false'
 				index_analyzer: cs_tag_analyzer
 				search_analyzer: cs_tag_analyzer
-			message: # without tags, for search
-				type: string
-				store: 'false'
-			message_raw: # with tags, for highlight
+			message:
 				type: string
 				store: 'true'
+			message_addons: # captions, descriptions etc, not highlit
+				type: string
+				store: 'false'
 			is_topic:
 				type: boolean
 				store: 'false'

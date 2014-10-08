@@ -36,13 +36,8 @@ class TemplateFilters extends Nette\Object
 		}
 	}
 
-	public function highlight($input, $highlight)
+	public function highlight($highlight)
 	{
-		if (!$highlight)
-		{
-			return $input;
-		}
-
 		return $this->highlighter->processHighlight($highlight);
 	}
 

@@ -55,7 +55,7 @@ class Data extends BaseModel
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
-			$map[$hit['_id']] = isset($hit['highlight']['message_raw'][0]) ? $hit['highlight']['message_raw'][0] : NULL;
+			$map[$hit['_id']] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
 		}
 
 		if (!$map)
@@ -85,12 +85,22 @@ class Data extends BaseModel
 			}
 		}
 
-		$topicsResult = $this->db->select("data.*, groups.name AS group_name, groups.closed AS group_closed")
+		$topicsResult = $this->db->select("data.*, Group_concat(DISTINCT tags.name SEPARATOR ' ') AS tags, groups.name AS group_name, groups.closed AS group_closed")
 			->from("data")
 			->leftJoin("groups")
 			->on("data.group_id = groups.id")
+			->leftJoin("data_tags")
+			->on("data_tags.data_id = data.id")
+			->leftJoin("tags")
+			->on("data_tags.tags_id = tags.id")
+			->groupBy('data.id')
 			->where("data.id IN %in", $topicsIds)
 			->fetchAssoc("id");
+
+		foreach ($topicsResult as &$row)
+		{
+			$row['tags'] = explode(' ', $row['tags']);
+		}
 
 		// sort topics the same way as original result was sorted
 		$topics = [];
