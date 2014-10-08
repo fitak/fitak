@@ -125,6 +125,7 @@ class Facebook extends Command
 		// on next iteration we might get some duplicates but
 		// we will never lose any posts if crawler is stopped
 		$kvs->save($key, $timestamp);
+		$this->orm->flush();
 	}
 
 	private function parseId($longId)
