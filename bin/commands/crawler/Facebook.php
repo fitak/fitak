@@ -145,10 +145,15 @@ class Facebook extends Command
 			$this->out->write($parentTopic ? 'c' : 'p');
 		}
 
-		$post = new Post;
-		$post->tagParser = $this->tagParser;
+		$id = $this->parseId($entry->id);
+		$post = $this->orm->posts->getById($this->$id);
+		if (!$post)
+		{
+			$post = new Post;
+			$post->tagParser = $this->tagParser;
+			$post->id = $id;
+		}
 
-		$post->id = $this->parseId($entry->id);
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
