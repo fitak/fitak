@@ -50,6 +50,7 @@ class Reindex extends Command
 				$row['caption'],
 			]));
 			$data[] = [
+				'id' => $row['id'],
 				'tags' => $tagParser->extractTags($row['message'])[0],
 				'message' => $message,
 				'message_raw' => $row['message'],
