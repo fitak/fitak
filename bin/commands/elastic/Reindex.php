@@ -44,8 +44,8 @@ class Reindex extends Command
 		$data = [];
 		foreach ($rows as $row)
 		{
-			$message = trim(implode(', ', [
-				$tagParser->parse($row['message']),
+			$message = trim(implode(' ', [
+				$tagParser->separateMessage($row['message'])[1],
 				$row['description'],
 				$row['caption'],
 			]));
