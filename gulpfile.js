@@ -3,7 +3,9 @@ var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var postcss = require('gulp-postcss');
+var sourcemaps = require('gulp-sourcemaps');
 var hashManifest = require('gulp-hash-manifest');
+var csswring = require('csswring');
 
 var removeUselessCss = function (css, options) {
 	css.eachRule(function (rule) {
@@ -65,9 +67,10 @@ gulp.task('watch', ['compile-css-dev', 'compile-js-dev'], function () {
 gulp.task('compile-css', function (cb) {
 	getClassSet(function (classSet) {
 		gulp.src(config.cssFiles)
+			.pipe(sourcemaps.init())
 			.pipe(concat('compiled.css'))
-			.pipe(postcss([removeUselessCss], {classSet: classSet}))
-			.pipe(minifyCss())
+			.pipe(postcss([removeUselessCss, csswring], {classSet: classSet}))
+			.pipe(sourcemaps.write('maps'))
 			.pipe(gulp.dest(config.outputDir))
 			.on('end', cb);
 	});
@@ -85,8 +88,10 @@ gulp.task('compile-css-dev', function (cb) {
 
 gulp.task('compile-js', function () {
 	return gulp.src(config.jsFiles)
-		.pipe(uglify())
+		.pipe(sourcemaps.init())
 		.pipe(concat('compiled.js'))
+		.pipe(uglify())
+		.pipe(sourcemaps.write('maps'))
 		.pipe(gulp.dest(config.outputDir));
 });
 
