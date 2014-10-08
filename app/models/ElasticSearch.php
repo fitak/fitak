@@ -126,12 +126,19 @@ class ElasticSearch extends Client
 						'query' => [
 							'bool' => [
 								'should' => [
-									'match' => [
-										'is_topic' => [
-											'query' => TRUE,
-										]
-									]
+									// Prefer matches in topics (as opposed to matches in comments)
+									['match' => ['is_topic' => TRUE]],
 								]
+							]
+						],
+						// Boost results from last year with
+						// most recent having greatest boost.
+						// Does not however set any score to zero.
+						'linear' => [
+							'updated_time' => [
+								'origin' => time(),
+								'scale' => '47304000', // 18 months
+								'decay' => 0.6,
 							]
 						]
 					]
@@ -140,14 +147,18 @@ class ElasticSearch extends Client
 					'pre_tags' => [self::HIGHLIGHT_START],
 					'post_tags' => [self::HIGHLIGHT_END],
 					'fields' => [
-						'message_raw' => ['number_of_fragments' => 0], // return full string (defaults to substrings)
+						// Return original message with highlights
+						'message_raw' => ['number_of_fragments' => 0],
 					]
-				]
+				],
 			]
 		];
+
+		$boolQuery = &$args['body']['query']['function_score']['query']['bool'];
+
 		if ($request->tags)
 		{
-			$args['body']['query']['function_score']['query']['bool']['must'][] = [
+			$boolQuery['must'][] = [
 				'match' => [
 					'tags' => implode(' ', $request->tags),
 				],
@@ -155,38 +166,56 @@ class ElasticSearch extends Client
 		}
 		if ($request->query)
 		{
-			$args['body']['query']['function_score']['query']['bool']['must'][] = [
+			$boolQuery['must'][] = [
 				'match' => [
 					'message' => $request->query,
 				],
 			];
+			if (!$request->tags)
+			{
+				// Improve score if query matches tags
+				// but no tags were specified by user
+				$boolQuery['should'][] = [
+					'match' => [
+						'tags' => $request->query,
+					]
+				];
+			}
 		}
 		if ($request->from)
 		{
-			$args['body']['query']['function_score']['query']['bool']['must'][] = [
+			$boolQuery['must'][] = [
 				'match' => [
 					'author' => $request->from,
 				]
 			];
 		}
+
+		$filters = [];
 		if ($request->groups)
 		{
-			$args['body']['filter'] = [
+			$filters[] = [
 				'terms' => [
 					'group' => $request->groups,
 					'execution' => 'bool',
 				]
 			];
 		}
-
 		if ($request->since > 0)
 		{
-			$args['body']['filter'] = [
+			$filters[] = [
 				'range' => [
 					'updated_time' => [
 						'gte' => $request->since,
 					]
 				]
+			];
+		}
+
+		if ($filters)
+		{
+			$args['body']['filter'] = [
+				'and' => $filters
 			];
 		}
 
