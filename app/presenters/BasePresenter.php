@@ -13,6 +13,8 @@ use Fitak\User;
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
+	use Nextras\Application\UI\SecuredLinksPresenterTrait;
+
 	/** @var Nette\Security\IUserStorage @inject */
 	public $userStorage;
 
