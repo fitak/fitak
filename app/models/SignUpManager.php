@@ -60,13 +60,13 @@ class SignUpManager extends Nette\Object
 		$mail = new Mail\Message();
 		$mail->setFrom('admin@fitak.cz');
 		$mail->addTo($email);
-		$mail->setSubject('Potvrzení registrace na Fitak.cz');
+		$mail->setSubject('Potvrzení registrace na Fiťák.cz');
 		$mail->setHtmlBody(
 			"Ahoj,<br>" .
-			"pro potvrzení registace na webu Fitak.cz je potřeba kliknout na následující odkaz:<br>" .
+			"pro potvrzení registace na webu Fiťák.cz je potřeba kliknout na následující odkaz:<br>" .
 			"<a href=\"$confirmLink\">$confirmLink</a><br>" .
 			"<br>" .
-			"Fitak.cz"
+			"Fiťák.cz"
 		);
 
 		$this->mailer->send($mail);

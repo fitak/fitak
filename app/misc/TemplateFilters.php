@@ -2,6 +2,7 @@
 
 namespace Fitak;
 
+use Latte;
 use Highlighter;
 use Nette;
 use Nextras\Application\LinkFactory;
@@ -27,7 +28,7 @@ class TemplateFilters extends Nette\Object
 		$this->highlighter = $highlighter;
 	}
 
-	public function register(\Latte\Engine $latte)
+	public function register(Latte\Engine $latte)
 	{
 		foreach (get_class_methods($this) as $method)
 		{
