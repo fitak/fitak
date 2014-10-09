@@ -9,6 +9,7 @@ return array(
     'Nextras\\Routing\\' => array($vendorDir . '/nextras/static-router/src'),
     'Nextras\\Orm\\' => array($vendorDir . '/nextras/orm/src'),
     'Nextras\\Migrations\\' => array($vendorDir . '/nextras/migrations/src'),
+    'Nextras\\Application\\UI\\' => array($vendorDir . '/nextras/secured-links/src'),
     'Nextras\\Application\\' => array($vendorDir . '/nextras/link-factory/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Facebook\\' => array($vendorDir . '/facebook/php-sdk-v4/src/Facebook'),

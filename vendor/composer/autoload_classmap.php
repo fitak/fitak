@@ -733,6 +733,8 @@ return array(
     'Nette\\Utils\\UnknownImageFileException' => $vendorDir . '/nette/utils/src/Utils/Image.php',
     'Nette\\Utils\\Validators' => $vendorDir . '/nette/utils/src/Utils/Validators.php',
     'Nextras\\Application\\LinkFactory' => $vendorDir . '/nextras/link-factory/src/LinkFactory.php',
+    'Nextras\\Application\\UI\\SecuredLinksControlTrait' => $vendorDir . '/nextras/secured-links/src/SecuredLinksControlTrait.php',
+    'Nextras\\Application\\UI\\SecuredLinksPresenterTrait' => $vendorDir . '/nextras/secured-links/src/SecuredLinksPresenterTrait.php',
     'Nextras\\Migrations\\Controllers\\BaseController' => $vendorDir . '/nextras/migrations/src/Controllers/BaseController.php',
     'Nextras\\Migrations\\Controllers\\ConsoleController' => $vendorDir . '/nextras/migrations/src/Controllers/ConsoleController.php',
     'Nextras\\Migrations\\Controllers\\HttpController' => $vendorDir . '/nextras/migrations/src/Controllers/HttpController.php',

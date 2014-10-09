@@ -1,0 +1,29 @@
+{
+	"name": "nextras/secured-links",
+	"type": "library",
+	"description": "Package secures Nette Framework signals against CSRF attack.",
+	"keywords": ["nextras", "nette", "application", "secured signals"],
+	"license": ["MIT"],
+	"authors": [
+		{
+			"name": "Jan Skrasek",
+			"email": "hrach.cz@gmail.com",
+			"homepage": "http://jan.skrasek.com"
+		}
+	],
+	"require": {
+		"php": "~5.4",
+		"nette/application": "~2.2"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.2-dev"
+		}
+	},
+	"autoload": {
+		"psr-4": { "Nextras\\Application\\UI\\": "src/" }
+	},
+	"replace": {
+		"nextras/application": "self.version"
+	}
+}
