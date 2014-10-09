@@ -156,19 +156,13 @@ class ElasticSearch extends Client
 
 		$boolQuery = &$args['body']['query']['function_score']['query']['bool'];
 
-		if ($request->tags)
-		{
-			$boolQuery['must'][] = [
-				'match' => ['tags' => implode(' ', $request->tags),],
-			];
-		}
 		if ($request->query)
 		{
 			$boolQuery['must'][] = [
-				'match' => ['message' => $request->query,],
+				'match' => ['message' => $request->query],
 			];
 			$boolQuery['should'][] = [
-				'match' => ['message_addons' => $request->query,],
+				'match' => ['message_addons' => $request->query],
 			];
 
 			if (!$request->tags)
@@ -176,14 +170,14 @@ class ElasticSearch extends Client
 				// Improve score if query matches tags
 				// but no tags were specified by user
 				$boolQuery['should'][] = [
-					'match' => ['tags' => $request->query,]
+					'match' => ['tags' => $request->query],
 				];
 			}
 		}
 		if ($request->from)
 		{
 			$boolQuery['must'][] = [
-				'match' => ['author' => $request->from,]
+				'match' => ['author' => $request->from],
 			];
 		}
 
@@ -207,6 +201,19 @@ class ElasticSearch extends Client
 				]
 			];
 		}
+		if ($request->tags)
+		{
+			$filters[] = [
+				'query' => [
+					'match' => [
+						'tags' => [
+							'query' => implode(' ', $request->tags),
+							'operator' => 'and',
+						]
+					]
+				]
+			];
+		}
 
 		if ($filters)
 		{
@@ -215,7 +222,14 @@ class ElasticSearch extends Client
 			];
 		}
 
-		return $this->search($args);
+		\Tracy\Debugger::$maxDepth = 30;
+		dump($args);
+		$r=$this->search($args);
+		foreach ($r['hits']['hits'] as $ro)
+		{
+			dump($ro['_score']);
+		}
+		return $r;
 	}
 
 	/**

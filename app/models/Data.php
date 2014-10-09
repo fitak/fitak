@@ -14,10 +14,16 @@ class Data extends BaseModel
 	 */
 	protected $elastic;
 
-	public function __construct(DibiConnection $connection, RepositoryContainer $orm, ElasticSearch $elastic)
+	/**
+	 * @var Tags
+	 */
+	private $tagParser;
+
+	public function __construct(DibiConnection $connection, RepositoryContainer $orm, ElasticSearch $elastic, Tags $tagParser)
 	{
 		parent::__construct($connection, $orm);
 		$this->elastic = $elastic;
+		$this->tagParser = $tagParser;
 	}
 
 	// get all topics + comments
@@ -60,12 +66,12 @@ class Data extends BaseModel
 
 		if (!$map)
 		{
-			return new SearchResponse([], [], 0);
+			return new SearchResponse([], [], 0, $this->tagParser);
 		}
 
 		$topics = $this->db->query('SELECT * FROM data WHERE id IN %in ORDER BY Field([id], ?)', array_keys($map), array_keys($map));
 		$result = $this->processRawResult($topics);
-		return new SearchResponse($result, $map, $response['hits']['total']);
+		return new SearchResponse($result, $map, $response['hits']['total'], $this->tagParser);
 	}
 
 	protected function processRawResult($result)

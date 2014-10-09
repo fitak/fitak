@@ -22,15 +22,22 @@ class SearchResponse extends Object implements IteratorAggregate
 	private $total;
 
 	/**
+	 * @var Tags
+	 */
+	private $tagParser;
+
+	/**
 	 * @param array $topics
 	 * @param array $highlights
 	 * @param int $total
+	 * @param Tags $tagParser
 	 */
-	public function __construct($topics, array $highlights, $total)
+	public function __construct($topics, array $highlights, $total, Tags $tagParser)
 	{
 		$this->topics = array_values($topics);
 		$this->highlights = $highlights;
 		$this->total = $total;
+		$this->tagParser = $tagParser;
 	}
 
 	/**
@@ -53,7 +60,7 @@ class SearchResponse extends Object implements IteratorAggregate
 	{
 		return isset($this->highlights[$row['id']])
 			? $this->highlights[$row['id']]
-			: NULL;
+			: $this->tagParser->separateMessage($row->message)[1];
 	}
 
 	/**
