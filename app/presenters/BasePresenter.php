@@ -25,7 +25,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	/**
 	 * @return User|NULL
 	 */
-	public function getSignInUser()
+	public function getLoggedInUser()
 	{
 		if ($this->userStorage->isAuthenticated())
 		{
@@ -44,7 +44,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	 */
 	public function requireLogin($message = 'Tato stránka vyžaduje přihlášení.')
 	{
-		if ($this->getSignInUser() === NULL)
+		if ($this->getLoggedInUser() === NULL)
 		{
 			$this->flashMessage($message);
 			$this->redirect('Auth:signIn', ['backlink' => $this->storeRequest()]);
