@@ -1,3 +1,11 @@
+nette:
+#	mailer:
+#		smtp: true
+#		host: smtp.mandrillapp.com
+#		port: 587
+#		secure: tls
+#		username:
+#		password:
 parameters:
 	database:
 		host: localhost
