@@ -134,6 +134,7 @@ a[href^="error:"] {
 form table th label {
 	padding-right: 10px;
 	text-align: left;
+	display: block;
 }
 
 form .error {

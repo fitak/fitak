@@ -1,5 +1,7 @@
 <?php
 
+use Fitak\InvalidPasswordResetTokenException;
+use Fitak\PasswordResetManager;
 use Fitak\SignInManager;
 use Fitak\SignUpManager;
 use Fitak\DuplicateEmailException;
@@ -19,6 +21,9 @@ class AuthPresenter extends BasePresenter
 
 	/** @var SignUpManager @inject */
 	public $signUpManager;
+
+	/** @var PasswordResetManager @inject */
+	public $passwordResetManager;
 
 	/** @var string @persistent */
 	public $backlink;
@@ -67,6 +72,75 @@ class AuthPresenter extends BasePresenter
 			{
 				throw new \LogicException();
 			}
+		}
+	}
+
+
+// === password reset ==================================================================================================
+
+	/**
+	 * @return UI\Form
+	 */
+	protected function createComponentLostPasswordForm()
+	{
+		$form = new UI\Form();
+		$form->addText('email', 'ČVUT e-mail')
+			->setType('email')
+			->setRequired('Vyplň e-mailovou adresu.')
+			->addRule($form::EMAIL, 'Vyplněná e-mailová adresa nemá správný tvar, zkontroluj si překlepy.');
+		$form->addSubmit('reset', 'Resetovat heslo');
+		$form->onSuccess[] = [$this, 'processLostPasswordForm'];
+
+		return $form;
+	}
+
+	public function processLostPasswordForm(UI\Form $form, array $values)
+	{
+		$user = $this->orm->users->getByEmail($values['email']);
+		if (!$user)
+		{
+			$form['email']->addError('S tímto mailem tu není nikdo zaregistrovaný.');
+			return;
+		}
+
+		$this->passwordResetManager->sendResetLink($user);
+		$this->flashMessage('Na zadanou e-mailovou adresu jsme ti odeslali odkaz k resetování hesla.');
+		$this->redirect('this');
+	}
+
+	protected function createComponentPasswordResetForm()
+	{
+		$form = new UI\Form();
+		$form->addPassword('password', 'Nové heslo')
+			->setRequired('Vyplň nové heslo.');
+		$form->addPassword('passwordCheck', 'Nové heslo (pro kontrolu)')
+			->setOmitted()
+			->setRequired('Vyplň nové heslo ještě jednou, pro kontrolu.')
+			->addRule($form::EQUAL, 'Zadané hesla se musí shodovat, zkontroluj si překlepy.', $form['password']);
+		$form->addHidden('userId', $this->getParameter('userId'));
+		$form->addHidden('token', $this->getParameter('token'));
+		$form->addSubmit('change', 'Změnit heslo');
+		$form->onSuccess[] = [$this, 'processPasswordResetForm'];
+
+		return $form;
+	}
+
+	public function processPasswordResetForm(UI\Form $form, array $values)
+	{
+		$user = $this->orm->users->getById($values['userId']);
+		if (!$user) $this->error();
+
+		try
+		{
+			$this->passwordResetManager->resetPassword($user, $values['token'], $values['password']);
+			$this->signInManager->signInWithoutPassword($user);
+			$this->flashMessage('Heslo bylo úspěšně změněno');
+			$this->redirect('Homepage:');
+		}
+		catch (InvalidPasswordResetTokenException $e)
+		{
+			$this->flashMessage('Neplatný token pro reset hesla.', 'danger');
+			$this->redirect('passwordReset');
 		}
 	}
 

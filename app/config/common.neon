@@ -69,6 +69,7 @@ services:
 	tags: Tags
 	signInManager: Fitak\SignInManager
 	signUpManager: Fitak\SignUpManager
+	passwordResetManager: Fitak\PasswordResetManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
 	templateMacrosFactory:
