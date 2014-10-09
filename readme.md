@@ -16,33 +16,20 @@ However this project is under [New BSD License](http://en.wikipedia.org/wiki/BSD
 
 Requirements
 ------------
-PHP 5.3 or later and MySQL. It's based on the [Nette Framework](https://github.com/nette/nette).
+PHP 5.5+, MySQL, Node.js with NPM and Elasticsearch. It's based on the [Nette Framework](http://nette.org).
 
 Installation
 ------------
-- `git clone https://github.com/fitak/fitak.git`
-- Create `log` and `tmp` dirs (make them writable) in the project root folder
-- Install Composer and call `composer install` in the project root folder
-- Create a database from /sql-structure.sql
-- Rename `/app/config/devel_example.neon` to `devel.neon` and edit parameters for your devel DB
-- Rename `/app/config/product_example.neon` to `product.neon` and edit parameters for your product DB
-- You need a developer account on the Facebook.
-- Create a new Facebook application `https://developers.facebook.com/apps`.
-- Rename `/app/config/fbparams_example.neon` to `fbparams.neon` and edit Facebook App parameters. The
-	email isn't connected with the Facebook. It's just for warnings if something goes wrong.
-- Add some new groups to DB table `groups` (just the first column is mandatory = ID of the Facebook group)
+- Execute `git clone https://github.com/fitak/fitak.git`
+- Make directories `log` and `tmp` writable.
+- Create MySQL database.
+- Copy `/app/config/local_example.neon` to `/app/config/local.neon` and update database parameters.
+- Open `/migrations/index.php` in your browser and click on "Run structures + basic-data + dummy-data" in the middle red section.
+- Execute `npm install --global gulp` to install gulp globally
+- Execute `gulp` to build CSS and JS
 - Install elasticsearch from http://www.elasticsearch.org/overview/elkdownloads/
 - Install ICU Analysis plugin (make sure to install the version corresponding to your elasticsearch version)
 	from https://github.com/elasticsearch/elasticsearch-analysis-icu
-- Run `php bin/es-regenerate-index.php` to create mappings and index all rows currently in relational db
-- Data from the selected Facebook groups are downloaded via one active user token. This user must have a
-	access to the all selected groups. That should be probably you. You have to generate the new token
-	and allow permissions to your Facebook App. Just open URL: `http://YOURURL/crawler/` - It should write
-	something like "This is a private party!". That is for a protection. Just you can add the new token.
-	Before that you have to add your IP address to DB table `ip`. Refresh `http://YOURURL/crawler/`. It should
-	be working now.
-- Be aware that this token goes inactive after some time. You must visit this URL repeatedly. If the token
-	becomes invalid, it should send you a email automatically.
-- Now open `http://YOURURL/crawler/` again. It should start downloading and processing data from the Facebook.
-- You should add this URL to your Cron. :)
-- Good Luck!
+- Start elasticsearch.
+- Execute `php ./www/index.php elastic:reindex`
+- Open `/www/index.php` in your browser. All users in database have password `heslo`.
