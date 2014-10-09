@@ -50,7 +50,7 @@ var config = {
 	cssFiles: './www/css/**/*.css',
 	jsFiles: ['./www/js/libs/jquery-2.1.1.js', './www/js/**/*.js'],
 	latteFiles: './app/**/*.latte',
-	keepClasses: ['label', 'label-info', 'open'],
+	keepClasses: ['open', 'alert-info', 'alert-warning', 'alert-success', 'alert-danger', 'highlight'],
 	outputDir:'./www/build'
 };
 
