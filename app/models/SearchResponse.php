@@ -1,6 +1,7 @@
 <?php
 
 use Nette\Object;
+use Nette\Utils\Strings;
 
 
 class SearchResponse extends Object implements IteratorAggregate
@@ -58,9 +59,10 @@ class SearchResponse extends Object implements IteratorAggregate
 
 	public function getHighlight($row)
 	{
-		return isset($this->highlights[$row['id']])
+		$msg = isset($this->highlights[$row['id']])
 			? $this->highlights[$row['id']]
 			: $this->tagParser->separateMessage($row->message)[1];
+		return Strings::trim($msg);
 	}
 
 	/**
