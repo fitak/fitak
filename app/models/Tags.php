@@ -6,13 +6,6 @@ use Nette\Utils\Strings;
 class Tags extends BaseModel
 {
 
-	public function saveTag($tagName, $postId)
-	{
-		$tag = $this->orm->tags->getByNameOrCreate($tagName);
-		$tag->posts->add($postId);
-		$this->orm->tags->persistAndFlush($tag);
-	}
-
 	/**
 	 * @param string $input
 	 * @return NULL[]|string[] [NULL|string $rawTags, NULL|string $content]
