@@ -57,6 +57,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	{
 		$template = $this->templateFactory->createTemplate($this);
 		$template->groupList = $this->orm->groups->findAllSorted();
+		$template->user = $this->getLoggedInUser();
 
 		return $template;
 	}

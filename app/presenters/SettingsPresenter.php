@@ -1,6 +1,7 @@
 <?php
 
 use Fitak\PasswordResetManager;
+use Fitak\TagsImporter;
 use Nette\Application\UI;
 use Nette\Utils\Strings;
 
@@ -10,6 +11,9 @@ class SettingsPresenter extends BasePresenter
 
 	/** @var PasswordResetManager @inject */
 	public $passwordResetManager;
+
+	/** @var TagsImporter @inject */
+	public $tagsImporter;
 
 	protected function startup()
 	{
@@ -24,6 +28,25 @@ class SettingsPresenter extends BasePresenter
 	{
 		$this->passwordResetManager->sendResetLink($this->getLoggedInUser());
 		$this->flashMessage('Na mail jsme ti poslali odkaz pro resetování hesla.');
+		$this->redirect('this');
+	}
+
+	/**
+	 * @secured
+	 */
+	public function handleImportTags()
+	{
+		$user = $this->getLoggedInUser();
+		$tags = $this->tagsImporter->importTags($user);
+		if ($tags)
+		{
+			$this->orm->users->persistAndFlush($user);
+			$this->flashMessage('Tagy byly úspěšně naimportovány');
+		}
+		else
+		{
+			$this->flashMessage('Žádné tagy nenalezeny', 'warning');
+		}
 		$this->redirect('this');
 	}
 
