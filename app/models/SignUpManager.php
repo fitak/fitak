@@ -20,11 +20,15 @@ class SignUpManager extends Nette\Object
 	/** @var LinkFactory */
 	private $linkFactory;
 
-	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer, LinkFactory $linkFactory)
+	/** @var TagsImporter */
+	private $tagsImporter;
+
+	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer, LinkFactory $linkFactory, TagsImporter $tagsImporter)
 	{
 		$this->orm = $orm;
 		$this->mailer = $mailer;
 		$this->linkFactory = $linkFactory;
+		$this->tagsImporter = $tagsImporter;
 	}
 
 	/**
@@ -45,6 +49,7 @@ class SignUpManager extends Nette\Object
 
 		try
 		{
+			$this->tagsImporter->importTags($user);
 			$this->orm->users->persistAndFlush($user);
 		}
 		catch (DuplicateEntryException $e)
