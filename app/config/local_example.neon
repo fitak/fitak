@@ -16,6 +16,9 @@ parameters:
 		appId: "APPID"
 		appSecret: "APPSECRET"
 		permissions: [offline_access, user_groups, read_stream]
+	kosapi:
+		username:
+		password:
 	elastic:
 		index: fitak
 	router:

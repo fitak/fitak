@@ -64,9 +64,11 @@ services:
 	elasticSearch: ElasticSearch(%elastic%, %appDir%)
 	elasticSearchUpdater: { class: Fitak\ElasticSearchUpdater, tags: [kdyby.subscriber] }
 	highlighter: Highlighter
+	kosApi: Fitak\KosApi(%kosapi.username%, %kosapi.password%)
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
 	pdo: @nette.database.default::getPdo()
 	tags: Tags
+	tagsImporter: Fitak\TagsImporter
 	signInManager: Fitak\SignInManager
 	signUpManager: Fitak\SignUpManager
 	passwordResetManager: Fitak\PasswordResetManager

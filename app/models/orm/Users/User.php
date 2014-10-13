@@ -3,6 +3,7 @@
 namespace Fitak;
 
 use DateTime;
+use Nette\Utils\Strings;
 use Nextras\Orm;
 use Nextras\Orm\Relationships\ManyHasMany;
 
@@ -23,6 +24,15 @@ class User extends Orm\Entity\Entity
 	public function getIsActivated()
 	{
 		return $this->signUpTokenHash === NULL;
+	}
+
+	/**
+	 * @return string|FALSE
+	 */
+	public function getKosUsername()
+	{
+		$match = Strings::match($this->email, '#^(.+)@fit.cvut.cz$#');
+		return ($match ? $match[1] : FALSE);
 	}
 
 }

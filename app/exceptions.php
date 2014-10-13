@@ -35,4 +35,14 @@ namespace Fitak
 	{
 
 	}
+
+	class IOException extends \RuntimeException
+	{
+
+	}
+
+	class HttpException extends IOException
+	{
+
+	}
 }
