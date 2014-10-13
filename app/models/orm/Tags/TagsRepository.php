@@ -3,10 +3,12 @@
 namespace Fitak;
 
 use Nextras\Orm;
+use Nextras\Orm\Entity\Collection\ICollection;
 
 
 /**
  * @method Tag getByName(string $name)
+ * @method ICollection findByName(array $names)
  * @property-read TagsMapper $mapper
  */
 class TagsRepository extends Orm\Repository\Repository
