@@ -346,6 +346,7 @@ return array(
     'Kdyby\\Console\\InvalidStateException' => $vendorDir . '/kdyby/console/src/Kdyby/Console/exceptions.php',
     'Kdyby\\Console\\StringOutput' => $vendorDir . '/kdyby/console/src/Kdyby/Console/StringOutput.php',
     'Kdyby\\Console\\UnknownCommandException' => $vendorDir . '/kdyby/console/src/Kdyby/Console/exceptions.php',
+    'Kdyby\\CurlCaBundle\\CertificateHelper' => $vendorDir . '/kdyby/curl-ca-bundle/src/CertificateHelper.php',
     'Kdyby\\Events\\DI\\EventsExtension' => $vendorDir . '/kdyby/events/src/Kdyby/Events/DI/EventsExtension.php',
     'Kdyby\\Events\\Diagnostics\\Panel' => $vendorDir . '/kdyby/events/src/Kdyby/Events/Diagnostics/Panel.php',
     'Kdyby\\Events\\Event' => $vendorDir . '/kdyby/events/src/Kdyby/Events/Event.php',

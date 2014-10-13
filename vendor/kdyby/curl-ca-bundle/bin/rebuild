@@ -1,0 +1,61 @@
+#!/usr/bin/env php
+<?php
+
+$root = __DIR__ . '/..';
+$curlVendor = $root . '/vendor/curl';
+
+chdir($root);
+
+passthru('git fetch origin && git checkout --force master && git reset --hard origin/master', $return);
+if ($return != 0) {
+	throw new \RuntimeException("Cannot fetch newer version");
+}
+
+chdir($root . '/src');
+
+if (!file_exists($script = $curlVendor . '/lib/mk-ca-bundle.pl')) {
+	passthru(sprintf('git clone %s %s', escapeshellarg("https://github.com/bagder/curl.git"), escapeshellarg($curlVendor)), $return);
+	if ($return != 0) {
+		throw new \RuntimeException("cURL sources cannot be cloned to vendor/");
+	}
+
+} elseif (!is_executable($script)) {
+	throw new \RuntimeException("Script $script is not executable!");
+}
+
+echo "\n";
+
+passthru(sprintf("%s", escapeshellcmd($script)), $return);
+if ($return != 0) {
+	throw new \RuntimeException("The certificate bundle cannot be downloaded");
+}
+
+echo "\n";
+
+chdir($root);
+
+exec("git rev-parse HEAD", $beforeRevision);
+$beforeRevision = trim(implode($beforeRevision));
+
+passthru(sprintf('git add src/ && git commit -m %s', escapeshellarg("Updated ca chain bundle [cron]")));
+passthru('git push origin master', $return);
+if ($return != 0) {
+	throw new \RuntimeException("Git: changes cannot be pushed");
+}
+
+exec("git rev-parse HEAD", $actualRevision);
+
+if ($beforeRevision !== trim(implode($actualRevision))) {
+	exec("git describe --abbrev=0 --tags", $lastTag);
+	$lastTag = explode('.', trim(implode($lastTag)));
+
+	end($lastTag);
+	$lastTag[key($lastTag)] = end($lastTag) + 1;
+	$newTag = implode('.', $lastTag);
+	passthru(sprintf('git tag %s', escapeshellarg($newTag)));
+	passthru('git push --tags origin', $return);
+
+	if ($return != 0) {
+		throw new \RuntimeException("Git: new tag cannot be pushed");
+	}
+}

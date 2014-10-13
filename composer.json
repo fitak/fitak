@@ -24,7 +24,8 @@
 		"facebook/php-sdk": "~3.2",
 		"elasticsearch/elasticsearch": "~1.2",
 		"kdyby/console": "~2.3",
-		"facebook/php-sdk-v4": "~4.0"
+		"facebook/php-sdk-v4": "~4.0",
+		"kdyby/curl-ca-bundle": "~1.0"
 	},
 	"config": {
 		"preferred-install": "dist",

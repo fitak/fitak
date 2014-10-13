@@ -1,0 +1,28 @@
+{
+	"name": "kdyby/curl-ca-bundle",
+	"type": "library",
+	"description": "This package provides root certificates for usage in api clients on systems that have missing or outdated certificates.",
+	"keywords": ["ssl", "ca", "certificate", "https", "bundle", "curl"],
+	"homepage": "http://kdyby.org",
+	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"authors": [
+		{
+			"name": "Filip Procházka",
+			"homepage": "http://filip-prochazka.com",
+			"email": "filip@prochazka.su"
+		}
+	],
+	"require": {
+		"ext-curl": "*"
+	},
+	"require-dev": {
+		"jakub-onderka/php-parallel-lint": "~0.6"
+	},
+	"support": {
+		"email": "filip@prochazka.su",
+		"issues": "https://github.com/Kdyby/CurlCaBundle/issues"
+	},
+	"autoload": {
+		"classmap": ["src/"]
+	}
+}
