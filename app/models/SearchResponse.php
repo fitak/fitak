@@ -65,8 +65,14 @@ class SearchResponse extends Object implements IteratorAggregate
 
 		if (is_array($msg))
 		{
+			foreach ($msg as &$part)
+			{
+				$part = $this->fixDiacritics($part);
+				$part = $this->removeWhitespace($part);
+			}
 			$msg = implode(' ... ', $msg);
 		}
+		$msg = $this->fixInwordHighlights($msg);
 
 		return Strings::trim($msg);
 	}
@@ -85,6 +91,55 @@ class SearchResponse extends Object implements IteratorAggregate
 	public function getIterator()
 	{
 		return new \ArrayIterator($this->topics);
+	}
+
+	private function fixDiacritics($part)
+	{
+		$map = [
+			['a', '´', 'á'],
+			['e', '´', 'é'],
+			['i', '´', 'í'],
+			['ı', '´', 'í'],
+			['´', 'ı', 'í'],
+			['o', '´', 'ó'],
+			['u', '´', 'ú'],
+			['u', '˚', 'ů'],
+			['y', '´', 'ý'],
+			['c', 'ˇ', 'č'],
+			['d', 'ˇ', 'ď'],
+			['e', 'ˇ', 'ě'],
+			['n', 'ˇ', 'ň'],
+			['r', 'ˇ', 'ř'],
+			['s', 'ˇ', 'š'],
+			['t', 'ˇ', 'ť'],
+			['z', 'ˇ', 'ž'],
+		];
+
+		$start = preg_quote(ElasticSearch::HIGHLIGHT_START, '~');
+		$end = preg_quote(ElasticSearch::HIGHLIGHT_END, '~');
+		foreach ($map as list($a, $b, $c))
+		{
+			$part = Strings::replace($part, "~$a($start|$end)?$b~i", "$c\\1");
+		}
+		return $part;
+	}
+
+	/**
+	 * Transforms >lexik<ální to >lexikální<
+	 * @param $msg
+	 * @return string
+	 */
+	private function fixInwordHighlights($msg)
+	{
+		$start = preg_quote(ElasticSearch::HIGHLIGHT_START, '~');
+		$msg = Strings::replace($msg, "~\b([\pL]+)$start([\pL]+)\b~ius", '\\1\\2' . ElasticSearch::HIGHLIGHT_START);
+		$end = preg_quote(ElasticSearch::HIGHLIGHT_END, '~');
+		return Strings::replace($msg, "~\b([\pL]+)$end([\pL]+)\b~ius", '\\1\\2' . ElasticSearch::HIGHLIGHT_END);
+	}
+
+	private function removeWhitespace($part)
+	{
+		return Strings::replace($part, '~\s{2,}~s', "\n");
 	}
 
 }
