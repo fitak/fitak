@@ -6,9 +6,9 @@ use Nextras\Orm;
 
 
 /**
+ * @property-read ContentsRepository $contents
  * @property-read GroupsRepository $groups
  * @property-read NewsRepository $news
- * @property-read PostsRepository $posts
  * @property-read TagsRepository $tags
  * @property-read UsersRepository $users
  */

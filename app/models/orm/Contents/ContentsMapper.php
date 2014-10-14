@@ -8,7 +8,7 @@ use Nextras\Orm\Entity\IEntity;
 use Nextras\Orm\Mapper\IMapper;
 
 
-class PostsMapper extends Orm\Mapper\Mapper
+class ContentsMapper extends Orm\Mapper\Mapper
 {
 
 	/** @var string */

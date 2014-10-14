@@ -11,7 +11,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  * @property string            $name
  * @property bool              $closed {default 0}
  *
- * @property OneHasMany|Post[] $posts  {1:m PostsRepository $group}
+ * @property OneHasMany|Content[] $contents  {1:m ContentsRepository $group}
  */
 class Group extends Orm\Entity\Entity
 {
