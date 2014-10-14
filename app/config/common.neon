@@ -44,6 +44,7 @@ console:
 	url: http://fitak.dev/
 	commands:
 		- Bin\Commands\Auth\Facebook
+		- Bin\Commands\Crawler\Edux
 		- Bin\Commands\Crawler\Facebook
 		- Bin\Commands\Elastic\Reindex
 
