@@ -3,6 +3,13 @@
 namespace Fitak\Crawler;
 
 
+use ElasticSearch;
+use Fitak\EduxFile;
+use Fitak\RepositoryContainer;
+use Nette\Utils\DateTime;
+use Nette\Utils\Strings;
+
+
 class Edux
 {
 
@@ -11,13 +18,24 @@ class Edux
 	const URL_FILE = 'https://edux.fit.cvut.cz/courses/%s/%s';
 
 	/**
-	 * @var array [string => 1]
+	 * @var ElasticSearch
 	 */
-	protected $files;
+	private $elastic;
+
+	/**
+	 * @var RepositoryContainer
+	 */
+	private $orm;
+
+	public function __construct(ElasticSearch $elastic, RepositoryContainer $orm)
+	{
+		$this->elastic = $elastic;
+		$this->orm = $orm;
+	}
 
 	public function getCoursesUrls()
 	{
-		$html = $this->makeRequest(self::URL_LIST);
+		list($html) = $this->makeRequest(self::URL_LIST);
 		$matches = [];
 		preg_match_all('~href=\\"([^"]+-[^"]+)\\"~', $html, $matches);
 
@@ -42,13 +60,11 @@ class Edux
 			unset($list[$part]);
 			$processed[$part] = 1;
 			$url = sprintf($courseTemplate, $part);
-			echo "   $part ($url)\n";
+			echo "   $part\n";
 
 			$pages = $this->processPage($course, $url);
 			$new = array_diff_key($pages, $processed);
 			$list = array_merge($list, $new);
-
-			echo "  $url\n";
 		}
 		while ($list);
 	}
@@ -60,7 +76,7 @@ class Edux
 	 */
 	protected function processPage($course, $url)
 	{
-		$html = $this->makeRequest($url);
+		list($html) = $this->makeRequest($url);
 
 		// TODO Process links to materials
 
@@ -70,11 +86,9 @@ class Edux
 		$new = [];
 		foreach ($matches[1] as $match)
 		{
-			// TODO all supported Tika extensions
-			if (strToLower(substr($match, -4)) === '.pdf')
+			if ($this->isIndexable($match))
 			{
-				// TODO make it event
-				$this->addFile($course, $match);
+				$this->processFile($course, $match);
 			}
 			else
 			{
@@ -83,6 +97,28 @@ class Edux
 			}
 		}
 		return $new;
+	}
+
+	private function isIndexable($url)
+	{
+		$norm = '.' . Strings::lower($url);
+		foreach ($this->getExtensions() as $ext)
+		{
+			if (Strings::endsWith($norm, $ext))
+			{
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	protected function getExtensions()
+	{
+		return [
+			'doc', 'dot', 'docx', // word processors
+			'pdf',
+			'ma', 'nb', 'mb', // mathematica
+		];
 	}
 
 	public function makeRequest($url)
@@ -94,31 +130,51 @@ class Edux
 					'Cookie: DW6666cd76f96956469e7be39d750cc7d9=ZGl0ZW1pa3U%3D%7C1%7CL3NVbXZvR3Fwdy95V3owQkcreTdUUT09'
 			]
 		]);
-		return file_get_contents($url, FALSE, $context);
+		$content = file_get_contents($url, FALSE, $context);
+		$headers = $this->parseHeaders($http_response_header);
+		return [$content, $headers];
 	}
 
-	private function addFile($course, $file)
+	/**
+	 * Does not support multiple same headers (such as set-cookie)
+	 * @param array $headers
+	 * @return array
+	 */
+	private function parseHeaders(array $headers)
 	{
-		$this->files[$course][$file] = 1;
-	}
-
-	public function processFiles()
-	{
-		foreach ($this->files as $course => $files)
+		$res = [];
+		foreach ($headers as $header)
 		{
-			foreach ($files as $file => $tmp)
-			{
-				$this->processFile($course, $file);
-			}
+			$o = Strings::match($header, '~^(?P<name>[^:]+?):\s*(?P<value>.*?)\s*$~');
+			$res[Strings::lower($o['name'])] = $o['value'];
 		}
+		return $res;
 	}
 
-	public function processFile($course, $file)
+	public function processFile($course, $fileName)
 	{
-		$url = sprintf(self::URL_FILE, $course, $file);
-		$content = base64_encode($this->makeRequest($url));
+		echo "PROCESSING FILE $fileName\n";
+		$url = sprintf(self::URL_FILE, $course, $fileName);
+		list($content, $headers) = $this->makeRequest($url);
 
-		$this->elastic->addFileToIndex($url, $content);
+		$file = new EduxFile();
+		$file->link = $file;
+
+		$file->updatedTime = $file->createdTime
+			= isset($headers['Last-Modified']) ? $headers['Last-Modified'] : new DateTime;
+
+		$this->orm->contents->persist($file);
+
+		$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $file->id, [
+			'updated_time' => $file->updatedTime->getTimestamp(),
+			'tags' => [$course],
+			'file' => [
+				'_content_type' => isset($headers['Content-Type']) ? $headers['Content-Type'] : NULL,
+				'_name' => $fileName,
+				'content' => base64_encode($content),
+			],
+			'is_topic' => TRUE, // strictly speaking its not but this will help us with scoring
+		]);
 	}
 
 }

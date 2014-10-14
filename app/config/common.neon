@@ -83,4 +83,5 @@ services:
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
 	keyValueStorage: KeyValueStorage
+	crawler.edux: Fitak\Crawler\Edux
 	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%)

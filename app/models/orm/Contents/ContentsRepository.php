@@ -11,6 +11,8 @@ class ContentsRepository extends Orm\Repository\Repository
 	public static function getEntityClassNames()
 	{
 		return [
+			EduxFile::class,
+			EduxPage::class,
 			FacebookComment::class,
 			FacebookThread::class,
 		];

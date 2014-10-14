@@ -47,6 +47,8 @@ mappings:
 			message_addons: # captions, descriptions etc, not highlit
 				type: string
 				store: 'false'
+			file:
+				type: attachment
 			is_topic:
 				type: boolean
 				store: 'false'
