@@ -10,21 +10,20 @@ use Nextras\Orm\Relationships\OneHasMany;
 
 
 /**
- * @property int      $id
  * @property string   $type
  * @property string   $message
  * @property DateTime $createdTime
  * @property DateTime $updatedTime
  *
  * Only valid on FacebookContent:
- * @property Group    $group         {m:1 GroupsRepository $contents}
+ * @property NULL|Group    $group         {m:1 GroupsRepository $contents}
  * @property ManyHasMany|Tag[] $tags {m:n TagsRepository $contents primary}
  *
  * Only valid on FacebookThread:
  * @property OneHasMany|FacebookComment[] $comments    {1:m ContentsRepository $parent}
  *
  * Only valid on FacebookComment:
- * @property ManyHasOne|FacebookThread $parent {m:1 ContentsRepository $comments}
+ * @property NULL|ManyHasOne|FacebookThread $parent {m:1 ContentsRepository $comments}
  */
 abstract class Content extends Orm\Entity\Entity
 {

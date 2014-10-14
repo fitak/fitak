@@ -149,6 +149,7 @@ class ElasticSearch extends Client
 					'fields' => [
 						// Return original message with highlights
 						'message' => ['number_of_fragments' => 0],
+						'file' => ['number_of_fragments' => 3],
 					]
 				],
 			]
@@ -159,7 +160,12 @@ class ElasticSearch extends Client
 		if ($request->query)
 		{
 			$boolQuery['must'][] = [
-				'match' => ['message' => $request->query],
+				'bool' => [
+					'should' => [
+						['match' => ['message' => $request->query]],
+						['match' => ['file' => $request->query]],
+					]
+				]
 			];
 			$boolQuery['should'][] = [
 				'match' => ['message_addons' => $request->query],

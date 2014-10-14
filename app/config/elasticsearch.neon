@@ -49,6 +49,10 @@ mappings:
 				store: 'false'
 			file:
 				type: attachment
+				fields:
+					file:
+						store: 'true'
+						term_vector: with_positions_offsets
 			is_topic:
 				type: boolean
 				store: 'false'

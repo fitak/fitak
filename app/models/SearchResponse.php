@@ -62,6 +62,12 @@ class SearchResponse extends Object implements IteratorAggregate
 		$msg = isset($this->highlights[$row['id']])
 			? $this->highlights[$row['id']]
 			: $this->tagParser->separateMessage($row->message)[1];
+
+		if (is_array($msg))
+		{
+			$msg = implode(' ... ', $msg);
+		}
+
 		return Strings::trim($msg);
 	}
 

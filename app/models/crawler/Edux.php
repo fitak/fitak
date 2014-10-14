@@ -157,13 +157,23 @@ class Edux
 		$url = sprintf(self::URL_FILE, $course, $fileName);
 		list($content, $headers) = $this->makeRequest($url);
 
-		$file = new EduxFile();
-		$file->link = $file;
+		if (! $file = $this->orm->contents->getBy(['link' => $url]))
+		{
+			$file = new EduxFile();
+			$file->link = $url;
+		}
+
+		// TODO remove
+		$file->message = json_encode([
+			'hash' => md5($content),
+			'headers' => $headers,
+		]);
 
 		$file->updatedTime = $file->createdTime
 			= isset($headers['Last-Modified']) ? $headers['Last-Modified'] : new DateTime;
 
 		$this->orm->contents->persist($file);
+		$this->orm->flush();
 
 		$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $file->id, [
 			'updated_time' => $file->updatedTime->getTimestamp(),

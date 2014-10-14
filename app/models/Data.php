@@ -61,7 +61,9 @@ class Data extends BaseModel
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
-			$map[$hit['_id']] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
+			$map[$hit['_id']] = isset($hit['highlight']['message']) ? $hit['highlight']['message'] : (
+				isset($hit['highlight']['file']) ? $hit['highlight']['file'] : NULL
+			);
 		}
 
 		if (!$map)
