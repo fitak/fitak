@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=d6c071a6286c7a51c5a2)
- * Config saved to config.json and https://gist.github.com/d6c071a6286c7a51c5a2
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=66f7f2ed02794c495679)
+ * Config saved to config.json and https://gist.github.com/66f7f2ed02794c495679
  */
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
 html {
@@ -2145,6 +2145,35 @@ input[type="submit"].btn-block,
 input[type="reset"].btn-block,
 input[type="button"].btn-block {
   width: 100%;
+}
+.fade {
+  opacity: 0;
+  -webkit-transition: opacity 0.15s linear;
+  -o-transition: opacity 0.15s linear;
+  transition: opacity 0.15s linear;
+}
+.fade.in {
+  opacity: 1;
+}
+.collapse {
+  display: none;
+}
+.collapse.in {
+  display: block;
+}
+tr.collapse.in {
+  display: table-row;
+}
+tbody.collapse.in {
+  display: table-row-group;
+}
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition: height 0.35s ease;
+  -o-transition: height 0.35s ease;
+  transition: height 0.35s ease;
 }
 .caret {
   display: inline-block;
