@@ -23,28 +23,31 @@
 	<link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
 </head>
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top navbg">
+	<div class="navbar navbar-inverse navbar-fixed-top navbg" role="navigation">
 		<div class="container">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" n:href="homepage:">Fiťák.cz</a>
-			<div class="nav-collapse collapse">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" n:href="Homepage:">Fiťák.cz</a>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li class="dropdown {$presenter->islinkCurrent('Search:*') ? active}">
+					<li n:class="dropdown, $presenter->islinkCurrent('Search:*') ? active">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-							Stream<span class="caret"></span>
+							Stream <span class="caret"></span>
 						</a>
-						<ul class="dropdown-menu">
+						<ul class="dropdown-menu" role="menu">
 							<li><a n:href="Search:">Vše</a></li>
 							<li n:foreach="$groupList as $group">
 								<a n:href="Search: 'groups[]' => $group->id, 'streamView' => 'true'">{$group->name}</a>
 							</li>
 						</ul>
 					</li>
-					<li n:class="$presenter->islinkCurrent('about:*') ? active"><a n:href="about:">O webu</a></li>
+					<li n:class="$presenter->islinkCurrent('About:*') ? active"><a n:href="About:">O webu</a></li>
 					<li><a href="https://github.com/fitak">GitHub</a></li>
 					<li><a href="https://www.facebook.com/fitakcz">Facebook</a></li>
 				</ul>

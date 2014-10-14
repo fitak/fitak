@@ -35,7 +35,7 @@ body {
 .navbg .navbar-brand {
   color: #fff;
 }
-.navbg .navbar-nav > li > a {
+.navbg .navbar-nav > li > a{
   color: #cdbfe3;
 }
 .navbg .navbar-nav > li > a:hover {
@@ -147,4 +147,15 @@ form .error {
 .navbar-fixed-bottom {
 	-webkit-transform: none;
 	transform: none;
+}
+
+.navbar-fixed-top .navbar-collapse,
+.navbar-fixed-bottom .navbar-collapse {
+	max-height: none;
+}
+
+@media (max-width: 767px) {
+	.navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+		color: #cdbfe3;
+	}
 }
