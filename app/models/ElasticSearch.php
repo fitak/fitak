@@ -222,14 +222,7 @@ class ElasticSearch extends Client
 			];
 		}
 
-		\Tracy\Debugger::$maxDepth = 30;
-		dump($args);
-		$r=$this->search($args);
-		foreach ($r['hits']['hits'] as $ro)
-		{
-			dump($ro['_score']);
-		}
-		return $r;
+		return $this->search($args);
 	}
 
 	/**
