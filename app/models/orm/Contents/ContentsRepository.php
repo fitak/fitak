@@ -18,13 +18,8 @@ class ContentsRepository extends Orm\Repository\Repository
 		];
 	}
 
-	public function getEntityClassName(array $data = NULL)
+	public function getEntityClassName(array $data)
 	{
-		if ($data === NULL)
-		{
-			return self::getEntityClassNames();
-		}
-
 		if (isset($data['type']) && class_exists($data['type']))
 		{
 			return $data['type'];
