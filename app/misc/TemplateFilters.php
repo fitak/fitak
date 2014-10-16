@@ -12,19 +12,11 @@ use Tags;
 class TemplateFilters extends Nette\Object
 {
 
-	/** @var Tags */
-	private $tagsModel;
-
-	/** @var LinkFactory */
-	private $linkFactory;
-
 	/** @var Highlighter */
 	private $highlighter;
 
-	public function __construct(LinkFactory $linkFactory, Tags $tagsModel, Highlighter $highlighter)
+	public function __construct(Highlighter $highlighter)
 	{
-		$this->tagsModel = $tagsModel;
-		$this->linkFactory = $linkFactory;
 		$this->highlighter = $highlighter;
 	}
 
