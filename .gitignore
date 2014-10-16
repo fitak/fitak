@@ -1,8 +1,10 @@
 /app/config/local.neon
 /log/
+/tests/temp/
 /tmp/
 /www/build
 fitak.sublime-project
 fitak.sublime-workspace
 .DS_Store
 /.idea/
+output
