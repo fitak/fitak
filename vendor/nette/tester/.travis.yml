@@ -1,0 +1,36 @@
+language: php
+php:
+    - 5.3
+    - 5.3.3
+    - 5.4
+    - 5.5
+    - 5.6
+    - hhvm
+    - hhvm-nightly
+
+env:
+    - TESTER_PHP_BIN=php
+    - TESTER_PHP_BIN=php-cgi
+
+matrix:
+    allow_failures:
+        - php: hhvm
+        - php: hhvm-nightly
+
+    exclude:
+        - php: 5.3
+          env: TESTER_PHP_BIN=php-cgi
+
+        - php: hhvm
+          env: TESTER_PHP_BIN=php-cgi
+
+        - php: hhvm-nightly
+          env: TESTER_PHP_BIN=php-cgi
+
+script:
+    - Tester/tester -p $TESTER_PHP_BIN tests -s
+    - Tester/tester -p $TESTER_PHP_BIN -o none tests/fail.phptx; if [ $? -eq 0 ]; then echo "tests/fail.phptx SHOULD FAIL"; exit 1; else echo "fail checked"; fi;
+
+after_failure:
+    # Print *.actual content
+    - for i in $(find tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done
