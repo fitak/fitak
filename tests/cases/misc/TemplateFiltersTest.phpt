@@ -49,6 +49,10 @@ class TemplateFiltersTest extends Tester\TestCase
 				"<a href=\"http://example.com\" title=\"http://example.com\">example.com</a>",
 			],
 			[
+				'aaa http://example.com bbb',
+				"aaa <a href=\"http://example.com\" title=\"http://example.com\">example.com</a> bbb",
+			],
+			[
 				'http://example.com/very-long-url-very-long-url',
 				"<a href=\"http://example.com/very-long-url-very-long-url\" title=\"http://example.com/very-long-url-very-long-url\">example.com/{$hellip}ery-long-url</a>",
 			],

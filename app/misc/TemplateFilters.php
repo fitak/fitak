@@ -43,7 +43,7 @@ class TemplateFilters extends Nette\Object
 		$alpha = "a-z\x80-\xFF";
 		$domain = "[0-9$alpha](?:[-0-9$alpha]{0,61}[0-9$alpha])?";
 		$topDomain = "[$alpha](?:[-0-9$alpha]{0,17}[$alpha])?";
-		$pattern = "(^https?://(?:(?:$domain\\.)*$topDomain|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|\\[[0-9a-f:]{3,39}\\])(:\\d{1,5})?(/\\S*)?\\z)i";
+		$pattern = "(https?://(?:(?:$domain\\.)*$topDomain|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|\\[[0-9a-f:]{3,39}\\])(:\\d{1,5})?(/\\S*)?)i";
 
 		return Strings::replace($input, $pattern, function ($matches) {
 			$url = $matches[0];
