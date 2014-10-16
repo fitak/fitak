@@ -10,6 +10,7 @@ return array(
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'Pimple' => array($vendorDir . '/pimple/pimple/src'),
+    'Mockery' => array($vendorDir . '/mockery/mockery/library'),
     'Kdyby\\Events\\' => array($vendorDir . '/kdyby/events/src'),
     'Kdyby\\Console\\' => array($vendorDir . '/kdyby/console/src'),
     'Inflect' => array($vendorDir . '/oodle/inflect/src'),

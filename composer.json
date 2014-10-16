@@ -28,7 +28,8 @@
 		"kdyby/curl-ca-bundle": "~1.0"
 	},
 	"require-dev": {
-		"nette/tester": "~1.3"
+		"nette/tester": "~1.3",
+		"mockery/mockery": "~0.9"
 	},
 	"config": {
 		"preferred-install": "dist",
