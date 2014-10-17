@@ -1,5 +1,5 @@
 
-<div class="row text-center hidden-sm">
+<div class="text-center hidden-xs">
 	<ul n:if="$paginator->pageCount > 1" class="pagination pagination-small">
 		<li n:class="$paginator->isFirst() ? 'disabled' : ''">
 			{if $paginator->isFirst()}
@@ -28,7 +28,7 @@
 	</ul>
 </div>
 
-<div class="row text-center visible-sm">
+<div class="text-center visible-xs-block">
 	<ul n:if="$paginator->pageCount > 1" class="pager">
 		<li n:class="$paginator->isFirst() ? 'disabled' : ''">
 			{if $paginator->isFirst()}
