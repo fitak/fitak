@@ -1,8 +1,8 @@
-<div class="row text-center cloud">
+<div class="text-center cloud">
 	{if $tagCloud}
-	    <span n:foreach="$tagCloud as $item" style="font-size: {$item["size"]|noescape}em; margin-right: 15px;">
-	        <a href="{plink Search:default "tag:$item[name]"}">{$item['name']}</a>
-        </span>
+		{foreach $tagCloud as $item}
+			<a href="{plink Search:default "tag:$item[name]"}" style="font-size: {$item["size"]|noescape}em;">{$item['name']}</a>
+		{/foreach}
 	{else}
 	    Žádné trendy v poslední době.
 	{/if}

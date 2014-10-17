@@ -1,9 +1,8 @@
 {block content}
-<div class="row text-center">
+<div class="text-center">
 	<img src="{$basePath}/img/logo.png" alt="Fitak.cz" title="Fitak.cz" style="max-width: 100%;">
-</div>
-<div class="row text-center">
-	{form searchForm}
+
+	{form searchForm, style => "margin-bottom: 20px"}
 		<fieldset>
 		<ul class="unstyled" n:if="$form->hasErrors()">
 			<li n:foreach="$form->errors as $error" class="alert alert-error">{$error}</li>

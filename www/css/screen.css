@@ -19,8 +19,11 @@ body {
 }
 
 .cloud {
-	padding-top: 1.6em;
-	padding-bottom: 1.6em;
+	margin-bottom: 20px;
+}
+
+.cloud a {
+	margin-right: 15px;
 }
 
 .search-advanced {
