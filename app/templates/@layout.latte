@@ -55,15 +55,13 @@
 		</div>
 	</div>
 
-	<div class="container" style="padding: 40px 15px">
 
-	<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}">
-		<button type="button" class="close" data-dismiss="alert">&times;</button>
-		{$flash->message}
-	</div>
-
-	{include #content}
-
+	<div class="container">
+		<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			{$flash->message}
+		</div>
+		{include #content}
 	</div>
 
 	<script src="{asset compiled.js}"></script>
