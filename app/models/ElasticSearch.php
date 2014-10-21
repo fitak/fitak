@@ -208,7 +208,7 @@ class ElasticSearch extends Client
 					'match' => [
 						'tags' => [
 							'query' => implode(' ', $request->tags),
-							'operator' => 'and',
+							'operator' => 'or',
 						]
 					]
 				]
