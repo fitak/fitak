@@ -1,5 +1,6 @@
 Welcome to [Fitak](http://www.fitak.cz)
 =======================================
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/fitak/fitak?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Fitak is a archiver of Facebook groups. It consists of 2 parts:
 
