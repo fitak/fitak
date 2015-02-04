@@ -46,12 +46,12 @@ class CrawlerPresenter extends BasePresenter
     public function actionToken( $state )
     {
         // only poeple on the list should be generating new tokens
-        if( !$this->context->token->checkAccess( $_SERVER['REMOTE_ADDR'] ) )
+        /*if( !$this->context->token->checkAccess( $_SERVER['REMOTE_ADDR'] ) )
         {
             echo "Oh sorry man, this is a private party!";
             mail( $this->context->token->getEmail(), 'Notice', 'The token is maybe invalid!' );
             $this->terminate();
-        }
+        }*/
 
         // facebook example code...
         $stoken = $this->session->getSection( 'token' );
@@ -105,8 +105,8 @@ class CrawlerPresenter extends BasePresenter
     private function grabPage()
     {
         $data = $this->getJson();
-    
-       
+
+
         if( !$this->nextPage ){
             echo "The last page";
             return false;
@@ -132,14 +132,14 @@ class CrawlerPresenter extends BasePresenter
             }
             $mess = "";
             $likes_count = 0;
-    
+
             $link = null;
             $source = null;
             $picture = null;
             $name = null;
             $caption = null;
             $description = null;
-     
+
             if( isSet( $message['message'] ) )
                 $mess = $message['message'];
 
@@ -181,23 +181,23 @@ class CrawlerPresenter extends BasePresenter
 
             if( !$datetime )
             {
-                $this->context->data->insertTopic( 
-                    $ids[1], 
-                    $this->gid, 
-                    0, 
-                    $mess, 
-                    $message['created_time'], 
-                    $message['updated_time'], 
-                    $commentsNum, 
-                    0, 
-                    $message['from']['id'], 
+                $this->context->data->insertTopic(
+                    $ids[1],
+                    $this->gid,
+                    0,
+                    $mess,
+                    $message['created_time'],
+                    $message['updated_time'],
+                    $commentsNum,
+                    0,
+                    $message['from']['id'],
                     $message['from']['name'],
                     $message['type'],
-                    $link, 
-                    $source, 
-                    $picture, 
-                    $name, 
-                    $caption, 
+                    $link,
+                    $source,
+                    $picture,
+                    $name,
+                    $caption,
                     $description
                 );
                 $this->saveTags( $mess, $ids[1] );
@@ -205,11 +205,11 @@ class CrawlerPresenter extends BasePresenter
             }
             else
             {
-                $this->context->data->updateTopic( 
-                    $ids[1], 
-                    $mess, 
-                    $message['updated_time'], 
-                    $commentsNum, 
+                $this->context->data->updateTopic(
+                    $ids[1],
+                    $mess,
+                    $message['updated_time'],
+                    $commentsNum,
                     0 );
                 $this->cnt_updated++;
             }
@@ -235,8 +235,8 @@ class CrawlerPresenter extends BasePresenter
                         if( isSet( $extraComments['paging']['previous'] ))
                         {
                             $next = $extraComments['paging']['previous'];
-                        }    
-                    }                
+                        }
+                    }
                 }
             }
         }
@@ -255,7 +255,7 @@ class CrawlerPresenter extends BasePresenter
             if( isSet( $comment['message'] ) )
                 $mess = $comment['message'];
             $likes_count = 0;
-           
+
             if( $this->context->data->existsComment( $comment['id'], $topicId ) )
             {
                 $this->context->data->updateComment( $comment['id'], $topicId, $mess, $likes_count );
