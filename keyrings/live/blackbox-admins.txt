@@ -1,1 +1,2 @@
 ditemiku@fit.cvut.cz
+server-delta@dite.pro
