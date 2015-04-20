@@ -23,7 +23,7 @@ settings:
 				language: cs
 			synonym:
 				type: synonym
-				synonyms_path: %rootDir%/synonyms.solr
+				synonyms_path: %solrPath% # %rootDir%/synonyms.solr
 mappings:
 	content:
 		index_analyzer: cs_icu_analyzer

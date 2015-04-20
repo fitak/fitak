@@ -22,10 +22,15 @@ class ElasticSearch extends Client
 	/** @var string */
 	private $index;
 
+	/** @var string */
+	private $solrPath;
+
 	public function __construct(array $params, $appDir)
 	{
 		$this->index = $params['index'];
+		$this->solrPath = $params['solrPath'];
 		unset($params['index']);
+		unset($params['solrPath']);
 
 		parent::__construct($params);
 
@@ -231,7 +236,7 @@ class ElasticSearch extends Client
 	public function setupIndices()
 	{
 		$conf = file_get_contents($this->appDir . '/config/elasticsearch.neon');
-		$conf = str_replace('%rootDir%', __DIR__ . '/../..', $conf);
+		$conf = str_replace('%solrPath%', $this->solrPath, $conf);
 		$args = Neon::decode($conf);
 		try
 		{
