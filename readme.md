@@ -34,3 +34,15 @@ Installation
 - Start elasticsearch.
 - Execute `php ./www/index.php elastic:reindex`
 - Open `/www/index.php` in your browser. All users in database have password `heslo`.
+
+Security
+--------
+
+This repository contains encrypted production configuration and possibly other private files.
+
+- List of encrypted files [./keyrings/live/blackbox-files.txt](.keyrings/live/blackbox-files.txt)
+- List of users that can decrypt those files [./keyrings/live/blackbox-admins.txt](.keyrings/live/blackbox-admins.txt)
+
+If you need access to one or more of those files, contact any of the blackbox-admins with your gpg key.
+
+See https://github.com/StackExchange/blackbox for more information

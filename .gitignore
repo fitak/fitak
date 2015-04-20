@@ -8,3 +8,5 @@ fitak.sublime-workspace
 .DS_Store
 /.idea/
 output
+pubring.gpg~
+secring.gpg
