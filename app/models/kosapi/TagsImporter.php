@@ -58,7 +58,7 @@ class TagsImporter extends Nette\Object
 		$tags = [];
 		foreach ($courses as $course)
 		{
-			if ($match = Strings::match($course, '#^bi|mi-([a-z]+)(?:\.\d+)?$#i'))
+			if ($match = Strings::match($course, '#^(?:bi|mi)-([a-z]+)(?:\.\d+)?$#i'))
 			{
 				$tags[] = strtolower($match[1]);
 			}
