@@ -38,6 +38,7 @@ class Post extends Orm\Entity\Entity
 	const TYPE_VIDEO = 'video';
 	const TYPE_LINK = 'link';
 	const TYPE_PHOTO = 'photo';
+	const TYPE_EVENT = 'event';
 
 	/**
 	 * @var Tags

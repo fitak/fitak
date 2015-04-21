@@ -179,6 +179,9 @@ class Facebook extends Command
 			$post->source = $entry->source;
 			$post->description = $entry->description;
 		}
+		else if ($post->type === $post::TYPE_EVENT)
+		{
+		}
 
 		$this->orm->posts->attach($post);
 		$post->parent = $this->parseId($parentTopic->id);
