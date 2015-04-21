@@ -146,7 +146,7 @@ class Facebook extends Command
 		}
 
 		$id = $this->parseId($entry->id);
-		$post = $this->orm->posts->getById($this->$id);
+		$post = $this->orm->posts->getById($id);
 		if (!$post)
 		{
 			$post = new Post;
