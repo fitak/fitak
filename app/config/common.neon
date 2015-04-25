@@ -3,7 +3,7 @@ extensions:
 	orm: Nextras\Orm\DI\OrmExtension
 	events: Kdyby\Events\DI\EventsExtension
 	console: Kdyby\Console\DI\ConsoleExtension
-
+	facebook: Kdyby\Facebook\DI\FacebookExtension
 php:
 	date.timezone: Europe/Prague
 
@@ -36,6 +36,10 @@ nette:
 orm:
 	model: Fitak\RepositoryContainer
 
+facebook:
+	appId: %fb.appId%
+	appSecret: %fb.appSecret%
+	permissions: %fb.permissions%
 
 events:
 	debugger: false

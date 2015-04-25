@@ -11,6 +11,7 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'Pimple' => array($vendorDir . '/pimple/pimple/src'),
     'Mockery' => array($vendorDir . '/mockery/mockery/library'),
+    'Kdyby\\Facebook\\' => array($vendorDir . '/kdyby/facebook/src'),
     'Kdyby\\Events\\' => array($vendorDir . '/kdyby/events/src'),
     'Kdyby\\Console\\' => array($vendorDir . '/kdyby/console/src'),
     'Inflect' => array($vendorDir . '/oodle/inflect/src'),
