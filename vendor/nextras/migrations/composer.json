@@ -1,23 +1,35 @@
 {
 	"name": "nextras/migrations",
-	"description": "Simple database migrations runner",
+	"description": "Database migrations runner",
 	"type": "library",
+	"license": "BSD-3-Clause",
 	"require": {
-		"php": "~5.3",
-		"nette/database": "~2.2"
+		"php": ">=5.4"
 	},
 	"require-dev": {
-		"php": "~5.4",
-		"nette/tester": "~1.0.0",
-		"mockery/mockery": "~0.8"
+		"dibi/dibi": "~2.3",
+		"doctrine/dbal": "~2.5",
+		"nette/database": "~2.2",
+		"nette/di": "~2.3",
+		"nette/tester": "~1.4",
+		"nette/utils": "~2.3",
+		"nextras/dbal": "@dev",
+		"mockery/mockery": "~0.9",
+		"symfony/console": "~2.6",
+		"ext-openssl": "*"
+	},
+	"suggest": {
+		"dibi/dibi": "to use DibiAdapter",
+		"nette/database": "to use NetteAdapter",
+		"nextras/dbal": "to use NextrasAdapter"
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "2.3-dev"
+			"dev-master": "3.0-dev"
 		}
 	},
 	"autoload": {
 		"psr-4": { "Nextras\\Migrations\\": "src/" },
-		"classmap": ["src/exceptions.php"]
+		"classmap": ["src/exceptions.php", "src/deprecated"]
 	}
 }

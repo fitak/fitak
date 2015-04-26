@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4ad4be291609b890a8472be2138f4c70",
+    "hash": "570409d5ae4d6e54ddc0c23c17638617",
     "packages": [
         {
             "name": "dibi/dibi",
@@ -1977,31 +1977,42 @@
         },
         {
             "name": "nextras/migrations",
-            "version": "v2.3.1",
+            "version": "v3.0.0-rc2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextras/migrations.git",
-                "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13"
+                "reference": "c89264c38b7689c5a05a616f5a9a9ba35875637d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextras/migrations/zipball/447666d228e466aa704c37c0c8a28bf11f1afd13",
-                "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13",
+                "url": "https://api.github.com/repos/nextras/migrations/zipball/c89264c38b7689c5a05a616f5a9a9ba35875637d",
+                "reference": "c89264c38b7689c5a05a616f5a9a9ba35875637d",
                 "shasum": ""
             },
             "require": {
-                "nette/database": "~2.2",
-                "php": "~5.3"
+                "php": ">=5.4"
             },
             "require-dev": {
-                "mockery/mockery": "~0.8",
-                "nette/tester": "~1.0.0",
-                "php": "~5.4"
+                "dibi/dibi": "~2.3",
+                "doctrine/dbal": "~2.5",
+                "ext-openssl": "*",
+                "mockery/mockery": "~0.9",
+                "nette/database": "~2.2",
+                "nette/di": "~2.3",
+                "nette/tester": "~1.4",
+                "nette/utils": "~2.3",
+                "nextras/dbal": "@dev",
+                "symfony/console": "~2.6"
+            },
+            "suggest": {
+                "dibi/dibi": "to use DibiAdapter",
+                "nette/database": "to use NetteAdapter",
+                "nextras/dbal": "to use NextrasAdapter"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
@@ -2009,12 +2020,16 @@
                     "Nextras\\Migrations\\": "src/"
                 },
                 "classmap": [
-                    "src/exceptions.php"
+                    "src/exceptions.php",
+                    "src/deprecated"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "description": "Simple database migrations runner",
-            "time": "2014-08-19 20:17:04"
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Database migrations runner",
+            "time": "2015-04-07 19:54:48"
         },
         {
             "name": "nextras/orm",
@@ -2613,6 +2628,7 @@
         "nette/nette": 20,
         "nette/database": 20,
         "nextras/orm": 20,
+        "nextras/migrations": 5,
         "nextras/static-router": 20
     },
     "prefer-stable": false,

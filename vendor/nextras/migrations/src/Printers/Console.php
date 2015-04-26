@@ -79,8 +79,8 @@ class Console implements IPrinter
 
 	/**
 	 * Prints text to a console, optionally in a specific color.
-	 * @param  string
-	 * @param  string|NULL self::COLOR_*
+	 * @param  string      $s
+	 * @param  string|NULL $color self::COLOR_*
 	 */
 	protected function output($s, $color = NULL)
 	{
@@ -93,11 +93,14 @@ class Console implements IPrinter
 
 
 	/**
-	 * @return bool TRUE if terminal support colors, FALSE otherwise
+	 * @author  David Grudl
+	 * @license New BSD License
+	 * @return  bool TRUE if terminal support colors, FALSE otherwise
 	 */
 	protected function detectColorSupport()
 	{
-		return (bool) preg_match('#^xterm|^screen|^cygwin#', getenv('TERM'));
+		return (getenv('ConEmuANSI') === 'ON' || getenv('ANSICON') !== FALSE
+			|| (defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT)));
 	}
 
 }

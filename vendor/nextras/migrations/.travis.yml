@@ -1,0 +1,35 @@
+language: php
+
+php:
+    - 5.4
+    - 5.5
+    - 5.6
+    - 7.0
+    - hhvm
+
+matrix:
+    fast_finish: true
+    allow_failures:
+        - php: 7.0
+
+before_script:
+    - cp ./tests/php-unix.sample.ini ./tests/php.ini
+    - if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; then cat ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini >> ./tests/php.ini; fi
+    - if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; then NTESTER_FLAGS="--coverage ./coverage.xml --coverage-src ./src"; else TESTER_FLAGS=""; fi
+
+    - if [ "$TRAVIS_PHP_VERSION" == "hhvm" -o "$TRAVIS_PHP_VERSION" == "hhvm-nightly" ]; then cp ./tests/dbals.hhvm.ini ./tests/dbals.ini; fi
+    - if ! [ "$TRAVIS_PHP_VERSION" == "hhvm" -o "$TRAVIS_PHP_VERSION" == "hhvm-nightly" ]; then cp ./tests/dbals.sample.ini ./tests/dbals.ini; fi
+    - cp ./tests/drivers.sample.ini ./tests/drivers.ini
+
+    - psql -c 'CREATE DATABASE nextras_migrations_test' -U postgres
+    - mysql -e 'CREATE DATABASE nextras_migrations_test;'
+    - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+
+    - composer install --no-interaction
+
+script:
+    - ./tests/run.sh $NTESTER_FLAGS ./tests/cases
+
+after_script:
+    - if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; then composer require satooshi/php-coveralls; fi
+    - if [ "$TRAVIS_PHP_VERSION" == "5.6" ]; then php vendor/bin/coveralls -c tests/.coveralls.yml -v; fi

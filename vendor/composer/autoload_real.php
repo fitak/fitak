@@ -38,6 +38,7 @@ class ComposerAutoloaderInite582cea833b37fefeb17059a2504ef74
             $loader->addClassMap($classMap);
         }
 
+        $loader->setClassMapAuthoritative(true);
         $loader->register(true);
 
         $includeFiles = require __DIR__ . '/autoload_files.php';

@@ -18,6 +18,8 @@ use Nextras\Migrations\Entities\File;
  */
 interface IDriver
 {
+	/** @const shared lock identifier */
+	const LOCK_NAME = 'Nextras.Migrations';
 
 	/**
 	 * Setups the connection, such as encoding, default schema, etc.
@@ -26,10 +28,18 @@ interface IDriver
 
 
 	/**
-	 * Drops the database / schema. Shoudl removes all db objects (tables, views, procedures, sequences, ...)
+	 * Drops the database / schema. Should removes all db objects (tables, views, procedures, sequences, ...)
 	 * @return mixed
 	 */
 	function emptyDatabase();
+
+
+	/**
+	 * Loads and executes SQL queries from given file.
+	 * @param  string $path
+	 * @return int number of executed queries
+	 */
+	function loadFile($path);
 
 
 	/**
@@ -45,7 +55,7 @@ interface IDriver
 
 
 	/**
-	 * Rollback transation.
+	 * Rollback transaction.
 	 */
 	function rollbackTransaction();
 
@@ -76,20 +86,20 @@ interface IDriver
 
 	/**
 	 * Inserts migration info into migration table.
-	 * @param  Migration
+	 * @param  Migration $migration
 	 */
 	function insertMigration(Migration $migration);
 
 
 	/**
 	 * Updated migration as executed.
-	 * @param  Migration
+	 * @param  Migration $migration
 	 */
 	function markMigrationAsReady(Migration $migration);
 
 
 	/**
-	 * Returns all migrations stored in migration table.
+	 * Returns all migrations stored in migration table sorted by time.
 	 * @return Migration[]
 	 */
 	function getAllMigrations();
@@ -104,7 +114,7 @@ interface IDriver
 
 	/**
 	 * Returns source code for migration table data initialization.
-	 * @param  File[]
+	 * @param  File[] $files
 	 * @return string
 	 */
 	function getInitMigrationsSource(array $files);

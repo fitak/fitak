@@ -64,8 +64,8 @@ class Runner
 
 
 	/**
-	 * @param  string
-	 * @param  IExtension
+	 * @param  string            $extension
+	 * @param  IExtensionHandler $handler
 	 * @return self
 	 */
 	public function addExtensionHandler($extension, IExtensionHandler $handler)
@@ -80,12 +80,13 @@ class Runner
 
 
 	/**
-	 * @param string self::MODE_CONTINUE|self::MODE_RESET|self::MODE_INIT
+	 * @param  string $mode self::MODE_CONTINUE|self::MODE_RESET|self::MODE_INIT
+	 * @return void
 	 */
 	public function run($mode = self::MODE_CONTINUE)
 	{
 		if ($mode === self::MODE_INIT) {
-			$this->printer->printSource($this->driver->getInitTableSource());
+			$this->printer->printSource($this->driver->getInitTableSource() . "\n");
 			$files = $this->finder->find($this->groups, array_keys($this->extensionsHandlers));
 			$files = $this->orderResolver->resolve(array(), $this->groups, $files, self::MODE_RESET);
 			$this->printer->printSource($this->driver->getInitMigrationsSource($files));
@@ -99,11 +100,10 @@ class Runner
 
 			if ($mode === self::MODE_RESET) {
 				$this->driver->emptyDatabase();
-				$this->driver->lock();
 				$this->printer->printReset();
-				$this->driver->createTable();
 			}
 
+			$this->driver->createTable();
 			$migrations = $this->driver->getAllMigrations();
 			$files = $this->finder->find($this->groups, array_keys($this->extensionsHandlers));
 			$toExecute = $this->orderResolver->resolve($migrations, $this->groups, $files, $mode);
@@ -114,16 +114,18 @@ class Runner
 				$this->printer->printExecute($file, $queriesCount);
 			}
 
+			$this->driver->unlock();
 			$this->printer->printDone();
 
 		} catch (Exception $e) {
+			$this->driver->unlock();
 			$this->printer->printError($e);
 		}
 	}
 
 
 	/**
-	 * @param string
+	 * @param  string $name
 	 * @return IExtensionHandler
 	 */
 	public function getExtension($name)
@@ -136,14 +138,12 @@ class Runner
 
 
 	/**
-	 * @param  File
+	 * @param  File $file
 	 * @return int  number of executed queries
 	 */
 	protected function execute(File $file)
 	{
 		$this->driver->beginTransaction();
-		// Note: MySQL implicitly commits after some operations, such as CREATE or ALTER TABLE, see http://dev.mysql.com/doc/refman/5.6/en/implicit-commit.html
-		// proto se radeji kontroluje jestli bylo dokonceno
 
 		$migration = new Migration;
 		$migration->group = $file->group->name;
@@ -157,7 +157,7 @@ class Runner
 			$queriesCount = $this->getExtension($file->extension)->execute($file);
 		} catch (\Exception $e) {
 			$this->driver->rollbackTransaction();
-			throw new ExecutionException(sprintf('Executing migration "%s" has failed.', $file->getPath()), NULL, $e);
+			throw new ExecutionException(sprintf('Executing migration "%s" has failed.', $file->path), NULL, $e);
 		}
 
 		$this->driver->markMigrationAsReady($migration);

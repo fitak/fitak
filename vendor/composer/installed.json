@@ -1938,49 +1938,6 @@
         ]
     },
     {
-        "name": "nextras/migrations",
-        "version": "v2.3.1",
-        "version_normalized": "2.3.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/nextras/migrations.git",
-            "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/nextras/migrations/zipball/447666d228e466aa704c37c0c8a28bf11f1afd13",
-            "reference": "447666d228e466aa704c37c0c8a28bf11f1afd13",
-            "shasum": ""
-        },
-        "require": {
-            "nette/database": "~2.2",
-            "php": "~5.3"
-        },
-        "require-dev": {
-            "mockery/mockery": "~0.8",
-            "nette/tester": "~1.0.0",
-            "php": "~5.4"
-        },
-        "time": "2014-08-19 20:17:04",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Nextras\\Migrations\\": "src/"
-            },
-            "classmap": [
-                "src/exceptions.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "description": "Simple database migrations runner"
-    },
-    {
         "name": "kdyby/events",
         "version": "v2.2.0",
         "version_normalized": "2.2.0.0",
@@ -2690,5 +2647,63 @@
             "nette",
             "sdk"
         ]
+    },
+    {
+        "name": "nextras/migrations",
+        "version": "v3.0.0-rc2",
+        "version_normalized": "3.0.0.0-RC2",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nextras/migrations.git",
+            "reference": "c89264c38b7689c5a05a616f5a9a9ba35875637d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nextras/migrations/zipball/c89264c38b7689c5a05a616f5a9a9ba35875637d",
+            "reference": "c89264c38b7689c5a05a616f5a9a9ba35875637d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "dibi/dibi": "~2.3",
+            "doctrine/dbal": "~2.5",
+            "ext-openssl": "*",
+            "mockery/mockery": "~0.9",
+            "nette/database": "~2.2",
+            "nette/di": "~2.3",
+            "nette/tester": "~1.4",
+            "nette/utils": "~2.3",
+            "nextras/dbal": "@dev",
+            "symfony/console": "~2.6"
+        },
+        "suggest": {
+            "dibi/dibi": "to use DibiAdapter",
+            "nette/database": "to use NetteAdapter",
+            "nextras/dbal": "to use NextrasAdapter"
+        },
+        "time": "2015-04-07 19:54:48",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Nextras\\Migrations\\": "src/"
+            },
+            "classmap": [
+                "src/exceptions.php",
+                "src/deprecated"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "Database migrations runner"
     }
 ]
