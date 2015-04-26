@@ -63,6 +63,19 @@ class SignInManager extends Nette\Object
 		$this->userStorage->setAuthenticated(TRUE);
 	}
 
+    /**
+     * @return void
+     * @throws Nette\Security\AuthenticationException
+     */
+    public function signInFacebook($id)
+    {
+        $user = $this->orm->users->getByFacebookId($id);
+        if ($user !== NULL) {
+            $this->signInWithoutPassword($user);
+        } else
+            throw new Nette\Security\AuthenticationException('This user is not registered.');
+    }
+
 	/**
 	 * @return void
 	 */

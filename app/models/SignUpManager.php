@@ -2,11 +2,12 @@
 
 namespace Fitak;
 
+use Kdyby\Facebook\FacebookApiException;
 use Nette;
 use Nette\Mail;
 use Nette\Utils\Random;
 use Nextras\Application\LinkFactory;
-
+use Tracy\Debugger;
 
 class SignUpManager extends Nette\Object
 {
@@ -23,13 +24,30 @@ class SignUpManager extends Nette\Object
 	/** @var TagsImporter */
 	private $tagsImporter;
 
-	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer, LinkFactory $linkFactory, TagsImporter $tagsImporter)
+	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer,
+                                LinkFactory $linkFactory, TagsImporter $tagsImporter)
 	{
 		$this->orm = $orm;
 		$this->mailer = $mailer;
 		$this->linkFactory = $linkFactory;
 		$this->tagsImporter = $tagsImporter;
 	}
+
+    /**
+     *
+     */
+    public function signUpUsingFacebook($data)
+    {
+        if ($data === NULL)
+            throw new InvalidSignUpTokenException("Bad Facebook token.");
+
+        $user = new User();
+        $user->signUpTime = 'now';
+        $user->email = $data['email'];
+        $user->passwordHash = "00000";
+        $user->facebookId = $data['id'];
+        $this->orm->users->persistAndFlush($user);
+    }
 
 	/**
 	 * @param  string $email
@@ -103,7 +121,6 @@ class SignUpManager extends Nette\Object
 	}
 
 }
-
 
 class DuplicateEmailException extends \RuntimeException
 {

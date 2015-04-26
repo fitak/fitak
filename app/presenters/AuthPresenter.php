@@ -28,6 +28,9 @@ class AuthPresenter extends BasePresenter
 	/** @var string @persistent */
 	public $backlink;
 
+    /** @var \Kdyby\Facebook\Facebook @inject */
+    public $facebook;
+
 
 // === sign in =========================================================================================================
 
@@ -44,6 +47,42 @@ class AuthPresenter extends BasePresenter
 
 		return $form;
 	}
+
+    protected function createComponentFacebookLoginForm()
+    {
+        $dialog = $this->facebook->createDialog('login');
+
+        /** @var \Kdyby\Facebook\Dialog\LoginDialog $dialog */
+        $dialog->onResponse[] = function($dialog) {
+            $fb = $dialog->getFacebook();
+
+            if (!$fb->getUser()) {
+                $this->flashMessage("Nedokazal som ziskat informacie o Vas.");
+                return;
+            }
+
+            $facebookData = null;
+            try {
+                $facebookData = $fb->api('/me');
+            } catch(\Kdyby\Facebook\FacebookApiException $e) {
+                $this->flashMessage("Facebook error: " . $e->getType());
+                $this->redirect('this');
+            }
+
+            try {
+                $this->signInManager->signInFacebook($facebookData['id']);
+                $this->restoreRequest($this->backlink);
+                $this->redirect('Homepage:');
+            } catch (AuthenticationException $e) {
+                $facebookData['email'] = 'dummy@company.com'; /// TODO: Get email from Facebook.
+                Tracy\Debugger::barDump($facebookData); /// TODO: remove.
+                $this->signUpManager->signUpUsingFacebook($facebookData);
+                $this->redirect('User:profile');  // redirect to
+            }
+        };
+
+        return $dialog;
+    }
 
 	public function processSignInForm(UI\Form $form, array $values)
 	{
@@ -153,7 +192,6 @@ class AuthPresenter extends BasePresenter
 		$this->flashMessage('Byl jsi odhlášen');
 		$this->redirect('signIn');
 	}
-
 
 // === sign up =========================================================================================================
 

@@ -10,6 +10,7 @@ use Nextras\Orm\Relationships\ManyHasMany;
 
 /**
  * @property string            $email
+ * @property string|NULL       $facebookId
  * @property string            $passwordHash
  * @property string|NULL       $signUpTokenHash
  * @property DateTime          $signUpTime

@@ -40,6 +40,7 @@ facebook:
 	appId: %fb.appId%
 	appSecret: %fb.appSecret%
 	permissions: %fb.permissions%
+	graphVersion: %fb.graphVersion%
 
 events:
 	debugger: false
