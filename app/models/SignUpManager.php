@@ -2,12 +2,10 @@
 
 namespace Fitak;
 
-use Kdyby\Facebook\FacebookApiException;
 use Nette;
 use Nette\Mail;
 use Nette\Utils\Random;
 use Nextras\Application\LinkFactory;
-use Tracy\Debugger;
 
 class SignUpManager extends Nette\Object
 {
@@ -34,12 +32,15 @@ class SignUpManager extends Nette\Object
 	}
 
     /**
-     *
+	 * @param \Nette\Utils\ArrayHash $data
+	 * @return void
+     * @throws \Nette\Security\AuthenticationException
      */
     public function signUpUsingFacebook($data)
     {
-        if ($data === NULL)
-            throw new InvalidSignUpTokenException("Bad Facebook token.");
+        if ($data === NULL) {
+            throw new Nette\Security\AuthenticationException('Registracia nezdarena - ziadne data k registracii.');
+        }
 
         $user = new User();
         $user->signUpTime = 'now';

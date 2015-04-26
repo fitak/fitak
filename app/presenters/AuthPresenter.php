@@ -28,8 +28,8 @@ class AuthPresenter extends BasePresenter
 	/** @var string @persistent */
 	public $backlink;
 
-    /** @var \Kdyby\Facebook\Facebook @inject */
-    public $facebook;
+	/** @var \Kdyby\Facebook\Facebook @inject */
+	public $facebook;
 
 
 // === sign in =========================================================================================================
@@ -44,45 +44,45 @@ class AuthPresenter extends BasePresenter
 			->setRequired('Vyplň heslo.');
 		$form->addSubmit('signIn', 'Přihlásit');
 		$form->onSuccess[] = [$this, 'processSignInForm'];
-
 		return $form;
 	}
 
-    protected function createComponentFacebookLoginForm()
-    {
-        $dialog = $this->facebook->createDialog('login');
+	protected function createComponentFacebookLoginForm()
+	{
+		$dialog = $this->facebook->createDialog('login');
 
-        /** @var \Kdyby\Facebook\Dialog\LoginDialog $dialog */
-        $dialog->onResponse[] = function($dialog) {
-            $fb = $dialog->getFacebook();
+		/** @var \Kdyby\Facebook\Dialog\LoginDialog $dialog */
+		$dialog->onResponse[] = function($dialog) {
+			$fb = $dialog->getFacebook();
 
-            if (!$fb->getUser()) {
-                $this->flashMessage("Nedokazal som ziskat informacie o Vas.");
-                return;
-            }
+			if (!$fb->getUser()) {
+				$this->flashMessage("Nedokazal som ziskat informacie o Vas.");
 
-            $facebookData = null;
-            try {
-                $facebookData = $fb->api('/me');
-            } catch(\Kdyby\Facebook\FacebookApiException $e) {
-                $this->flashMessage("Facebook error: " . $e->getType());
-                $this->redirect('this');
-            }
+				return;
+			}
 
-            try {
-                $this->signInManager->signInFacebook($facebookData['id']);
-                $this->restoreRequest($this->backlink);
-                $this->redirect('Homepage:');
-            } catch (AuthenticationException $e) {
-                $facebookData['email'] = 'dummy@company.com'; /// TODO: Get email from Facebook.
-                Tracy\Debugger::barDump($facebookData); /// TODO: remove.
-                $this->signUpManager->signUpUsingFacebook($facebookData);
-                $this->redirect('User:profile');  // redirect to
-            }
-        };
+			$facebookData = null;
+			try {
+				$facebookData = $fb->api('/me');
+			} catch(\Kdyby\Facebook\FacebookApiException $e) {
+				$this->flashMessage("Facebook error: " . $e->getType());
+				$this->redirect('this');
+			}
 
-        return $dialog;
-    }
+			try {
+				$this->signInManager->signInFacebook($facebookData['id']);
+				$this->restoreRequest($this->backlink);
+				$this->redirect('Homepage:');
+			} catch (AuthenticationException $e) {
+				$facebookData['email'] = 'dummy@company.com'; /// TODO: Get email from Facebook.
+				Tracy\Debugger::barDump($facebookData); /// TODO: remove.
+				$this->signUpManager->signUpUsingFacebook($facebookData);
+				$this->redirect('User:profile');  // redirect to
+			}
+		};
+
+		return $dialog;
+	}
 
 	public function processSignInForm(UI\Form $form, array $values)
 	{

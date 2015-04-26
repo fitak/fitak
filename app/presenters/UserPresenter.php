@@ -2,23 +2,23 @@
 
 class UserPresenter extends BasePresenter
 {
-    public function actionDefault()
-    {
+	public function actionDefault()
+	{
 
-    }
+	}
 
-    public function renderDefault()
-    {
+	public function renderDefault()
+	{
 
-    }
+	}
 
-    public function actionProfile()
-    {
+	public function actionProfile()
+	{
 
-    }
+	}
 
-    public function renderProfile()
-    {
+	public function renderProfile()
+	{
 
-    }
+	}
 }
