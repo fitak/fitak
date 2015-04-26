@@ -204,6 +204,7 @@ class AuthPresenter extends BasePresenter
 			->addRule($form::EMAIL, 'Vyplněná e-mailová adresa nemá správný tvar, zkontroluj si překlepy.')
 			->addRule($form::PATTERN, 'Musíš vyplnit ČVUT e-mail (na doméně *.cvut.cz).', '.+\.cvut.cz');
 		$form->addPassword('password', 'Heslo')
+			->setOption('description', '(jiné než „Heslo ČVUT“)')
 			->setRequired('Vyplň heslo.');
 		$form->addPassword('passwordCheck', 'Heslo (pro kontrolu)')
 			->setOmitted()

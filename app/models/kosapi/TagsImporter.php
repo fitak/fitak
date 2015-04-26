@@ -85,7 +85,6 @@ class TagsImporter extends Nette\Object
 				'fields' => 'entry(content(course))',
 				'limit' => 100,
 			]);
-
 		}
 		catch (HttpException $e)
 		{

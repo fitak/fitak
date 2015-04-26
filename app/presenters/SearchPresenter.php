@@ -56,14 +56,12 @@ class SearchPresenter extends BasePresenter
 		}
 
 		$form = new SearchForm($this->orm);
-		$form->setDefaults(
-			[
-				's' => $this->getParameter('s'),
-				'since' => $this->getParameter('since', 0),
-				'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
-				'groups' => $groups,
-			]
-		);
+		$form->setDefaults([
+			's' => $this->getParameter('s'),
+			'since' => $this->getParameter('since', 0),
+			'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
+			'groups' => $groups,
+		]);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;
