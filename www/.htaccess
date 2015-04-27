@@ -6,7 +6,7 @@
 # enable cool URL
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-       # RewriteBase /
+	# RewriteBase /
 
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
@@ -16,7 +16,9 @@
 
 # enable gzip compression
 <IfModule mod_deflate.c>
-	AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript text/javascript application/javascript application/json
+	<IfModule mod_filter.c>
+		AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript text/javascript application/javascript application/json
+	</IfModule>	
 </IfModule>
 
 # allow combined JavaScript & CSS. Inside of script.combined.js you could use <!--#include file="script.js" -->
