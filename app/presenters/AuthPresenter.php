@@ -47,41 +47,23 @@ class AuthPresenter extends BasePresenter
 		return $form;
 	}
 
-	protected function createComponentFacebookLoginForm()
+	public function handleFacebookLogin()
 	{
-		$dialog = $this->facebook->createDialog('login');
+		$array = $this->getRequest()->getPost();
 
-		/** @var \Kdyby\Facebook\Dialog\LoginDialog $dialog */
-		$dialog->onResponse[] = function($dialog) {
-			$fb = $dialog->getFacebook();
+		try {
+			$this->signInManager->signInFacebook($array["accountId"]);
+			$this->redirect('Homepage:');
+		} catch (AuthenticationException $e) {
+			$this->signUpManager->signUpUsingFacebook($array);
+		} catch (AuthenticationException $e) {
+			$this->payload->errorMessage = "Zle profilove data.";
+			\Tracy\Debugger::log($array);
+		} catch (DuplicateEmailException $e) {
+			$this->payload->errorMessage = "Tento pouzivatel s takymto emailom uz existuje.";
+		}
 
-			if (!$fb->getUser()) {
-				$this->flashMessage("Nedokazal som ziskat informacie o Vas.");
-
-				return;
-			}
-
-			$facebookData = null;
-			try {
-				$facebookData = $fb->api('/me');
-			} catch(\Kdyby\Facebook\FacebookApiException $e) {
-				$this->flashMessage("Facebook error: " . $e->getType());
-				$this->redirect('this');
-			}
-
-			try {
-				$this->signInManager->signInFacebook($facebookData['id']);
-				$this->restoreRequest($this->backlink);
-				$this->redirect('Homepage:');
-			} catch (AuthenticationException $e) {
-				$facebookData['email'] = 'dummy@company.com'; /// TODO: Get email from Facebook.
-				Tracy\Debugger::barDump($facebookData); /// TODO: remove.
-				$this->signUpManager->signUpUsingFacebook($facebookData);
-				$this->redirect('User:profile');  // redirect to
-			}
-		};
-
-		return $dialog;
+		$this->sendPayload();
 	}
 
 	public function processSignInForm(UI\Form $form, array $values)

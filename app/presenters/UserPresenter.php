@@ -2,9 +2,13 @@
 
 class UserPresenter extends BasePresenter
 {
+	/** @var \Kdyby\Facebook\Facebook @inject */
+	public $facebook;
+
+	/** @var */
+
 	public function actionDefault()
 	{
-
 	}
 
 	public function renderDefault()
@@ -21,4 +25,9 @@ class UserPresenter extends BasePresenter
 	{
 
 	}
+
+	public function actionRemoveFacebookAccount()
+	{
+	}
 }
+

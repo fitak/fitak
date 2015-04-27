@@ -35,20 +35,29 @@ class SignUpManager extends Nette\Object
 	 * @param \Nette\Utils\ArrayHash $data
 	 * @return void
      * @throws \Nette\Security\AuthenticationException
+	 * @throws DuplicateEmailException
      */
-    public function signUpUsingFacebook($data)
-    {
-        if ($data === NULL) {
-            throw new Nette\Security\AuthenticationException('Registracia nezdarena - ziadne data k registracii.');
-        }
+	public function signUpUsingFacebook($data)
+	{
+		if ($data === NULL) {
+			throw new Nette\Security\AuthenticationException('Registracia nezdarena - ziadne data k registracii.');
+		}
 
-        $user = new User();
-        $user->signUpTime = 'now';
-        $user->email = $data['email'];
-        $user->passwordHash = "00000";
-        $user->facebookId = $data['id'];
-        $this->orm->users->persistAndFlush($user);
-    }
+		$user = new User();
+		$user->signUpTime = 'now';
+		$user->email = $data['userData']['email'];
+		$user->firstName = $data['userData']['first_name'];
+		$user->lastName = $data['userData']['last_name'];
+		$user->passwordHash = "00000";
+		$user->facebookId = $data['accountId'];
+		$user->facebookAccessToken = $data['accessToken'];
+
+		try {
+			$this->orm->users->persistAndFlush($user);
+		} catch(DuplicateEntryException $e) {
+			throw new DuplicateEmailException();
+		}
+	}
 
 	/**
 	 * @param  string $email
