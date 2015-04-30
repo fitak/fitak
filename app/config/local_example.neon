@@ -15,7 +15,7 @@ parameters:
 	fb:
 		appId: "APPID"
 		appSecret: "APPSECRET"
-		permissions: [offline_access, email, public_profile]
+		permissions: [offline_access, read_stream, user_groups, email, public_profile]
 	kosapi:
 		username:
 		password:
