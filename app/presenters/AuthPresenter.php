@@ -34,6 +34,13 @@ class AuthPresenter extends BasePresenter
 
 // === sign in =========================================================================================================
 
+	public function actionSignIn()
+	{
+		if ($this->user->isLoggedIn()) {
+			$this->redirect('Homepage:');
+		}
+	}
+
 	protected function createComponentSignInForm()
 	{
 		$form = new UI\Form();
@@ -47,23 +54,34 @@ class AuthPresenter extends BasePresenter
 		return $form;
 	}
 
-	public function handleFacebookLogin()
+	protected function createComponentFacebookLogin()
 	{
-		$array = $this->getRequest()->getPost();
+		$dialog = $this->facebook->createDialog('login');
 
-		try {
-			$this->signInManager->signInFacebook($array["accountId"]);
-			$this->redirect('Homepage:');
-		} catch (AuthenticationException $e) {
-			$this->signUpManager->signUpUsingFacebook($array);
-		} catch (AuthenticationException $e) {
-			$this->payload->errorMessage = "Zle profilove data.";
-			\Tracy\Debugger::log($array);
-		} catch (DuplicateEmailException $e) {
-			$this->payload->errorMessage = "Tento pouzivatel s takymto emailom uz existuje.";
-		}
+		/** @var Kdyby\Facebook\Dialog\LoginDialog $dialog */
+		$dialog->onResponse[] = function($dialog) {
+			$fb = $dialog->getFacebook();
+			try
+			{
+				if (!$fb->getUser()) {
+					$this->flashMessage("Error");
+				}
+				$response = $fb->api('/me');
 
-		$this->sendPayload();
+				try {
+					$this->signInManager->signInFacebook($response['id']);
+					$this->redirect('Homepage:');
+				} catch (AuthenticationException $e) {
+					$response['accessToken'] = $fb->getAccessToken();
+					$this->signUpManager->signUpUsingFacebook($response);
+					$this->redirect('User:profile');
+				}
+			} catch (\Kdyby\Facebook\FacebookApiException $e) {
+				$this->flashMessage('Facebook autentikacia zlyhala: ' . $e->getMessage());
+			}
+		};
+
+		return $dialog;
 	}
 
 	public function processSignInForm(UI\Form $form, array $values)

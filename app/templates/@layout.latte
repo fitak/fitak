@@ -39,9 +39,19 @@
 						</ul>
 					</li>
 					<li n:class="$presenter->islinkCurrent('About:*') ? active"><a n:href="About:">O webu</a></li>
-					<li n:class="$presenter->islinkCurrent('User:*') ? active"><a n:href="User:">Uzivatel</a></li>
-                    <li><a href="https://github.com/fitak">GitHub</a></li>
+					<li><a href="https://github.com/fitak">GitHub</a></li>
 					<li><a href="https://www.facebook.com/fitakcz">Facebook</a></li>
+					{if isset($user) } {*Find better way.*}
+						<li n:class="dropdown, $presenter->islinkCurrent('Search:*') ? active">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							{$user->displayName} <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a n:href="User:profile">Profil</a></li>
+							<li><a n:href="Auth:signOut">Odhlaseni</a></li>
+						</ul>
+					</li>
+					{/if}
 				</ul>
 			</div>
 		</div>

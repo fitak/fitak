@@ -45,17 +45,18 @@ class SignUpManager extends Nette\Object
 
 		$user = new User();
 		$user->signUpTime = 'now';
-		$user->email = $data['userData']['email'];
-		$user->firstName = $data['userData']['first_name'];
-		$user->lastName = $data['userData']['last_name'];
+		$user->email = $data['email'];
+		$user->firstName = $data['first_name'];
+		$user->lastName = $data['last_name'];
 		$user->passwordHash = "00000";
-		$user->facebookId = $data['accountId'];
+		$user->facebookId = $data['id'];
 		$user->facebookAccessToken = $data['accessToken'];
+		$user->displayName = $data['name'];
 
 		try {
 			$this->orm->users->persistAndFlush($user);
 		} catch(DuplicateEntryException $e) {
-			throw new DuplicateEmailException();
+			throw new DuplicateEmailException('Tento email uz je registrovany.');
 		}
 	}
 
