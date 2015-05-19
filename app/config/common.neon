@@ -60,6 +60,8 @@ dibi:
 
 
 parameters:
+	fb:
+		graphVersion: v2.3
 	elastic:
 		solrPath: %appDir%/../synonyms.solr
 		hosts:

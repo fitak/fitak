@@ -31,6 +31,11 @@ class Facebook
 	private $scope;
 
 	/**
+	 * @var string graph api prefix
+	 */
+	private $version = 'v2.3';
+
+	/**
 	 * @param string $appId
 	 * @param string $appSecret
 	 * @param string[] $scope
@@ -90,7 +95,7 @@ class Facebook
 			throw new \ImplementationException('Call setSession prior to calling ' . __METHOD__);
 		}
 
-		$req = new FacebookRequest($this->fbs, 'GET', '/me/groups');
+		$req = new FacebookRequest($this->fbs, 'GET', '/me/groups', NULL, $this->version);
 		/** @var \StdClass $res */
 		$res = $req->execute()->getResponse();
 		return $res->data;
@@ -109,7 +114,7 @@ class Facebook
 			throw new \ImplementationException('Call setSession prior to calling ' . __METHOD__);
 		}
 
-		$req = new FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since");
+		$req = new FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since", NULL, $this->version);
 		do
 		{
 			$res = $req->execute();
@@ -144,7 +149,7 @@ class Facebook
 			yield $comment;
 		}
 
-		$res = new FacebookResponse(new FacebookRequest($this->fbs, 'GET', "/$post->id/comments"), $post->comments, NULL);
+		$res = new FacebookResponse(new FacebookRequest($this->fbs, 'GET', "/$post->id/comments", NULL, $this->version), $post->comments, NULL);
 		$req = $res->getRequestForNextPage();
 
 		while ($req)
