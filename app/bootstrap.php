@@ -27,15 +27,7 @@ $container = $configurator->createContainer();
 // Setup router
 $container->router[] = new Route('index.php', 'Homepage:default', Route::ONE_WAY);
 $container->router[] = new Route('stream/', 'Search:stream');
-if ($configurator->isDebugMode())
-{
-	$container->router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default');
-}
-else
-{
-	$container->router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default', Route::SECURED);
-}
-
+$container->router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default');
 
 // Configure and run the application!
 $container->application->run();
