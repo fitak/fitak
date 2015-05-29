@@ -6,7 +6,11 @@
 # enable cool URL
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-       # RewriteBase /
+  # RewriteBase /
+
+  RewriteCond %{SERVER_PORT} ^443$ [OR]
+  RewriteCond %{HTTPS} =on
+  RewriteRule ^(.*)$ http://www.fitak.cz/$1 [R=301,L]
 
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
