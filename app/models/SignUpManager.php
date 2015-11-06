@@ -77,7 +77,7 @@ class SignUpManager extends Nette\Object
 
 		try
 		{
-			$this->tagsImporter->importTags($user);
+//			$this->tagsImporter->importTags($user);
 			$this->orm->users->persistAndFlush($user);
 		}
 		catch (DuplicateEntryException $e)
