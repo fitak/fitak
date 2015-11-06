@@ -47,7 +47,37 @@ class AuthPresenter extends BasePresenter
 		return $form;
 	}
 
-	public function handleFacebookLogin()
+    public function processSignInForm(UI\Form $form, array $values)
+    {
+        try
+        {
+            $this->signInManager->signIn($values['email'], $values['password']);
+            $this->restoreRequest($this->backlink);
+            $this->redirect('Homepage:');
+        }
+        catch (AuthenticationException $e)
+        {
+            /** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
+            if ($e->getCode() === IAuthenticator::IDENTITY_NOT_FOUND)
+            {
+                $form['email']->addError('S tímto e-mailem tu není nikdo zaregistrovaný.');
+            }
+            elseif ($e->getCode() === IAuthenticator::NOT_APPROVED)
+            {
+                $form['email']->addError('Účet není ještě aktitován. Klikni na odkaz v e-mailu.');
+            }
+            elseif ($e->getCode() === IAuthenticator::INVALID_CREDENTIAL)
+            {
+                $form['password']->addError('Neplatné heslo.');
+            }
+            else
+            {
+                throw new \LogicException();
+            }
+        }
+    }
+
+    public function handleFacebookLogin()
 	{
 		$array = $this->getRequest()->getPost();
 
@@ -64,36 +94,6 @@ class AuthPresenter extends BasePresenter
 		}
 
 		$this->sendPayload();
-	}
-
-	public function processSignInForm(UI\Form $form, array $values)
-	{
-		try
-		{
-			$this->signInManager->signIn($values['email'], $values['password']);
-			$this->restoreRequest($this->backlink);
-			$this->redirect('Homepage:');
-		}
-		catch (AuthenticationException $e)
-		{
-			/** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
-			if ($e->getCode() === IAuthenticator::IDENTITY_NOT_FOUND)
-			{
-				$form['email']->addError('S tímto e-mailem tu není nikdo zaregistrovaný.');
-			}
-			elseif ($e->getCode() === IAuthenticator::NOT_APPROVED)
-			{
-				$form['email']->addError('Účet není ještě aktitován. Klikni na odkaz v e-mailu.');
-			}
-			elseif ($e->getCode() === IAuthenticator::INVALID_CREDENTIAL)
-			{
-				$form['password']->addError('Neplatné heslo.');
-			}
-			else
-			{
-				throw new \LogicException();
-			}
-		}
 	}
 
 
