@@ -24,7 +24,7 @@ class TagsMapper extends Orm\Mapper\Mapper
 				ON data.id = data_tags.data_id
 			INNER JOIN tags
 				ON data_tags.tags_id = tags.id
-			WHERE data.created_time > DATE_SUB(NOW(), INTERVAL 2 WEEK)
+			WHERE data.created_time > DATE_SUB(NOW(), INTERVAL 2 YEAR)
 			GROUP BY tags.id
 			ORDER BY count DESC
 			LIMIT 25
