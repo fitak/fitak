@@ -64,7 +64,7 @@ class AuthPresenter extends BasePresenter
             }
             elseif ($e->getCode() === IAuthenticator::NOT_APPROVED)
             {
-                $form['email']->addError('Účet není ještě aktitován. Klikni na odkaz v e-mailu.');
+                $form['email']->addError('Účet není ještě aktivován. Klikni na odkaz v e-mailu.');
             }
             elseif ($e->getCode() === IAuthenticator::INVALID_CREDENTIAL)
             {
@@ -222,12 +222,12 @@ class AuthPresenter extends BasePresenter
 		{
 			$this->signUpManager->confirmSignUp($user, $token);
 			$this->signInManager->signInWithoutPassword($user);
-			$this->flashMessage('Účet byl úspěšně aktitován');
+			$this->flashMessage('Účet byl úspěšně aktivován.');
 			$this->redirect('Homepage:');
 		}
 		catch (UserAlreadyActivatedException $e)
 		{
-			$this->flashMessage('Tento účet byl již aktivován v minulosti', 'warning');
+			$this->flashMessage('Tento účet byl již aktivován v minulosti.', 'warning');
 		}
 		catch (InvalidSignUpTokenException $e)
 		{
