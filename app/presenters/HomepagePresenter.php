@@ -8,6 +8,11 @@ use Fitak\TagCloudControl;
  */
 class HomepagePresenter extends BasePresenter
 {
+    protected function startup()
+    {
+        parent::startup();
+        $this->requireLogin('Pro přístup k obsahu je nutné se přihlásit.');
+    }
 
 	public function renderDefault()
 	{
