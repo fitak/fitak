@@ -40,8 +40,11 @@
 					</li>
 					<li n:class="$presenter->islinkCurrent('About:*') ? active"><a n:href="About:">O webu</a></li>
 					<li n:class="$presenter->islinkCurrent('User:*') ? active"><a n:href="User:">Uzivatel</a></li>
+
                     <li><a href="https://github.com/fitak">GitHub</a></li>
 					<li><a href="https://www.facebook.com/fitakcz">Facebook</a></li>
+					<li><a n:href="Auth:signOut" n:if="$loggedIn">Odhlásit se</a></li>
+					<li><a n:href="Auth:signIn" n:if="!$loggedIn">Přihlásit se</a></li>
 				</ul>
 			</div>
 		</div>

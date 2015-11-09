@@ -62,4 +62,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 		return $template;
 	}
 
+    public function beforeRender() {
+        $this->template->loggedIn = $this->userStorage->isAuthenticated();
+    }
 }
