@@ -1,5 +1,6 @@
 <?php
 
+use Fitak\PostManager;
 
 /**
  * @author Vojtech Miksu <vojtech@miksu.cz>
@@ -62,6 +63,14 @@ class SearchPresenter extends BasePresenter
 			'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
 			'groups' => $groups,
 		]);
+		$form->onSuccess[] = callback($form, 'submitted');
+
+		return $form;
+	}
+
+	protected function createComponentPostForm()
+	{
+		$form = new postForm($this->orm);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;

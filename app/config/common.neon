@@ -79,6 +79,7 @@ services:
 	tagsImporter: Fitak\TagsImporter
 	signInManager: Fitak\SignInManager
 	signUpManager: Fitak\SignUpManager
+	postManager: Fitak\PostManager
 	passwordResetManager: Fitak\PasswordResetManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
