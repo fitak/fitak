@@ -7,13 +7,9 @@
 
 namespace Nette\Security;
 
-use Nette;
-
 
 /**
  * Represents role, an object that may request access to an IResource.
- *
- * @author     David Grudl
  */
 interface IRole
 {

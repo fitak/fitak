@@ -3,7 +3,6 @@
 use Nette\Database\Context as Database;
 use Nette\Utils\Json;
 
-
 class KeyValueStorage
 {
 

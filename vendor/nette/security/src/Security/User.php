@@ -13,8 +13,6 @@ use Nette;
 /**
  * User authentication and authorization.
  *
- * @author     David Grudl
- *
  * @property-read bool $loggedIn
  * @property-read IIdentity $identity
  * @property-read mixed $id
@@ -37,10 +35,10 @@ class User extends Nette\Object
 	/** @var string  default role for authenticated user without own identity */
 	public $authenticatedRole = 'authenticated';
 
-	/** @var array of function(User $sender); Occurs when the user is successfully logged in */
+	/** @var callable[]  function (User $sender); Occurs when the user is successfully logged in */
 	public $onLoggedIn;
 
-	/** @var array of function(User $sender); Occurs when the user is logged out */
+	/** @var callable[]  function (User $sender); Occurs when the user is logged out */
 	public $onLoggedOut;
 
 	/** @var IUserStorage Session storage for current user */

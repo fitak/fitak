@@ -70,6 +70,9 @@ class Client
      */
     protected $cat;
 
+
+    protected $customNamespaces = array();
+
     /** @var  callback */
     protected $dicEndpoints;
 
@@ -78,18 +81,31 @@ class Client
      * Client constructor
      *
      * @param array $params Array of injectable parameters
+     * @throws Common\Exceptions\RuntimeException
      */
     public function __construct($params = array())
     {
+        if (!extension_loaded('curl') || !function_exists('curl_multi_exec')) {
+            throw new Exceptions\RuntimeException("curl_multi_exec() function is required for the client.");
+        }
+
         $this->setParams($params);
         $this->setLogging();
-        $this->transport    = $this->params['transport'];
-        $this->indices      = $this->params['indicesNamespace'];
-        $this->cluster      = $this->params['clusterNamespace'];
-        $this->nodes        = $this->params['nodesNamespace'];
-        $this->snapshot     = $this->params['snapshotNamespace'];
-        $this->cat          = $this->params['catNamespace'];
-        $this->dicEndpoints = $this->params['endpoint'];
+        $this->transport      = $this->params['transport'];
+        $this->indices        = $this->params['indicesNamespace'];
+        $this->cluster        = $this->params['clusterNamespace'];
+        $this->nodes          = $this->params['nodesNamespace'];
+        $this->snapshot       = $this->params['snapshotNamespace'];
+        $this->cat            = $this->params['catNamespace'];
+
+        if (isset($this->params['customNamespaces']) === true) {
+            foreach ($this->params['customNamespaces'] as $name => $ns) {
+                $this->customNamespaces[$name] = $this->params[$name];
+            }
+        }
+
+
+        $this->dicEndpoints   = $this->params['endpoint'];
     }
 
 
@@ -460,6 +476,7 @@ class Client
      *        ['preference']       = (string) Specify the node or shard the operation should be performed on (default: random) .Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
      *        ['routing']          = (string) Specific routing value. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
      *        ['parent']           = (string) Parent id of documents. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
+     *        ['realtime']         = (boolean) Specifies if request is real-time as opposed to near-real-time (default: true).
      *
      * @param $params array Associative array of parameters
      *
@@ -486,6 +503,14 @@ class Client
         return $response['data'];
     }
 
+    /**
+     * Redirect to termvector, this is just a naming difference depending on version
+     */
+    public function termvectors($params = array())
+    {
+        return $this->termvector($params);
+    }
+
 
     /**
      * $params['index']            = (string) Default index for items which don't provide one
@@ -500,6 +525,7 @@ class Client
      *        ['preference']       = (string) Specify the node or shard the operation should be performed on (default: random) .Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
      *        ['routing']          = (string) Specific routing value. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
      *        ['parent']           = (string) Parent id of documents. Applies to all returned documents unless otherwise specified in body \"params\" or \"docs\".
+     *        ['realtime']         = (boolean) Specifies if request is real-time as opposed to near-real-time (default: true).
      *
      * @param $params array Associative array of parameters
      *
@@ -776,6 +802,7 @@ class Client
      *        ['refresh']     = (boolean) Refresh the index after performing the operation
      *        ['replication'] = (enum) Explicitly set the replication type
      *        ['body']        = (string) Default document type for items which don't provide one
+     *        ['fields']      = (list) Default comma-separated list of fields to return in the response for updates
      *
      * @param $params array Associative array of parameters
      *
@@ -1006,6 +1033,63 @@ class Client
         $endpoint->setIndex($index)
                  ->setType($type)
                  ->setBody($body);
+        $endpoint->setParams($params);
+        $response = $endpoint->performRequest();
+        return $response['data'];
+    }
+
+    /**
+     * $params['index']                    = (list) A comma-separated list of index names to search; use `_all` or empty string to perform the operation on all indices
+     *        ['type']                     = (list) A comma-separated list of document types to search; leave empty to perform the operation on all types
+     *        ['analyzer']                 = (string) The analyzer to use for the query string
+     *        ['analyze_wildcard']         = (boolean) Specify whether wildcard and prefix queries should be analyzed (default: false)
+     *        ['default_operator']         = (enum) The default operator for query string query (AND or OR)
+     *        ['df']                       = (string) The field to use as default where no field prefix is given in the query string
+     *        ['explain']                  = (boolean) Specify whether to return detailed information about score computation as part of a hit
+     *        ['fields']                   = (list) A comma-separated list of fields to return as part of a hit
+     *        ['from']                     = (number) Starting offset (default: 0)
+     *        ['ignore_indices']           = (enum) When performed on multiple indices, allows to ignore `missing` ones
+     *        ['indices_boost']            = (list) Comma-separated list of index boosts
+     *        ['lenient']                  = (boolean) Specify whether format-based query failures (such as providing text to a numeric field) should be ignored
+     *        ['lowercase_expanded_terms'] = (boolean) Specify whether query terms should be lowercased
+     *        ['preference']               = (string) Specify the node or shard the operation should be performed on (default: random)
+     *        ['q']                        = (string) Query in the Lucene query string syntax
+     *        ['routing']                  = (list) A comma-separated list of specific routing values
+     *        ['scroll']                   = (duration) Specify how long a consistent view of the index should be maintained for scrolled search
+     *        ['search_type']              = (enum) Search operation type
+     *        ['size']                     = (number) Number of hits to return (default: 10)
+     *        ['sort']                     = (list) A comma-separated list of <field>:<direction> pairs
+     *        ['source']                   = (string) The URL-encoded request definition using the Query DSL (instead of using request body)
+     *        ['_source']                  = (list) True or false to return the _source field or not, or a list of fields to return
+     *        ['_source_exclude']          = (list) A list of fields to exclude from the returned _source field
+     *        ['_source_include']          = (list) A list of fields to extract and return from the _source field
+     *        ['stats']                    = (list) Specific 'tag' of the request for logging and statistical purposes
+     *        ['suggest_field']            = (string) Specify which field to use for suggestions
+     *        ['suggest_mode']             = (enum) Specify suggest mode
+     *        ['suggest_size']             = (number) How many suggestions to return in response
+     *        ['suggest_text']             = (text) The source text for which the suggestions should be returned
+     *        ['timeout']                  = (time) Explicit operation timeout
+     *        ['version']                  = (boolean) Specify whether to return document version as part of a hit
+     *        ['body']                     = (array|string) The search definition using the Query DSL
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function searchExists($params = array())
+    {
+        $index = $this->extractArgument($params, 'index');
+        $type = $this->extractArgument($params, 'type');
+        $body = $this->extractArgument($params, 'body');
+
+        /** @var callback $endpointBuilder */
+        $endpointBuilder = $this->dicEndpoints;
+
+        /** @var \Elasticsearch\Endpoints\SearchExists $endpoint */
+        $endpoint = $endpointBuilder('SearchExists');
+        $endpoint->setIndex($index)
+            ->setType($type)
+            ->setBody($body);
         $endpoint->setParams($params);
         $response = $endpoint->performRequest();
         return $response['data'];
@@ -1328,6 +1412,61 @@ class Client
         return $response['data'];
     }
 
+    /**
+     * $params['index']              = (list) A comma-separated list of indices to restrict the results
+     *        ['body']               = (array) Field json objects containing the name and optionally a range to filter out indices result, that have results outside the defined bounds
+     *        ['fields']             = (list) A comma-separated list of fields for to get field statistics for (min value, max value, and more)
+     *        ['level']              = (enum) Defines if field stats should be returned on a per index level or on a cluster wide level
+     *        ['ignore_unavailable'] = (bool) Whether specified concrete indices should be ignored when unavailable (missing or closed)
+     *        ['allow_no_indices']   = (bool) Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)
+     *        ['expand_wildcards']   = (enum) Whether to expand wildcard expression to concrete indices that are open, closed or both.
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function fieldStats($params = array())
+    {
+        $index = $this->extractArgument($params, 'index');
+        $body = $this->extractArgument($params, 'body');
+
+        /** @var callback $endpointBuilder */
+        $endpointBuilder = $this->dicEndpoints;
+
+        /** @var \Elasticsearch\Endpoints\FieldStats $endpoint */
+        $endpoint = $endpointBuilder('FieldStats');
+        $endpoint->setIndex($index)
+            ->setBody($body);
+        $endpoint->setParams($params);
+        $response = $endpoint->performRequest();
+        return $response['data'];
+    }
+
+
+    /**
+     * $params['id']                 = (string) ID of the template to render
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function renderSearchTemplate($params = array())
+    {
+        $body = $this->extractArgument($params, 'body');
+        $id   = $this->extractArgument($params, 'id');
+
+        /** @var callback $endpointBuilder */
+        $endpointBuilder = $this->dicEndpoints;
+
+        /** @var \Elasticsearch\Endpoints\RenderSearchTemplate $endpoint */
+        $endpoint = $endpointBuilder('RenderSearchTemplate');
+        $endpoint->setBody($body)
+            ->setID($id);
+        $endpoint->setParams($params);
+        $response = $endpoint->performRequest();
+        return $response['data'];
+    }
+
 
 
     /**
@@ -1384,6 +1523,20 @@ class Client
         return $this->cat;
     }
 
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws Common\Exceptions\RuntimeException
+     */
+    public function __call($name, $arguments)
+    {
+        if (isset($this->customNamespaces[$name]) === true) {
+            return $this->customNamespaces[$name];
+        }
+        throw new Exceptions\RuntimeException("User-defined namespace '$name' could not be found.'");
+    }
 
     /**
      * Sets up the DIC parameter object
@@ -1454,7 +1607,9 @@ class Client
         $log       = new Logger('log');
         $handler   = new StreamHandler(
             $this->params['logPath'],
-            $this->params['logLevel']
+            $this->params['logLevel'],
+            $this->params['logBubble'],
+            $this->params['logPermission']
         );
         $processor = new IntrospectionProcessor();
 
@@ -1469,7 +1624,9 @@ class Client
         $trace        = new Logger('trace');
         $traceHandler = new StreamHandler(
             $this->params['tracePath'],
-            $this->params['traceLevel']
+            $this->params['traceLevel'],
+            $this->params['traceBubble'],
+            $this->params['tracePermission']
         );
 
         $trace->pushHandler($traceHandler);

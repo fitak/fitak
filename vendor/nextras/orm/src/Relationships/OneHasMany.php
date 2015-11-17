@@ -1,62 +1,47 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
 
-use Nette\NotImplementedException;
 use Nextras\Orm\Entity\IEntity;
-use Nextras\Orm\NotSupportedException;
 
 
 class OneHasMany extends HasMany
 {
 
-	public function persist($recursive = TRUE)
+	public function persist($recursive = TRUE, & $queue = NULL)
 	{
 		foreach ($this->toAdd as $add) {
-			$this->getTargetRepository()->persist($add);
+			$this->getTargetRepository()->persist($add, $recursive, $queue);
 		}
 
 		foreach ($this->toRemove as $remove) {
-			$this->getTargetRepository()->persist($remove);
-		}
-
-		if ($this->collection !== NULL) {
-			foreach ($this->collection as $entity) {
-				$this->getTargetRepository()->persist($entity);
+			if ($remove->isPersisted()) {
+				$this->getTargetRepository()->persist($remove, $recursive, $queue);
 			}
 		}
 
-		$this->isModified = FALSE;
-		$this->toRemove = $this->toAdd = [];
-		if ($this->collection && $this->collection->getRelationshipMapper() === NULL) {
-			$this->collection = NULL;
+		if ($this->collection !== NULL) {
+			foreach ($this->getIterator() as $entity) {
+				$this->getTargetRepository()->persist($entity, $recursive, $queue);
+			}
 		}
+
+		$this->toAdd = [];
+		$this->toRemove = [];
+		$this->collection = NULL;
+		$this->isModified = FALSE;
 	}
 
 
-	public function getInjectedValue()
+	protected function modify()
 	{
-		throw new NotSupportedException();
-	}
-
-
-	public function getStorableValue()
-	{
-		return NULL;
-	}
-
-
-	public function getRawValue()
-	{
-		throw new NotImplementedException();
+		$this->isModified = TRUE;
 	}
 
 
@@ -70,7 +55,7 @@ class OneHasMany extends HasMany
 	protected function updateRelationshipAdd(IEntity $entity)
 	{
 		$this->updatingReverseRelationship = TRUE;
-		$entity->setValue($this->metadata->relationshipProperty, $this->parent);
+		$entity->getProperty($this->metadata->relationship->property)->setInjectedValue($this->parent);
 		$this->updatingReverseRelationship = FALSE;
 	}
 
@@ -78,7 +63,7 @@ class OneHasMany extends HasMany
 	protected function updateRelationshipRemove(IEntity $entity)
 	{
 		$this->updatingReverseRelationship = TRUE;
-		$entity->setValue($this->metadata->relationshipProperty, NULL);
+		$entity->getProperty($this->metadata->relationship->property)->setInjectedValue(NULL);
 		$this->updatingReverseRelationship = FALSE;
 	}
 

@@ -6,13 +6,13 @@
 
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {
-	die('Install packages using `composer update --dev`');
+	die('Install packages using `composer install`');
 }
 
-use Nette\Forms\Form,
-	Nette\Forms\Controls,
-	Tracy\Debugger,
-	Tracy\Dumper;
+use Nette\Forms\Form;
+use Nette\Forms\Controls;
+use Tracy\Debugger;
+use Tracy\Dumper;
 
 Debugger::enable();
 
@@ -85,7 +85,7 @@ foreach ($form->getControls() as $control) {
 <meta charset="utf-8">
 <title>Nette Forms & Bootstrap 2 rendering example</title>
 
-<link rel="stylesheet" media="screen" href="http://netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css" />
+<link rel="stylesheet" media="screen" href="https://netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css" />
 
 <div class="container">
 	<div class="page-header">

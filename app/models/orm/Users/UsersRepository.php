@@ -2,14 +2,14 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Repository\Repository;
 
 
 /**
  * @method User getByEmail(string $email)
  * @method User getByFacebookId(string $id)
  */
-class UsersRepository extends Orm\Repository\Repository
+class UsersRepository extends Repository
 {
 
 }

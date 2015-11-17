@@ -1,0 +1,32 @@
+{
+	"name": "nextras/dbal",
+	"type": "library",
+	"description": "Nextras database abstraction layer",
+	"keywords": ["database", "nextras", "dbal"],
+	"homepage": "https://github.com/nextras/dbal",
+	"license": "MIT",
+	"authors": [
+		{ "name": "Nextras Project", "homepage": "https://github.com/nextras/dbal/graphs/contributors" }
+	],
+	"support": {
+		"issues": "https://github.com/nextras/dbal/issues"
+	},
+	"require": {
+		"php": ">=5.4"
+	},
+	"require-dev": {
+		"nette/tester": "~1.4",
+		"mockery/mockery": "~0.9",
+		"tracy/tracy": "~2.3",
+		"nette/di": "~2.3"
+	},
+	"autoload": {
+		"psr-4": { "Nextras\\Dbal\\": "src/" },
+		"classmap": ["src/exceptions.php"]
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.0-dev"
+		}
+	}
+}

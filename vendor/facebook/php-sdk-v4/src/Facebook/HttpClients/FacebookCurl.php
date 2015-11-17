@@ -35,14 +35,16 @@ class FacebookCurl
   /**
    * @var resource Curl resource instance
    */
-  protected $curl;
+  protected $curl = null;
 
   /**
    * Make a new curl reference instance
    */
   public function init()
   {
-    $this->curl = curl_init();
+    if ($this->curl === null) {
+        $this->curl = curl_init();
+    }
   }
 
   /**
@@ -124,6 +126,9 @@ class FacebookCurl
   public function close()
   {
     curl_close($this->curl);
+
+    // closed handle has to be initialized again
+    $this->curl = null;
   }
 
 }

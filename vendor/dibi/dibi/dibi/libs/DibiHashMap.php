@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * Lazy cached storage.
  *
- * @author     David Grudl
  * @package    dibi
  * @internal
  */
@@ -45,7 +44,6 @@ abstract class DibiHashMapBase
 /**
  * Lazy cached storage.
  *
- * @author     David Grudl
  * @internal
  */
 final class DibiHashMap extends DibiHashMapBase

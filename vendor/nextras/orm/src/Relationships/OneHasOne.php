@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
@@ -14,18 +12,26 @@ namespace Nextras\Orm\Relationships;
 class OneHasOne extends HasOne
 {
 
-	protected function updateRelationship($oldEntity, $newEntity)
+	protected function modify()
+	{
+		$this->isModified = TRUE;
+		$this->parent->setAsModified($this->metadata->name);
+	}
+
+
+	protected function updateRelationship($oldEntity, $newEntity, $allowNull)
 	{
 		$this->updatingReverseRelationship = TRUE;
-		$key = $this->propertyMeta->relationshipProperty;
+		$key = $this->metadata->relationship->property;
 
-		if ($oldEntity && isset($oldEntity->{$key}) && $oldEntity->{$key} === $this->parent) {
-			$oldEntity->{$key} = NULL;
+		if ($oldEntity && $oldEntity->hasValue($key) && $oldEntity->getValue($key) === $this->parent) {
+			$oldEntity->getProperty($key)->set(NULL, $allowNull);
 		}
 
-		if ($newEntity && (!isset($newEntity->{$key}) || $newEntity->{$key} !== $this->parent)) {
-			$newEntity->{$key} = $this->parent;
+		if ($newEntity && (!$newEntity->hasValue($key) || $newEntity->getValue($key) !== $this->parent)) {
+			$newEntity->getProperty($key)->set($this->parent, $allowNull);
 		}
+
 		$this->updatingReverseRelationship = FALSE;
 	}
 

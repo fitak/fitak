@@ -101,7 +101,7 @@ class Container
             $finalArg = end($args);
             reset($args);
             if (is_callable($finalArg) && is_object($finalArg)) {
-                 $expectationClosure = array_pop($args);
+                $expectationClosure = array_pop($args);
             }
         }
 
@@ -156,7 +156,7 @@ class Container
                     . ' an existing class or interface');
                 }
                 $class = $parts[0];
-                $parts[1] = str_replace(' ','', $parts[1]);
+                $parts[1] = str_replace(' ', '', $parts[1]);
                 $partialMethods = explode(',', strtolower(rtrim($parts[1], ']')));
                 $builder->addTarget($class);
                 $builder->setWhiteListedMethods($partialMethods);
@@ -176,7 +176,10 @@ class Container
                 continue;
             } elseif (is_array($arg) && !empty($arg) && array_keys($arg) !== range(0, count($arg) - 1)) {
                 // if associative array
-                if(array_key_exists(self::BLOCKS, $arg)) $blocks = $arg[self::BLOCKS]; unset($arg[self::BLOCKS]);
+                if (array_key_exists(self::BLOCKS, $arg)) {
+                    $blocks = $arg[self::BLOCKS];
+                }
+                unset($arg[self::BLOCKS]);
                 $quickdefs = array_shift($args);
                 continue;
             } elseif (is_array($arg)) {
@@ -230,7 +233,6 @@ class Container
 
     public function instanceMock()
     {
-
     }
 
     public function getLoader()
@@ -249,7 +251,6 @@ class Container
      */
     public function getKeyOfDemeterMockFor($method)
     {
-
         $keys = array_keys($this->_mocks);
         $match = preg_grep("/__demeter_{$method}$/", $keys);
         if (count($match) == 1) {
@@ -292,7 +293,7 @@ class Container
      */
     public function mockery_verify()
     {
-        foreach($this->_mocks as $mock) {
+        foreach ($this->_mocks as $mock) {
             $mock->mockery_verify();
         }
     }
@@ -304,7 +305,7 @@ class Container
      */
     public function mockery_close()
     {
-        foreach($this->_mocks as $mock) {
+        foreach ($this->_mocks as $mock) {
             $mock->mockery_teardown();
         }
         $this->_mocks = array();
@@ -396,7 +397,7 @@ class Container
     public function mockery_getExpectationCount()
     {
         $count = 0;
-        foreach($this->_mocks as $mock) {
+        foreach ($this->_mocks as $mock) {
             $count += $mock->mockery_getExpectationCount();
         }
         return $count;
@@ -445,41 +446,21 @@ class Container
      */
     public function fetchMock($reference)
     {
-        if (isset($this->_mocks[$reference])) return $this->_mocks[$reference];
+        if (isset($this->_mocks[$reference])) {
+            return $this->_mocks[$reference];
+        }
     }
 
     protected function _getInstance($mockName, $constructorArgs = null)
     {
-        $r = new \ReflectionClass($mockName);
-
-        if (null === $r->getConstructor()) {
-            $return = new $mockName;
-            return $return;
-        }
-
         if ($constructorArgs !== null) {
+            $r = new \ReflectionClass($mockName);
             return $r->newInstanceArgs($constructorArgs);
         }
 
-        $isInternal = $r->isInternal();
-        $child = $r;
-        while (!$isInternal && $parent = $child->getParentClass()) {
-            $isInternal = $parent->isInternal();
-            $child = $parent;
-        }
-
         try {
-            if (version_compare(PHP_VERSION, '5.4') < 0 || $isInternal) {
-                $return = unserialize(sprintf(
-                    '%s:%d:"%s":0:{}',
-                    // see https://github.com/sebastianbergmann/phpunit-mock-objects/pull/176/files
-                    (version_compare(PHP_VERSION, '5.4', '>') && $r->implementsInterface('Serializable') ? 'C' : 'O'),
-                    strlen($mockName),
-                    $mockName)
-                );
-            } else {
-                $return = $r->newInstanceWithoutConstructor();
-            }
+            $instantiator = new Instantiator;
+            $instance = $instantiator->instantiate($mockName);
         } catch (\Exception $ex) {
             $internalMockName = $mockName . '_Internal';
 
@@ -489,10 +470,10 @@ class Container
                     '}');
             }
 
-            $return = new $internalMockName();
+            $instance = new $internalMockName();
         }
 
-        return $return;
+        return $instance;
     }
 
     /**

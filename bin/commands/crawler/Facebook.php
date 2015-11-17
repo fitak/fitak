@@ -10,9 +10,11 @@ use Facebook\Entities\AccessToken;
 use Fitak\DuplicateEntryException;
 use Fitak\InvalidAccessTokenException;
 use Fitak\Post;
-use Fitak\RepositoryContainer;
+//use Fitak\RepositoryContainer;
 use KeyValueStorage;
 use Tags;
+use Fitak\Orm;
+
 
 
 class Facebook extends Command
@@ -25,7 +27,7 @@ class Facebook extends Command
 	public $elastic;
 
 	/**
-	 * @var RepositoryContainer
+	 * @var Orm
 	 * @inject
 	 */
 	public $orm;
@@ -94,6 +96,8 @@ class Facebook extends Command
 	 */
 	private function indexGroup(FbCrawler $fb, $group, KeyValueStorage $kvs)
 	{
+		$flushLimit = 50;
+
 		$this->out->writeln("<info>Processing '$group->name'</info>");
 
 		$timestamp = time();
@@ -114,10 +118,11 @@ class Facebook extends Command
 				$this->indexEntry($group, $comment, $post);
 			}
 
-			if (++$flushCounter > 50)
+			if (++$flushCounter > $flushLimit)
 			{
 				$this->orm->flush();
 				$flushCounter = 0;
+				exit();
 			}
 		}
 
@@ -144,8 +149,8 @@ class Facebook extends Command
 		{
 			$this->out->write($parentTopic ? 'c' : 'p');
 		}
-
 		$id = $this->parseId($entry->id);
+		$this->out->writeln("Id: $id");
 		$post = $this->orm->posts->getById($id);
 		if (!$post)
 		{
@@ -153,8 +158,10 @@ class Facebook extends Command
 			$post->tagParser = $this->tagParser;
 			$post->id = $id;
 		}
-
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
+		$this->out->writeln("Post message: $entry->message");
+		$this->out->writeln("$post->message");
+		$this->out->writeln("-");
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
 		//$post->commentsCount; // TODO deprecate
@@ -184,6 +191,7 @@ class Facebook extends Command
 		}
 
 		$this->orm->posts->attach($post);
+
 		$post->parent = $this->parseId($parentTopic->id);
 		$post->group = $group->id;
 

@@ -3,11 +3,11 @@
 namespace Fitak;
 
 use Nette\Database\Drivers\MySqlDriver;
-use Nextras\Orm;
+use Nextras\Orm\Mapper\Mapper;
 use Nextras\Orm\Entity\IEntity;
 
 
-class TagsMapper extends Orm\Mapper\Mapper
+class TagsMapper extends Mapper
 {
 
 	/**
@@ -17,7 +17,7 @@ class TagsMapper extends Orm\Mapper\Mapper
 	 */
 	public function findTrending()
 	{
-		return $this->databaseContext->query('
+		$row =  $this->connection->query('
 			SELECT tags.name, COUNT(tags.id) AS count
 			FROM data
 			INNER JOIN data_tags
@@ -29,6 +29,7 @@ class TagsMapper extends Orm\Mapper\Mapper
 			ORDER BY count DESC
 			LIMIT 25
 		')->fetchAll();
+		return $row;
 	}
 
 	public function persist(IEntity $entity)

@@ -7,14 +7,12 @@
 
 namespace Nette\Bridges\HttpTracy;
 
-use Nette,
-	Tracy;
+use Nette;
+use Tracy;
 
 
 /**
  * Session panel for Debugger Bar.
- *
- * @author     David Grudl
  */
 class SessionPanel extends Nette\Object implements Tracy\IBarPanel
 {

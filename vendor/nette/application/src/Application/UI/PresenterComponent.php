@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\UI;
@@ -17,10 +17,7 @@ use Nette;
  * other child components, and interact with user. Components have properties
  * for storing their status, and responds to user command.
  *
- * @author     David Grudl
- *
  * @property-read Presenter $presenter
- * @property-read string $uniqueId
  */
 abstract class PresenterComponent extends Nette\ComponentModel\Container implements ISignalReceiver, IStatePersistent, \ArrayAccess
 {
@@ -129,7 +126,13 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 			if (isset($params[$name])) { // NULLs are ignored
 				$type = gettype($meta['def']);
 				if (!$reflection->convertType($params[$name], $type)) {
-					throw new Nette\Application\BadRequestException("Invalid value for persistent parameter '$name' in '{$this->getName()}', expected " . ($type === 'NULL' ? 'scalar' : $type) . ".");
+					throw new Nette\Application\BadRequestException(sprintf(
+						"Value passed to persistent parameter '%s' in %s must be %s, %s given.",
+						$name,
+						$this instanceof Presenter ? 'presenter ' . $this->getName() : "component '{$this->getUniqueId()}'",
+						$type === 'NULL' ? 'scalar' : $type,
+						is_object($params[$name]) ? get_class($params[$name]) : gettype($params[$name])
+					));
 				}
 				$this->$name = $params[$name];
 			} else {
@@ -157,7 +160,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 			} elseif (array_key_exists($name, $params)) { // NULLs are skipped
 				continue;
 
-			} elseif (!isset($meta['since']) || $this instanceof $meta['since']) {
+			} elseif ((!isset($meta['since']) || $this instanceof $meta['since']) && isset($this->$name)) {
 				$params[$name] = $this->$name; // object property value
 
 			} else {
@@ -166,7 +169,13 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 
 			$type = gettype($meta['def']);
 			if (!PresenterComponentReflection::convertType($params[$name], $type)) {
-				throw new InvalidLinkException(sprintf("Invalid value for persistent parameter '%s' in '%s', expected %s.", $name, $this->getName(), $type === 'NULL' ? 'scalar' : $type));
+				throw new InvalidLinkException(sprintf(
+					"Value passed to persistent parameter '%s' in %s must be %s, %s given.",
+					$name,
+					$this instanceof Presenter ? 'presenter ' . $this->getName() : "component '{$this->getUniqueId()}'",
+					$type === 'NULL' ? 'scalar' : $type,
+					is_object($params[$name]) ? get_class($params[$name]) : gettype($params[$name])
+				));
 			}
 
 			if ($params[$name] === $meta['def'] || ($meta['def'] === NULL && is_scalar($params[$name]) && (string) $params[$name] === '')) {
@@ -184,11 +193,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 	 */
 	public function getParameter($name, $default = NULL)
 	{
-		if (func_num_args() === 0) {
-			trigger_error('Calling ' . __METHOD__ . ' with no arguments to get all parameters is deprecated, use getParameters() instead.', E_USER_DEPRECATED);
-			return $this->params;
-
-		} elseif (isset($this->params[$name])) {
+		if (isset($this->params[$name])) {
 			return $this->params[$name];
 
 		} else {
@@ -234,10 +239,10 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 	 */
 	public static function getPersistentParams()
 	{
-		$rc = new Nette\Reflection\ClassType(get_called_class());
+		$rc = new \ReflectionClass(get_called_class());
 		$params = array();
 		foreach ($rc->getProperties(\ReflectionProperty::IS_PUBLIC) as $rp) {
-			if (!$rp->isStatic() && $rp->hasAnnotation('persistent')) {
+			if (!$rp->isStatic() && PresenterComponentReflection::parseAnnotation($rp, 'persistent')) {
 				$params[] = $rp->getName();
 			}
 		}
@@ -279,7 +284,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 
 	/**
 	 * Generates URL to presenter, action or signal.
-	 * @param  string   destination in format "[[module:]presenter:]action" or "signal!" or "this"
+	 * @param  string   destination in format "[//] [[[module:]presenter:]action | signal! | this] [#fragment]"
 	 * @param  array|mixed
 	 * @return string
 	 * @throws InvalidLinkException
@@ -297,7 +302,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 
 	/**
 	 * Returns destination as Link object.
-	 * @param  string   destination in format "[[module:]presenter:]view" or "signal!"
+	 * @param  string   destination in format "[//] [[[module:]presenter:]action | signal! | this] [#fragment]"
 	 * @param  array|mixed
 	 * @return Link
 	 */
@@ -309,7 +314,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 
 	/**
 	 * Determines whether it links to the current page.
-	 * @param  string   destination in format "[[module:]presenter:]action" or "signal!" or "this"
+	 * @param  string   destination in format "[//] [[[module:]presenter:]action | signal! | this] [#fragment]"
 	 * @param  array|mixed
 	 * @return bool
 	 * @throws InvalidLinkException
@@ -326,7 +331,7 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 	/**
 	 * Redirect to another presenter, action or signal.
 	 * @param  int      [optional] HTTP error code
-	 * @param  string   destination in format "[[module:]presenter:]view" or "signal!"
+	 * @param  string   destination in format "[//] [[[module:]presenter:]action | signal! | this] [#fragment]"
 	 * @param  array|mixed
 	 * @return void
 	 * @throws Nette\Application\AbortException
@@ -334,13 +339,12 @@ abstract class PresenterComponent extends Nette\ComponentModel\Container impleme
 	public function redirect($code, $destination = NULL, $args = array())
 	{
 		if (!is_numeric($code)) { // first parameter is optional
-			$args = $destination;
+			$args = is_array($destination) ? $destination : array_slice(func_get_args(), 1);
 			$destination = $code;
 			$code = NULL;
-		}
 
-		if (!is_array($args)) {
-			$args = array_slice(func_get_args(), is_numeric($code) ? 2 : 1);
+		} elseif (!is_array($args)) {
+			$args = array_slice(func_get_args(), 2);
 		}
 
 		$presenter = $this->getPresenter();

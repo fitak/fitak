@@ -7,14 +7,12 @@
 
 namespace Nette\Caching\Storages;
 
-use Nette,
-	Nette\Caching\Cache;
+use Nette;
+use Nette\Caching\Cache;
 
 
 /**
  * Memcached storage.
- *
- * @author     David Grudl
  */
 class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 {
@@ -83,7 +81,7 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 	 */
 	public function read($key)
 	{
-		$key = $this->prefix . $key;
+		$key = urlencode($this->prefix . $key);
 		$meta = $this->memcache->get($key);
 		if (!$meta) {
 			return NULL;
@@ -133,7 +131,7 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 			throw new Nette\NotSupportedException('Dependent items are not supported by MemcachedStorage.');
 		}
 
-		$key = $this->prefix . $key;
+		$key = urlencode($this->prefix . $key);
 		$meta = array(
 			self::META_DATA => $data,
 		);
@@ -168,7 +166,7 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 	 */
 	public function remove($key)
 	{
-		$this->memcache->delete($this->prefix . $key, 0);
+		$this->memcache->delete(urlencode($this->prefix . $key), 0);
 	}
 
 

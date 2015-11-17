@@ -7,14 +7,12 @@
 
 namespace Nette\Caching\Storages;
 
-use Nette,
-	Nette\Caching\Cache;
+use Nette;
+use Nette\Caching\Cache;
 
 
 /**
  * Cache file storage.
- *
- * @author     David Grudl
  */
 class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 {
@@ -65,11 +63,11 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 
 	public function __construct($dir, IJournal $journal = NULL)
 	{
-		$this->dir = realpath($dir);
-		if ($this->dir === FALSE) {
+		if (!is_dir($dir)) {
 			throw new Nette\DirectoryNotFoundException("Directory '$dir' not found.");
 		}
 
+		$this->dir = $dir;
 		$this->useDirs = (bool) static::$useDirectories;
 		$this->journal = $journal;
 

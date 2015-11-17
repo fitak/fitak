@@ -1,6 +1,6 @@
 <?php
 
-use Fitak\RepositoryContainer;
+use Fitak\Orm;
 
 
 class Data extends BaseModel
@@ -19,7 +19,7 @@ class Data extends BaseModel
 	 */
 	private $tagParser;
 
-	public function __construct(DibiConnection $connection, RepositoryContainer $orm, ElasticSearch $elastic, Tags $tagParser)
+	public function __construct(DibiConnection $connection, Orm $orm, ElasticSearch $elastic, Tags $tagParser)
 	{
 		parent::__construct($connection, $orm);
 		$this->elastic = $elastic;

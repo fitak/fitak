@@ -1,19 +1,15 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
 
-use Tracy;
-
 
 /**
  * Rendering helpers for Debugger.
- *
- * @author     David Grudl
  */
 class Helpers
 {
@@ -22,23 +18,23 @@ class Helpers
 	 * Returns HTML link to editor.
 	 * @return string
 	 */
-	public static function editorLink($file, $line)
+	public static function editorLink($file, $line = NULL)
 	{
 		if ($editor = self::editorUri($file, $line)) {
-			$dir = dirname(strtr($file, '/', DIRECTORY_SEPARATOR));
-			$base = isset($_SERVER['SCRIPT_FILENAME']) ? dirname(dirname(strtr($_SERVER['SCRIPT_FILENAME'], '/', DIRECTORY_SEPARATOR))) : dirname($dir);
-			if (substr($dir, 0, strlen($base)) === $base) {
-				$dir = '...' . substr($dir, strlen($base));
+			$file = strtr($file, '\\', '/');
+			if (preg_match('#(^[a-z]:)?/.{1,50}$#i', $file, $m) && strlen($file) > strlen($m[0])) {
+				$file = '...' . $m[0];
 			}
-			return self::createHtml('<a href="%" title="%">%<b>%</b>%</a>',
+			$file = strtr($file, '/', DIRECTORY_SEPARATOR);
+			return self::formatHtml('<a href="%" title="%">%<b>%</b>%</a>',
 				$editor,
-				"$file:$line",
-				rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR,
+				$file . ($line ? ":$line" : ''),
+				rtrim(dirname($file), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR,
 				basename($file),
 				$line ? ":$line" : ''
 			);
 		} else {
-			return self::createHtml('<span>%</span>', $file . ($line ? ":$line" : ''));
+			return self::formatHtml('<span>%</span>', $file . ($line ? ":$line" : ''));
 		}
 	}
 
@@ -47,19 +43,19 @@ class Helpers
 	 * Returns link to editor.
 	 * @return string
 	 */
-	public static function editorUri($file, $line)
+	public static function editorUri($file, $line = NULL)
 	{
 		if (Debugger::$editor && $file && is_file($file)) {
-			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => (int) $line));
+			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line ? (int) $line : ''));
 		}
 	}
 
 
-	public static function createHtml($mask)
+	public static function formatHtml($mask)
 	{
 		$args = func_get_args();
-		return preg_replace_callback('#%#', function() use (& $args, & $count) {
-			return htmlspecialchars($args[++$count], ENT_IGNORE | ENT_QUOTES);
+		return preg_replace_callback('#%#', function () use (& $args, & $count) {
+			return htmlspecialchars($args[++$count], ENT_IGNORE | ENT_QUOTES, 'UTF-8');
 		}, $mask);
 	}
 
@@ -76,6 +72,15 @@ class Helpers
 				return $item;
 			}
 		}
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public static function getClass($obj)
+	{
+		return current(explode("\x00", get_class($obj)));
 	}
 
 
@@ -113,6 +118,103 @@ class Helpers
 		} else {
 			return htmlspecialchars_decode(htmlspecialchars($s, ENT_NOQUOTES | ENT_IGNORE, 'UTF-8'), ENT_NOQUOTES);
 		}
+	}
+
+
+	/** @internal */
+	public static function errorTypeToString($type)
+	{
+		$types = array(
+			E_ERROR => 'Fatal Error',
+			E_USER_ERROR => 'User Error',
+			E_RECOVERABLE_ERROR => 'Recoverable Error',
+			E_CORE_ERROR => 'Core Error',
+			E_COMPILE_ERROR => 'Compile Error',
+			E_PARSE => 'Parse Error',
+			E_WARNING => 'Warning',
+			E_CORE_WARNING => 'Core Warning',
+			E_COMPILE_WARNING => 'Compile Warning',
+			E_USER_WARNING => 'User Warning',
+			E_NOTICE => 'Notice',
+			E_USER_NOTICE => 'User Notice',
+			E_STRICT => 'Strict standards',
+			E_DEPRECATED => 'Deprecated',
+			E_USER_DEPRECATED => 'User Deprecated',
+		);
+		return isset($types[$type]) ? $types[$type] : 'Unknown error';
+	}
+
+
+	/** @internal */
+	public static function getSource()
+	{
+		if (isset($_SERVER['REQUEST_URI'])) {
+			return (!empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'off') ? 'https://' : 'http://')
+				. (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '')
+				. $_SERVER['REQUEST_URI'];
+		} else {
+			return empty($_SERVER['argv']) ? 'CLI' : 'CLI: ' . implode(' ', $_SERVER['argv']);
+		}
+	}
+
+
+	/** @internal */
+	public static function improveException($e)
+	{
+		$message = $e->getMessage();
+		if (!$e instanceof \Error && !$e instanceof \ErrorException) {
+			// do nothing
+		} elseif (preg_match('#^Call to undefined function (\S+)\(#', $message, $m)) {
+			$fs = get_defined_functions();
+			$hint = self::getSuggestion(array_merge($fs['internal'], $fs['user']), $m[1]);
+			$message .= ", did you mean $hint()?";
+
+		} elseif (preg_match('#^Call to undefined method (\S+)::(\w+)#', $message, $m)) {
+			$hint = self::getSuggestion(get_class_methods($m[1]), $m[2]);
+			$message .= ", did you mean $hint()?";
+
+		} elseif (preg_match('#^Undefined variable: (\w+)#', $message, $m) && !empty($e->context)) {
+			$hint = self::getSuggestion(array_keys($e->context), $m[1]);
+			$message = "Undefined variable $$m[1], did you mean $$hint?";
+
+		} elseif (preg_match('#^Undefined property: (\S+)::\$(\w+)#', $message, $m)) {
+			$rc = new \ReflectionClass($m[1]);
+			$items = array_diff($rc->getProperties(\ReflectionProperty::IS_PUBLIC), $rc->getProperties(\ReflectionProperty::IS_STATIC));
+			$hint = self::getSuggestion($items, $m[2]);
+			$message .= ", did you mean $$hint?";
+
+		} elseif (preg_match('#^Access to undeclared static property: (\S+)::\$(\w+)#', $message, $m)) {
+			$rc = new \ReflectionClass($m[1]);
+			$items = array_intersect($rc->getProperties(\ReflectionProperty::IS_PUBLIC), $rc->getProperties(\ReflectionProperty::IS_STATIC));
+			$hint = self::getSuggestion($items, $m[2]);
+			$message .= ", did you mean $$hint?";
+		}
+
+		if (isset($hint)) {
+			$ref = new \ReflectionProperty($e, 'message');
+			$ref->setAccessible(TRUE);
+			$ref->setValue($e, $message);
+		}
+	}
+
+
+	/**
+	 * Finds the best suggestion.
+	 * @return string|NULL
+	 * @internal
+	 */
+	public static function getSuggestion(array $items, $value)
+	{
+		$best = NULL;
+		$min = (int) (strlen($value) / 4) + 2;
+		foreach (array_unique($items) as $item) {
+			$item = is_object($item) ? $item->getName() : $item;
+			if (($len = levenshtein($item, $value)) > 0 && $len < $min) {
+				$min = $len;
+				$best = $item;
+			}
+		}
+		return $best;
 	}
 
 }

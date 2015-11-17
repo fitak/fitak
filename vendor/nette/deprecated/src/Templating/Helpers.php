@@ -7,8 +7,8 @@
 
 namespace Nette\Templating;
 
-use Nette,
-	Latte;
+use Nette;
+use Latte;
 
 
 /**
@@ -22,7 +22,7 @@ class Helpers extends Latte\Runtime\Filters
 		'webalize' => 'Nette\Utils\Strings::webalize',
 		'padleft' => 'Nette\Utils\Strings::padLeft',
 		'padright' => 'Nette\Utils\Strings::padRight',
-		'reverse' =>  'Nette\Utils\Strings::reverse',
+		'reverse' => 'Nette\Utils\Strings::reverse',
 		'url' => 'rawurlencode',
 	);
 

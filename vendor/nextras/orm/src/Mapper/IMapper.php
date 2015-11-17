@@ -1,16 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Mapper;
 
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
 use Nextras\Orm\Entity\IEntity;
 use Nextras\Orm\Entity\Reflection\PropertyMetadata;
 use Nextras\Orm\StorageReflection\IStorageReflection;
@@ -29,10 +27,23 @@ interface IMapper
 
 
 	/**
+	 * Transforms value from mapper, which is not a collection.
+	 * @return ICollection
+	 */
+	public function toCollection($data);
+
+
+	/**
 	 * Returns cache object for collections.
 	 * @return stdClass
 	 */
 	public function getCollectionCache();
+
+
+	/**
+	 * Clears cache object for collection.
+	 */
+	public function clearCollectionCache();
 
 
 	/**

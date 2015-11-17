@@ -2,10 +2,10 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Repository\Repository;
 
 
-class PostsRepository extends Orm\Repository\Repository
+class PostsRepository extends Repository
 {
 
 }

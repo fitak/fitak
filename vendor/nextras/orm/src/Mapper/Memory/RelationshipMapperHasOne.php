@@ -1,18 +1,16 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Mapper\Memory;
 
 use Nette\Object;
 use Nextras\Orm\Entity\IEntity;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
 use Nextras\Orm\Entity\Reflection\PropertyMetadata;
 use Nextras\Orm\Mapper\IRelationshipMapper;
 use Nextras\Orm\NotSupportedException;
@@ -35,8 +33,8 @@ class RelationshipMapperHasOne extends Object implements IRelationshipMapper
 
 	public function getIterator(IEntity $parent, ICollection $collection)
 	{
-		$key = $parent->getForeignKey($this->metadata->name);
-		return [$key ? $collection->getById($key) : NULL];
+		$key = $parent->getRawValue($this->metadata->name);
+		return [$key ? $collection->getBy(['id' => $key]) : NULL];
 	}
 
 

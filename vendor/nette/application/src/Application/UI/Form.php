@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\UI;
@@ -12,10 +12,6 @@ use Nette;
 
 /**
  * Web form adapted for Presenter.
- *
- * @author     David Grudl
- *
- * @property-read Presenter $presenter
  */
 class Form extends Nette\Forms\Form implements ISignalReceiver
 {
@@ -68,10 +64,6 @@ class Form extends Nette\Forms\Form implements ISignalReceiver
 				$this->getElementPrototype()->id = 'frm-' . $name;
 			}
 
-			if (!$this->getAction()) {
-				$this->setAction(new Link($presenter, 'this', array()));
-			}
-
 			if (iterator_count($this->getControls()) && $this->isSubmitted()) {
 				foreach ($this->getControls() as $control) {
 					if (!$control->isDisabled()) {
@@ -80,9 +72,12 @@ class Form extends Nette\Forms\Form implements ISignalReceiver
 				}
 			}
 
-			$signal = new Nette\Forms\Controls\HiddenField($name . self::NAME_SEPARATOR . 'submit');
-			$signal->setOmitted()->setHtmlId(FALSE);
-			$this[Presenter::SIGNAL_KEY] = $signal;
+			if (!$this->getAction()) {
+				$this->setAction(new Link($presenter, 'this', array()));
+				$signal = new Nette\Forms\Controls\HiddenField($name . self::NAME_SEPARATOR . 'submit');
+				$signal->setOmitted()->setHtmlId(FALSE);
+				$this[Presenter::SIGNAL_KEY] = $signal;
+			}
 		}
 		parent::attached($presenter);
 	}

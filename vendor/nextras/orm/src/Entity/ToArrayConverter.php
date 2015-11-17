@@ -1,18 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
+ * This file is part of the Nextras\Orm library.
  * This file was inspired by PetrP's ORM library https://github.com/PetrP/Orm/.
- *
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity;
 
 use Nextras\Orm\Relationships\IRelationshipCollection;
-use Nextras\Orm\Relationships\IRelationshipContainer;
 
 
 class ToArrayConverter
@@ -37,8 +34,11 @@ class ToArrayConverter
 		$return = [];
 		$metadata = $entity->getMetadata();
 
-		foreach ($metadata->getStorageProperties() as $name) {
-			if ($name === 'id' && !$entity->isPersisted()) {
+		foreach ($metadata->getProperties() as $name => $metadataProperty) {
+			if ($metadataProperty->isVirtual) {
+				continue;
+
+			} elseif ($name === 'id' && !$entity->isPersisted()) {
 				$value = NULL;
 
 			} else {

@@ -1,13 +1,11 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application;
-
-use Nette;
 
 
 /**
@@ -36,17 +34,17 @@ class InvalidPresenterException extends \Exception
 
 
 /**
- * Bad HTTP / presenter request exception.
+ * The exception that indicates client error with HTTP code 4xx.
  */
 class BadRequestException extends \Exception
 {
 	/** @var int */
-	protected $defaultCode = 404;
+	protected $code = 404;
 
 
 	public function __construct($message = '', $code = 0, \Exception $previous = NULL)
 	{
-		parent::__construct($message, $code < 200 || $code > 504 ? $this->defaultCode : $code, $previous);
+		parent::__construct($message, $code < 200 || $code > 504 ? $this->code : $code, $previous);
 	}
 
 }
@@ -58,6 +56,6 @@ class BadRequestException extends \Exception
 class ForbiddenRequestException extends BadRequestException
 {
 	/** @var int */
-	protected $defaultCode = 403;
+	protected $code = 403;
 
 }

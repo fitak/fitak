@@ -7,7 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     $vendorDir . '/tracy/tracy/src/shortcuts.php',
-    $vendorDir . '/nette/deprecated/src/shortcuts.php',
-    $vendorDir . '/nette/nette/Nette/loader.php',
+    $vendorDir . '/hamcrest/hamcrest-php/hamcrest/Hamcrest.php',
+    $vendorDir . '/nette/safe-stream/src/loader.php',
+    $vendorDir . '/nette/deprecated/src/loader.php',
     $vendorDir . '/kdyby/events/src/Doctrine/compatibility.php',
 );

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms\Controls;
@@ -11,7 +11,7 @@ use Nette;
 
 
 /**
- * @author Filip Procházka
+ * CSRF protection field.
  */
 class CsrfProtection extends HiddenField
 {
@@ -43,6 +43,25 @@ class CsrfProtection extends HiddenField
 
 
 	/**
+	 * @return self
+	 */
+	public function setValue($value)
+	{
+		return $this;
+	}
+
+
+	/**
+	 * Loads HTTP data.
+	 * @return void
+	 */
+	public function loadHttpData()
+	{
+		$this->value = $this->getHttpData(Nette\Forms\Form::DATA_TEXT);
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public function getToken()
@@ -51,7 +70,7 @@ class CsrfProtection extends HiddenField
 		if (!isset($session->token)) {
 			$session->token = Nette\Utils\Random::generate();
 		}
-		return $session->token;
+		return $session->token ^ $this->getSession()->getId();
 	}
 
 

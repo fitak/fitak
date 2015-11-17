@@ -84,7 +84,7 @@ class CliRouter extends Nette\Object implements Nette\Application\IRouter
 	 */
 	public function match(Nette\Http\IRequest $httpRequest)
 	{
-		if (!in_array(PHP_SAPI, $this->allowedMethods)) {
+		if (!in_array(PHP_SAPI, $this->allowedMethods, TRUE)) {
 			return NULL;
 		}
 
@@ -123,10 +123,10 @@ class CliRouter extends Nette\Object implements Nette\Application\IRouter
 	 */
 	public static function prependTo(Nette\Application\IRouter &$router, self $cliRouter)
 	{
-		if (!$router instanceof RouteList) {
+		if (!$router instanceof RouteList || $router->getModule()) {
 			throw new Nette\Utils\AssertionException(
 				'If you want to use Kdyby/Console then your main router ' .
-				'must be an instance of Nette\Application\Routers\RouteList'
+				'must be an instance of Nette\Application\Routers\RouteList without module'
 			);
 		}
 

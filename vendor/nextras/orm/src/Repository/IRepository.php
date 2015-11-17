@@ -1,17 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
+ * This file is part of the Nextras\Orm library.
  * This file was inspired by PetrP's ORM library https://github.com/PetrP/Orm/.
- *
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Repository;
 
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
 use Nextras\Orm\Entity\IEntity;
 use Nextras\Orm\Entity\Reflection\EntityMetadata;
 use Nextras\Orm\Mapper\IMapper;
@@ -53,6 +51,13 @@ interface IRepository
 	 * @param  IEntity  $entity
 	 */
 	public function attach(IEntity $entity);
+
+
+	/**
+	 * Detaches entity from repository.
+	 * @param  IEntity  $entity
+	 */
+	public function detach(IEntity $entity);
 
 
 	/**
@@ -117,11 +122,12 @@ interface IRepository
 
 
 	/**
-	 * @param  IEntity   $entity
-	 * @param  bool      $recursive
+	 * @param  IEntity  $entity
+	 * @param  bool     $recursive
+	 * @param  array    $queue
 	 * @return mixed
 	 */
-	public function persist(IEntity $entity, $recursive = TRUE);
+	public function persist(IEntity $entity, $recursive = TRUE, & $queue = NULL);
 
 
 	/**
@@ -149,8 +155,31 @@ interface IRepository
 
 
 	/**
-	 * Flushes all persisted changes in repositories.
+	 * Flushes all persisted changes in all repositories.
 	 */
 	public function flush();
+
+
+	/**
+	 * DO NOT CALL THIS METHOD DIRECTLY.
+	 * INTERNAL.
+	 * @internal
+	 * @ignore
+	 *
+	 * - The first key contains all flushed persisted entities.
+	 * - The second key contains all flushed removed entities.
+	 * @return [IEntity[], IEntity[]]
+	 */
+	public function processFlush();
+
+
+	/**
+	 * DO NOT CALL THIS METHOD DIRECTLY.
+	 * INTERNAL.
+	 * @internal
+	 * @ignore
+	 * @dangerous
+	 */
+	public function processClearIdentityMapAndCaches($areYouSure);
 
 }

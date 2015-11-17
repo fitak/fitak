@@ -7,13 +7,9 @@
 
 namespace Nette\Neon;
 
-use Nette;
-
 
 /**
  * Simple generator for Nette Object Notation.
- *
- * @author     David Grudl
  */
 class Encoder
 {
@@ -32,11 +28,16 @@ class Encoder
 			return $var->format('Y-m-d H:i:s O');
 
 		} elseif ($var instanceof Entity) {
-			return self::encode($var->value) . '(' . (is_array($var->attributes) ? substr(self::encode($var->attributes), 1, -1) : '') . ')';
+			if ($var->value === Neon::CHAIN) {
+				return implode('', array_map(array($this, 'encode'), $var->attributes));
+			}
+			return $this->encode($var->value) . '('
+				. (is_array($var->attributes) ? substr($this->encode($var->attributes), 1, -1) : '') . ')';
 		}
 
 		if (is_object($var)) {
-			$obj = $var; $var = array();
+			$obj = $var;
+			$var = array();
 			foreach ($obj as $k => $v) {
 				$var[$k] = $v;
 			}
@@ -50,17 +51,17 @@ class Encoder
 					return '[]';
 				}
 				foreach ($var as $k => $v) {
-					$v = self::encode($v, self::BLOCK);
-					$s .= ($isList ? '-' : self::encode($k) . ':')
-						. (strpos($v, "\n") === FALSE ? ' ' . $v : "\n\t" . str_replace("\n", "\n\t", $v))
-						. "\n";
-					continue;
+					$v = $this->encode($v, self::BLOCK);
+					$s .= ($isList ? '-' : $this->encode($k) . ':')
+						. (strpos($v, "\n") === FALSE
+							? ' ' . $v . "\n"
+							: "\n" . preg_replace('#^(?=.)#m', "\t", $v) . (substr($v, -2, 1) === "\n" ? '' : "\n"));
 				}
 				return $s;
 
 			} else {
 				foreach ($var as $k => $v) {
-					$s .= ($isList ? '' : self::encode($k) . ': ') . self::encode($v) . ', ';
+					$s .= ($isList ? '' : $this->encode($k) . ': ') . $this->encode($v) . ', ';
 				}
 				return ($isList ? '[' : '{') . substr($s, 0, -2) . ($isList ? ']' : '}');
 			}
@@ -76,7 +77,7 @@ class Encoder
 			return strpos($var, '.') === FALSE ? $var . '.0' : $var;
 
 		} else {
-			return json_encode($var);
+			return json_encode($var, PHP_VERSION_ID >= 50400 ? JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES : 0);
 		}
 	}
 

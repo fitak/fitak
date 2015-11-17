@@ -1,6 +1,6 @@
 <?php
 
-use Fitak\RepositoryContainer;
+use Fitak\Orm;
 use Fitak\TemplateFactory;
 use Fitak\User;
 
@@ -21,7 +21,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	/** @var TemplateFactory @inject */
 	public $templateFactory;
 
-	/** @var RepositoryContainer @inject */
+	/** @var Orm @inject */
 	public $orm;
 
 	/**

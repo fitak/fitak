@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application;
@@ -11,15 +11,12 @@ use Nette;
 
 
 /**
- * Presenter request. Immutable object.
+ * Presenter request.
  *
- * @author     David Grudl
- *
- * @property   string $presenterName
  * @property   array $parameters
  * @property   array $post
  * @property   array $files
- * @property   string $method
+ * @property   string|NULL $method
  */
 class Request extends Nette\Object
 {
@@ -32,7 +29,7 @@ class Request extends Nette\Object
 	/** flag */
 	const RESTORED = 'restored';
 
-	/** @var string */
+	/** @var string|NULL */
 	private $method;
 
 	/** @var array */
@@ -59,7 +56,7 @@ class Request extends Nette\Object
 	 * @param  array   all uploaded files
 	 * @param  array   flags
 	 */
-	public function __construct($name, $method, array $params, array $post = array(), array $files = array(), array $flags = array())
+	public function __construct($name, $method = NULL, array $params = array(), array $post = array(), array $files = array(), array $flags = array())
 	{
 		$this->name = $name;
 		$this->method = $method;
@@ -114,6 +111,17 @@ class Request extends Nette\Object
 
 
 	/**
+	 * Returns a parameter provided to the presenter.
+	 * @param  string
+	 * @return mixed
+	 */
+	public function getParameter($key)
+	{
+		return isset($this->params[$key]) ? $this->params[$key] : NULL;
+	}
+
+
+	/**
 	 * Sets variables provided to the presenter via POST.
 	 * @return self
 	 */
@@ -125,12 +133,22 @@ class Request extends Nette\Object
 
 
 	/**
-	 * Returns all variables provided to the presenter via POST.
-	 * @return array
+	 * Returns a variable provided to the presenter via POST.
+	 * If no key is passed, returns the entire array.
+	 * @param  string
+	 * @return mixed
 	 */
-	public function getPost()
+	public function getPost($key = NULL)
 	{
-		return $this->post;
+		if (func_num_args() === 0) {
+			return $this->post;
+
+		} elseif (isset($this->post[$key])) {
+			return $this->post[$key];
+
+		} else {
+			return NULL;
+		}
 	}
 
 
@@ -157,7 +175,7 @@ class Request extends Nette\Object
 
 	/**
 	 * Sets the method.
-	 * @param  string
+	 * @param  string|NULL
 	 * @return self
 	 */
 	public function setMethod($method)
@@ -169,7 +187,7 @@ class Request extends Nette\Object
 
 	/**
 	 * Returns the method.
-	 * @return string
+	 * @return string|NULL
 	 */
 	public function getMethod()
 	{
@@ -189,11 +207,11 @@ class Request extends Nette\Object
 
 
 	/**
-	 * Checks if the method is POST.
-	 * @return bool
+	 * @deprecated
 	 */
 	public function isPost()
 	{
+		trigger_error('Method isPost() is deprecated, use isMethod(\'POST\') instead.', E_USER_DEPRECATED);
 		return strcasecmp($this->method, 'post') === 0;
 	}
 

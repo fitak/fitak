@@ -1,22 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Routers;
 
-use Nette,
-	Nette\Application;
+use Nette;
+use Nette\Application;
 
 
 /**
  * The unidirectional router for CLI. (experimental)
- *
- * @author     David Grudl
- *
- * @property-read array $defaults
  */
 class CliRouter extends Nette\Object implements Application\IRouter
 {

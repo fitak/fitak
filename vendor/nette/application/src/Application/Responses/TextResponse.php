@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Responses;
@@ -12,10 +12,6 @@ use Nette;
 
 /**
  * String output response.
- *
- * @author     David Grudl
- *
- * @property-read mixed $source
  */
 class TextResponse extends Nette\Object implements Nette\Application\IResponse
 {
@@ -47,7 +43,7 @@ class TextResponse extends Nette\Object implements Nette\Application\IResponse
 	 */
 	public function send(Nette\Http\IRequest $httpRequest, Nette\Http\IResponse $httpResponse)
 	{
-		if ($this->source instanceof Nette\Application\UI\ITemplate || $this->source instanceof Nette\Templating\ITemplate) {
+		if ($this->source instanceof Nette\Application\UI\ITemplate) {
 			$this->source->render();
 
 		} else {

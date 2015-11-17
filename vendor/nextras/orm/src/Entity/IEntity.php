@@ -1,16 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity;
 
-use Nextras\Orm\Entity\Collection\IEntityPreloadContainer;
+use Nextras\Orm\Collection\IEntityPreloadContainer;
 use Nextras\Orm\Entity\Reflection\EntityMetadata;
 use Nextras\Orm\Model\IModel;
 use Nextras\Orm\Repository\IRepository;
@@ -19,14 +17,36 @@ use Serializable;
 
 interface IEntity extends Serializable
 {
-	/** @const Does not transform relationship entities. */
+	/**
+	 * @const
+	 * IRelationshipContainer property is returned as IEntity entity.
+	 * IRelationshipCollection property is returned as array of its IEntity entities.
+	 * Other properties are not changed.
+	 */
 	const TO_ARRAY_RELATIONSHIP_AS_IS = 1;
 
-	/** @const Transform relationship entities to their ids. */
+	/**
+	 * @const
+	 * IRelationshipContainer property is returned as entity id.
+	 * IRelationshipCollection property is returned as array of entity ids.
+	 * Other properties are not changed.
+	 */
 	const TO_ARRAY_RELATIONSHIP_AS_ID = 2;
 
-	/** @const Transform relationship entities as array. */
+	/**
+	 * @const
+	 * IRelationshipContainer property is returned as array (entity tranformed to array).
+	 * IRelationshipCollection property is returned as array of array (entities tranformed to array).
+	 * Other properties are not changed.
+	 */
 	const TO_ARRAY_RELATIONSHIP_AS_ARRAY = 3;
+
+
+	/**
+	 * @const
+	 * Skips setting return value form setter.
+	 */
+	const SKIP_SET_VALUE = "\0";
 
 
 	/**
@@ -74,11 +94,9 @@ interface IEntity extends Serializable
 	/**
 	 * Returns value.
 	 * @param  string   $name
-	 * @param  bool     $allowNull
-	 * @param  ICollection
 	 * @return mixed
 	 */
-	public function getValue($name, $allowNull = FALSE);
+	public function getValue($name);
 
 
 	/**
@@ -90,10 +108,16 @@ interface IEntity extends Serializable
 
 
 	/**
-	 * Returns raw value
-	 * - from IPropertyContainer without transforming
-	 * - from entity without validation.
-	 *
+	 * Sets raw value.
+	 * @param  string   $name
+	 * @param  mixed    $value
+	 */
+	public function setRawValue($name, $value);
+
+
+	/**
+	 * Returns raw value.
+	 * Raw value is normalized value which is suitable unique identification and storing.
 	 * @param  string   $name
 	 * @return mixed
 	 */
@@ -103,18 +127,17 @@ interface IEntity extends Serializable
 	/**
 	 * Returns property contents.
 	 * @param  string   $name
-	 * @return mixed|IPropertyContainer|IPropertyInjection
+	 * @return mixed|IPropertyContainer
 	 */
 	public function getProperty($name);
 
 
 	/**
-	 * Returns foreign key.
-	 * Possile to call only for has one relationships.
-	 * @param  string   $name
+	 * Returns property raw contents.
+	 * @param  string  $name
 	 * @return mixed
 	 */
-	public function getForeignKey($name);
+	public function getRawProperty($name);
 
 
 	/**
@@ -160,6 +183,13 @@ interface IEntity extends Serializable
 	 * @return mixed
 	 */
 	public function getPersistedId();
+
+
+	/**
+	 * Returns true if entity is attached to its repository.
+	 * @return bool
+	 */
+	public function isAttached();
 
 
 	/**

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database;
@@ -10,8 +10,6 @@ namespace Nette\Database;
 
 /**
  * Container of database result fetched into IRow.
- *
- * @author     Jan Skrasek
  */
 interface IRowContainer extends \Traversable
 {
@@ -35,5 +33,12 @@ interface IRowContainer extends \Traversable
 	 * @return IRow[]
 	 */
 	function fetchAll();
+
+	/**
+	 * Fetches all rows and returns associative tree.
+	 * @param  string  associative descriptor
+	 * @return array
+	 */
+	function fetchAssoc($path);
 
 }

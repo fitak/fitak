@@ -4,7 +4,7 @@ namespace Fitak;
 
 use DateTime;
 use Nette\Utils\Strings;
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\OneHasMany;
 use Nextras\Orm\Relationships\ManyHasMany;
 use Tags;
@@ -31,7 +31,7 @@ use Tags;
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}
  */
-class Post extends Orm\Entity\Entity
+class Post extends Entity
 {
 
 	const TYPE_STATUS = 'status';

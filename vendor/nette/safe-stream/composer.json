@@ -23,7 +23,12 @@
 		"nette/nette": "<2.2"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"files": ["src/loader.php"]
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.3-dev"
+		}
+	}
 }

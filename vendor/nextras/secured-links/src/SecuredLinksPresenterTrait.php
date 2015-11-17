@@ -14,24 +14,22 @@ use Nette;
 use Nette\Application\UI\PresenterComponent;
 
 
-
 trait SecuredLinksPresenterTrait
 {
-
 	use SecuredLinksControlTrait;
 
 
 	/**
-	 * @param  PresenterComponent
-	 * @param  string created URL
-	 * @param  string
+	 * @param  PresenterComponent $component
+	 * @param  string $link created URL
+	 * @param  string $destination
 	 * @return string
 	 * @throws Nette\Application\UI\InvalidLinkException
 	 */
 	public function createSecuredLink(PresenterComponent $component, $link, $destination)
 	{
 		/** @var $lastRequest Nette\Application\Request */
-		$lastRequest = $this->lastCreatedRequest;
+		$lastRequest = $this->getLastCreatedRequest();
 
 		do {
 			if ($lastRequest === NULL) {
@@ -107,24 +105,23 @@ trait SecuredLinksPresenterTrait
 	}
 
 
-
 	/**
 	 * Returns unique token for method and params
-	 * @param string
-	 * @param string
-	 * @param array
+	 * @param  string $control
+	 * @param  string $method
+	 * @param  array $params
 	 * @return string
 	 */
 	public function getCsrfToken($control, $method, $params)
 	{
 		$session = $this->getSession('Nextras.Application.UI.SecuredLinksPresenterTrait');
 		if (!isset($session->token)) {
-			$session->token = Nette\Utils\Strings::random();
+			$session->token = Nette\Utils\Random::generate();
 		}
 
 		$params = Nette\Utils\Arrays::flatten($params);
 		$params = implode('|', array_keys($params)) . '|' . implode('|', array_values($params));
-		return substr(md5($control . $method . $params . $session->token), 0, 8);
+		return substr(md5($control . $method . $params . $session->token . $this->getSession()->getId()), 0, 8);
 	}
 
 }

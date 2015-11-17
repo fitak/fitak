@@ -51,6 +51,11 @@ class GraphUser extends GraphObject
   {
     return $this->getProperty('name');
   }
+  
+  public function getEmail()
+  {
+    return $this->getProperty('email');
+  }
 
   /**
    * Returns the first name for the user as a string if present.
@@ -80,6 +85,16 @@ class GraphUser extends GraphObject
   public function getLastName()
   {
     return $this->getProperty('last_name');
+  }
+  
+  /**
+   * Returns the gender for the user as a string if present.
+   *
+   * @return string|null
+   */
+  public function getGender()
+  {
+    return $this->getProperty('gender');
   }
 
   /**
@@ -117,4 +132,13 @@ class GraphUser extends GraphObject
     return $this->getProperty('location', GraphLocation::className());
   }
 
+  /**
+   * Returns the timezone for the user as a int if present.
+   *
+   * @return string|null
+   */
+  public function getTimezone()
+  {
+    return $this->getProperty('timezone');
+  }
 }

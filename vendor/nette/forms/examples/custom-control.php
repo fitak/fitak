@@ -6,11 +6,11 @@
 
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {
-	die('Install packages using `composer update --dev`');
+	die('Install packages using `composer install`');
 }
 
-use Nette\Forms\Form,
-	Nette\Utils\Html;
+use Nette\Forms\Form;
+use Nette\Utils\Html;
 
 
 class DateInput extends Nette\Forms\Controls\BaseControl
@@ -27,14 +27,15 @@ class DateInput extends Nette\Forms\Controls\BaseControl
 
 	public function setValue($value)
 	{
-		if ($value) {
+		if ($value === NULL) {
+			$this->day = $this->month = $this->year = NULL;
+		} else {
 			$date = Nette\Utils\DateTime::from($value);
 			$this->day = $date->format('j');
 			$this->month = $date->format('n');
 			$this->year = $date->format('Y');
-		} else {
-			$this->day = $this->month = $this->year = NULL;
 		}
+		return $this;
 	}
 
 
@@ -44,7 +45,7 @@ class DateInput extends Nette\Forms\Controls\BaseControl
 	public function getValue()
 	{
 		return self::validateDate($this)
-			? date_create()->setDate($this->year, $this->month, $this->day)
+			? (new DateTime)->setDate($this->year, $this->month, $this->day)->setTime(0, 0)
 			: NULL;
 	}
 
@@ -62,7 +63,6 @@ class DateInput extends Nette\Forms\Controls\BaseControl
 	 */
 	public function getControl()
 	{
-		$this->setOption('rendered', TRUE);
 		$name = $this->getHtmlName();
 		return Html::el()
 			->add(Html::el('input')->name($name . '[day]')->id($this->getHtmlId())->value($this->day))
@@ -79,7 +79,10 @@ class DateInput extends Nette\Forms\Controls\BaseControl
 	 */
 	public static function validateDate(Nette\Forms\IControl $control)
 	{
-		return checkdate($control->month, $control->day, $control->year);
+		return is_numeric($control->day)
+			&& is_numeric($control->month)
+			&& is_numeric($control->year)
+			&& checkdate($control->month, $control->day, $control->year);
 	}
 
 }
@@ -112,4 +115,4 @@ if ($form->isSuccess()) {
 
 <?php echo $form ?>
 
-<footer><a href="http://doc.nette.org/en/forms">see documentation</a></footer>
+<footer><a href="https://doc.nette.org/en/forms">see documentation</a></footer>

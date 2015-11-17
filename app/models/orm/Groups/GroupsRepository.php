@@ -2,11 +2,11 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
+use Nextras\Orm\Repository\Repository;
 
 
-class GroupsRepository extends Orm\Repository\Repository
+class GroupsRepository extends Repository
 {
 
 	/**

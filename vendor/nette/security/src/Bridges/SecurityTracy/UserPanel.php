@@ -7,14 +7,12 @@
 
 namespace Nette\Bridges\SecurityTracy;
 
-use Nette,
-	Tracy;
+use Nette;
+use Tracy;
 
 
 /**
  * User panel for Debugger Bar.
- *
- * @author     David Grudl
  */
 class UserPanel extends Nette\Object implements Tracy\IBarPanel
 {
@@ -34,7 +32,12 @@ class UserPanel extends Nette\Object implements Tracy\IBarPanel
 	 */
 	public function getTab()
 	{
+		if (headers_sent() && !session_id()) {
+			return;
+		}
+
 		ob_start();
+		$user = $this->user;
 		require __DIR__ . '/templates/UserPanel.tab.phtml';
 		return ob_get_clean();
 	}
@@ -47,6 +50,7 @@ class UserPanel extends Nette\Object implements Tracy\IBarPanel
 	public function getPanel()
 	{
 		ob_start();
+		$user = $this->user;
 		require __DIR__ . '/templates/UserPanel.panel.phtml';
 		return ob_get_clean();
 	}

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Reflection;
@@ -31,7 +31,7 @@ class DiscoveredReflection extends Nette\Object implements Nette\Database\IRefle
 	 */
 	public function __construct(Nette\Database\Connection $connection, Nette\Caching\IStorage $cacheStorage = NULL)
 	{
-		trigger_error(__CLASS__ . '() is deprecated; use Nette\Database\Conventions\DiscoverConventions instead.', E_USER_DEPRECATED);
+		trigger_error(__CLASS__ . '() is deprecated; use Nette\Database\Conventions\DiscoveredConventions instead.', E_USER_DEPRECATED);
 
 		$this->connection = $connection;
 		if ($cacheStorage) {
@@ -149,7 +149,7 @@ class DiscoveredReflection extends Nette\Object implements Nette\Database\IRefle
 		}
 
 		foreach ($this->structure['hasMany'] as & $table) {
-			uksort($table, function($a, $b) {
+			uksort($table, function ($a, $b) {
 				return strlen($a) - strlen($b);
 			});
 		}
@@ -164,7 +164,7 @@ class DiscoveredReflection extends Nette\Object implements Nette\Database\IRefle
 		}
 
 		if (isset($this->structure['belongsTo'][$table])) {
-			uksort($this->structure['belongsTo'][$table], function($a, $b) {
+			uksort($this->structure['belongsTo'][$table], function ($a, $b) {
 				return strlen($a) - strlen($b);
 			});
 		}

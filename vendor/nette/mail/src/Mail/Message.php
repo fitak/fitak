@@ -1,25 +1,20 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Mail;
 
-use Nette,
-	Nette\Utils\Strings;
+use Nette;
+use Nette\Utils\Strings;
 
 
 /**
  * Mail provides functionality to compose and send both text and MIME-compliant multipart email messages.
  *
- * @author     David Grudl
- *
- * @property   array $from
  * @property   string $subject
- * @property   string $returnPath
- * @property   int $priority
  * @property   mixed $htmlBody
  */
 class Message extends MimePart
@@ -213,27 +208,28 @@ class Message extends MimePart
 
 	/**
 	 * Sets HTML body.
-	 * @param  string|Nette\Templating\ITemplate
-	 * @param  mixed base-path or FALSE to disable parsing
+	 * @param  string
+	 * @param  mixed base-path
 	 * @return self
 	 */
 	public function setHtmlBody($html, $basePath = NULL)
 	{
-		if ($html instanceof Nette\Templating\ITemplate || $html instanceof Nette\Application\UI\ITemplate) {
-			$html->mail = $this;
-			if ($basePath === NULL && ($html instanceof Nette\Templating\IFileTemplate || $html instanceof Nette\Application\UI\ITemplate)) {
-				$basePath = dirname($html->getFile());
-			}
-			$html = $html->__toString(TRUE);
+		if ($basePath === NULL && ($html instanceof Nette\Templating\IFileTemplate || $html instanceof Nette\Application\UI\ITemplate)) {
+			$basePath = dirname($html->getFile());
+			$bc = TRUE;
 		}
+		$html = (string) $html;
 
-		if ($basePath !== FALSE) {
+		if ($basePath) {
 			$cids = array();
 			$matches = Strings::matchAll(
 				$html,
 				'#(src\s*=\s*|background\s*=\s*|url\()(["\']?)(?![a-z]+:|[/\\#])([^"\')\s]+)#i',
 				PREG_OFFSET_CAPTURE
 			);
+			if ($matches && isset($bc)) {
+				trigger_error(__METHOD__ . '() missing second argument with image base path.', E_USER_WARNING);
+			}
 			foreach (array_reverse($matches) as $m) {
 				$file = rtrim($basePath, '/\\') . '/' . urldecode($m[3][0]);
 				if (!isset($cids[$file])) {
@@ -245,15 +241,20 @@ class Message extends MimePart
 				);
 			}
 		}
-		$this->html = $html;
 
-		if ($this->getSubject() == NULL && $matches = Strings::match($html, '#<title>(.+?)</title>#is')) { // intentionally ==
-			$this->setSubject(html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8'));
+		if ($this->getSubject() == NULL) { // intentionally ==
+			$html = Strings::replace($html, '#<title>(.+?)</title>#is', function ($m) use (& $title) {
+				$title = $m[1];
+			});
+			$this->setSubject(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
 		}
+
+		$this->html = ltrim(str_replace("\r", '', $html), "\n");
 
 		if ($this->getBody() == NULL && $html != NULL) { // intentionally ==
 			$this->setBody($this->buildText($html));
 		}
+
 		return $this;
 	}
 
@@ -296,6 +297,16 @@ class Message extends MimePart
 
 
 	/**
+	 * Gets all email attachments.
+	 * @return MimePart[]
+	 */
+	public function getAttachments()
+	{
+		return $this->attachments;
+	}
+
+
+	/**
 	 * Creates file MIME part.
 	 * @return MimePart
 	 */
@@ -333,7 +344,7 @@ class Message extends MimePart
 
 	/**
 	 * Builds email. Does not modify itself, but returns a new object.
-	 * @return Message
+	 * @return self
 	 */
 	protected function build()
 	{
@@ -361,7 +372,7 @@ class Message extends MimePart
 				}
 			}
 			$alt->setContentType('text/html', 'UTF-8')
-				->setEncoding(preg_match('#\S{990}#', $mail->html)
+				->setEncoding(preg_match('#[^\n]{990}#', $mail->html)
 					? self::ENCODING_QUOTED_PRINTABLE
 					: (preg_match('#[\x80-\xFF]#', $mail->html) ? self::ENCODING_8BIT : self::ENCODING_7BIT))
 				->setBody($mail->html);
@@ -370,7 +381,7 @@ class Message extends MimePart
 		$text = $mail->getBody();
 		$mail->setBody(NULL);
 		$cursor->setContentType('text/plain', 'UTF-8')
-			->setEncoding(preg_match('#\S{990}#', $text)
+			->setEncoding(preg_match('#[^\n]{990}#', $text)
 				? self::ENCODING_QUOTED_PRINTABLE
 				: (preg_match('#[\x80-\xFF]#', $text) ? self::ENCODING_8BIT : self::ENCODING_7BIT))
 			->setBody($text);
@@ -387,7 +398,8 @@ class Message extends MimePart
 	{
 		$text = Strings::replace($html, array(
 			'#<(style|script|head).*</\\1>#Uis' => '',
-			'#<t[dh][ >]#i' => " $0",
+			'#<t[dh][ >]#i' => ' $0',
+			'#<a [^>]*href=("|\')([^\\1]+)\\1[^>]*>(.*?)</a>#i' =>  '$3 &lt;$2&gt;',
 			'#[\r\n]+#' => ' ',
 			'#<(/?p|/?h\d|li|br|/tr)[ >/]#i' => "\n$0",
 		));

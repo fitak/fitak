@@ -1,24 +1,21 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace NetteModule;
 
-use Nette,
-	Nette\Application,
-	Nette\Application\Responses,
-	Nette\Http;
+use Nette;
+use Nette\Application;
+use Nette\Application\Responses;
+use Nette\Http;
+use Latte;
 
 
 /**
  * Micro presenter.
- *
- * @author     David Grudl
- *
- * @property-read Nette\Application\IRequest $request
  */
 class MicroPresenter extends Nette\Object implements Application\IPresenter
 {
@@ -45,7 +42,7 @@ class MicroPresenter extends Nette\Object implements Application\IPresenter
 
 	/**
 	 * Gets the context.
-	 * @return \SystemContainer|Nette\DI\Container
+	 * @return Nette\DI\Container
 	 */
 	public function getContext()
 	{
@@ -77,14 +74,15 @@ class MicroPresenter extends Nette\Object implements Application\IPresenter
 		$reflection = Nette\Utils\Callback::toReflection(Nette\Utils\Callback::check($callback));
 		$params = Application\UI\PresenterComponentReflection::combineArgs($reflection, $params);
 
-		foreach ($reflection->getParameters() as $param) {
-			if ($param->getClassName()) {
-				unset($params[$param->getPosition()]);
-			}
-		}
-
 		if ($this->context) {
+			foreach ($reflection->getParameters() as $param) {
+				if ($param->getClassName()) {
+					unset($params[$param->getPosition()]);
+				}
+			}
+
 			$params = Nette\DI\Helpers::autowireArguments($reflection, $params, $this->context);
+			$params['presenter'] = $this;
 		}
 
 		$response = call_user_func_array($callback, $params);
@@ -93,12 +91,12 @@ class MicroPresenter extends Nette\Object implements Application\IPresenter
 			$response = array($response, array());
 		}
 		if (is_array($response)) {
-			$response = $this->createTemplate()->setParameters($response[1]);
-			if ($response[0] instanceof \SplFileInfo) {
-				$response->setFile($response[0]);
-			} else {
-				$response->setSource($response[0]);
+			list($templateSource, $templateParams) = $response;
+			$response = $this->createTemplate()->setParameters($templateParams);
+			if (!$templateSource instanceof \SplFileInfo) {
+				$response->getLatte()->setLoader(new Latte\Loaders\StringLoader);
 			}
+			$response->setFile($templateSource);
 		}
 		if ($response instanceof Application\UI\ITemplate) {
 			return new Responses\TextResponse($response);
@@ -157,7 +155,7 @@ class MicroPresenter extends Nette\Object implements Application\IPresenter
 
 
 	/**
-	 * @return Nette\Application\IRequest
+	 * @return Nette\Application\Request
 	 */
 	public function getRequest()
 	{

@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Bridges\ApplicationLatte;
 
-use Nette,
-	Latte;
+use Nette;
+use Latte;
 
 
 /**
  * Latte powered template.
- *
- * @author     David Grudl
  */
 class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 {
@@ -49,7 +47,7 @@ class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 	 */
 	public function render($file = NULL, array $params = array())
 	{
-		$this->latte->render($file ?: $this->file, $params ?: $this->params);
+		$this->latte->render($file ?: $this->file, $params + $this->params);
 	}
 
 
@@ -60,13 +58,9 @@ class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 	 */
 	public function __toString()
 	{
-		ob_start();
 		try {
-			$this->render();
-			return ob_get_clean();
-
+			return $this->latte->renderToString($this->file, $this->params);
 		} catch (\Exception $e) {
-			ob_end_clean();
 			if (func_num_args()) {
 				throw $e;
 			}
@@ -107,9 +101,9 @@ class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 	 */
 	public function registerHelperLoader($loader)
 	{
-		//trigger_error(__METHOD__ . '() is deprecated, use dynamic getLatte()->addFilter().', E_USER_DEPRECATED);
+		trigger_error(__METHOD__ . '() is deprecated, use dynamic getLatte()->addFilter().', E_USER_DEPRECATED);
 		$latte = $this->latte;
-		$this->latte->addFilter(NULL, function($name) use ($loader, $latte) {
+		$this->latte->addFilter(NULL, function ($name) use ($loader, $latte) {
 			if ($callback = call_user_func($loader, $name)) {
 				$latte->addFilter($name, $callback);
 			}
@@ -195,6 +189,16 @@ class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 	public function getParameters()
 	{
 		return $this->params;
+	}
+
+
+	/**
+	 * @deprecated
+	 */
+	public function __call($name, $args)
+	{
+		trigger_error('Invoking filters on Template object is deprecated, use getLatte()->invokeFilter().', E_USER_DEPRECATED);
+		return $this->latte->invokeFilter($name, $args);
 	}
 
 

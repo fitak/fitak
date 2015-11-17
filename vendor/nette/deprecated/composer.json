@@ -16,10 +16,11 @@
 	],
 	"require-dev": {
 		"nette/application": "~2.2",
-		"nette/bootstrap": "~2.2",
+		"nette/bootstrap": "~2.2, >=2.2.1",
 		"nette/caching": "~2.2",
 		"nette/forms": "~2.2",
 		"nette/mail": "~2.2",
+		"nette/robot-loader": "~2.2",
 		"nette/safe-stream": "~2.2",
 		"nette/utils": "~2.2",
 		"latte/latte": "~2.2",
@@ -28,6 +29,6 @@
 	},
 	"autoload": {
 		"classmap": ["src/"],
-		"files": ["src/shortcuts.php"]
+		"files": ["src/loader.php"]
 	}
 }

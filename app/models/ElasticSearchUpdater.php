@@ -5,7 +5,7 @@ namespace Fitak;
 use ElasticSearch;
 use Kdyby;
 use Nette;
-use Nextras\Orm;
+use Nextras\Orm\Entity\IEntity;
 
 
 class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscriber
@@ -43,7 +43,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 		];
 	}
 
-	public function onAfterInsert(Orm\Entity\IEntity $post)
+	public function onAfterInsert(IEntity $post)
 	{
 		if ($post instanceof Post)
 		{
@@ -56,7 +56,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 		}
 	}
 
-	public function onAfterUpdate(Orm\Entity\IEntity $post)
+	public function onAfterUpdate(IEntity $post)
 	{
 		if ($post instanceof Post)
 		{

@@ -12,7 +12,7 @@ class ClassNamePassTest extends \PHPUnit_Framework_TestCase
 
     public function setup()
     {
-       $this->pass = new ClassNamePass();
+        $this->pass = new ClassNamePass();
     }
 
     /**
@@ -44,5 +44,15 @@ class ClassNamePassTest extends \PHPUnit_Framework_TestCase
         $config = new MockConfiguration(array(), array(), array(), "Dave");
         $code = $this->pass->apply(static::CODE, $config);
         $this->assertContains('class Dave', $code);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRemoveLeadingBackslashesFromNamespace()
+    {
+        $config = new MockConfiguration(array(), array(), array(), "\Dave\Dave");
+        $code = $this->pass->apply(static::CODE, $config);
+        $this->assertContains('namespace Dave;', $code);
     }
 }

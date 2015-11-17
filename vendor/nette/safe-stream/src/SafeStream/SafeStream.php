@@ -7,27 +7,23 @@
 
 namespace Nette\Utils;
 
-use Nette;
-
 
 /**
- * Provides atomicity and isolation for thread safe file manipulation using stream safe://
+ * Provides atomicity and isolation for thread safe file manipulation using stream nette.safe://
  *
  * <code>
- * file_put_contents('safe://myfile.txt', $content);
+ * file_put_contents('nette.safe://myfile.txt', $content);
  *
- * $content = file_get_contents('safe://myfile.txt');
+ * $content = file_get_contents('nette.safe://myfile.txt');
  *
- * unlink('safe://myfile.txt');
+ * unlink('nette.safe://myfile.txt');
  * </code>
- *
- * @author     David Grudl
  * @internal
  */
 class SafeStream
 {
-	/** Name of stream protocol - safe:// */
-	const PROTOCOL = 'safe';
+	/** Name of stream protocol - nette.safe:// */
+	const PROTOCOL = 'nette.safe';
 
 	/** @var resource  orignal file handle */
 	private $handle;
@@ -49,11 +45,13 @@ class SafeStream
 
 
 	/**
-	 * Registers protocol 'safe://'.
+	 * Registers protocol 'nette.safe://'.
 	 * @return bool
 	 */
 	public static function register()
 	{
+		@stream_wrapper_unregister('safe'); // old protocol
+		stream_wrapper_register('safe', __CLASS__);
 		@stream_wrapper_unregister(self::PROTOCOL); // intentionally @
 		return stream_wrapper_register(self::PROTOCOL, __CLASS__);
 	}
@@ -64,12 +62,11 @@ class SafeStream
 	 * @param  string    file name with stream protocol
 	 * @param  string    mode - see fopen()
 	 * @param  int       STREAM_USE_PATH, STREAM_REPORT_ERRORS
-	 * @param  string    full path
 	 * @return bool      TRUE on success or FALSE on failure
 	 */
-	public function stream_open($path, $mode, $options, & $opened_path)
+	public function stream_open($path, $mode, $options)
 	{
-		$path = substr($path, strlen(self::PROTOCOL)+3);  // trim protocol safe://
+		$path = substr($path, strpos($path, ':') + 3);  // trim protocol nette.safe://
 
 		$flag = trim($mode, 'crwax+');  // text | binary mode
 		$mode = trim($mode, 'tb');     // mode
@@ -281,7 +278,7 @@ class SafeStream
 	public function url_stat($path, $flags)
 	{
 		// This is not thread safe
-		$path = substr($path, strlen(self::PROTOCOL)+3);
+		$path = substr($path, strpos($path, ':') + 3);
 		return ($flags & STREAM_URL_STAT_LINK) ? @lstat($path) : @stat($path); // intentionally @
 	}
 
@@ -294,7 +291,7 @@ class SafeStream
 	 */
 	public function unlink($path)
 	{
-		$path = substr($path, strlen(self::PROTOCOL)+3);
+		$path = substr($path, strpos($path, ':') + 3);
 		return unlink($path);
 	}
 

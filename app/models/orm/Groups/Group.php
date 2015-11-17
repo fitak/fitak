@@ -2,7 +2,7 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\OneHasMany;
 
 
@@ -13,7 +13,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  *
  * @property OneHasMany|Post[] $posts  {1:m PostsRepository $group}
  */
-class Group extends Orm\Entity\Entity
+class Group extends Entity
 {
 
 }

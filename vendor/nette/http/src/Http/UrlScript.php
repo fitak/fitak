@@ -7,8 +7,6 @@
 
 namespace Nette\Http;
 
-use Nette;
-
 
 /**
  * Extended HTTP URL.
@@ -22,8 +20,6 @@ use Nette;
  *
  * - scriptPath:  /admin/script.php (or simply /admin/ when script is directory index)
  * - pathInfo:    /pathinfo/ (additional path information)
- *
- * @author     David Grudl
  *
  * @property   string $scriptPath
  * @property-read string $pathInfo
@@ -63,7 +59,7 @@ class UrlScript extends Url
 	public function getBasePath()
 	{
 		$pos = strrpos($this->scriptPath, '/');
-		return $pos === FALSE ? '' : substr($this->path, 0, $pos + 1);
+		return $pos === FALSE ? '' : substr($this->getPath(), 0, $pos + 1);
 	}
 
 
@@ -73,7 +69,7 @@ class UrlScript extends Url
 	 */
 	public function getPathInfo()
 	{
-		return (string) substr($this->path, strlen($this->scriptPath));
+		return (string) substr($this->getPath(), strlen($this->scriptPath));
 	}
 
 }

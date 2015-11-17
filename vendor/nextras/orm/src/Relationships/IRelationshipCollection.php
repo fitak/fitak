@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
@@ -13,11 +11,11 @@ namespace Nextras\Orm\Relationships;
 use Countable;
 use IteratorAggregate;
 use Nextras\Orm\Entity\IEntity;
-use Nextras\Orm\Entity\Collection\ICollection;
-use Nextras\Orm\Entity\IPropertyInjection;
+use Nextras\Orm\Collection\ICollection;
+use Nextras\Orm\Entity\IProperty;
 
 
-interface IRelationshipCollection extends IPropertyInjection, IteratorAggregate, Countable
+interface IRelationshipCollection extends IProperty, IteratorAggregate, Countable
 {
 
 	/**
@@ -66,9 +64,10 @@ interface IRelationshipCollection extends IPropertyInjection, IteratorAggregate,
 
 
 	/**
-	 * @param  bool $recursive Persists all associations?
+	 * @param  bool     $recursive
+	 * @param  array    $queue
 	 */
-	public function persist($recursive = TRUE);
+	public function persist($recursive = TRUE, & $queue = NULL);
 
 
 	/**
@@ -76,6 +75,13 @@ interface IRelationshipCollection extends IPropertyInjection, IteratorAggregate,
 	 * @return bool
 	 */
 	public function isLoaded();
+
+
+	/**
+	 * Returns true if relationship is modified.
+	 * @return bool
+	 */
+	public function isModified();
 
 
 	/**

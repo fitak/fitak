@@ -4,7 +4,7 @@ namespace Fitak;
 
 use DateTime;
 use Nette\Utils\Strings;
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\ManyHasMany;
 
 
@@ -22,10 +22,10 @@ use Nextras\Orm\Relationships\ManyHasMany;
  *
  * @property-read bool         $isActivated {virtual} only activated users can sign in
  */
-class User extends Orm\Entity\Entity
+class User extends Entity
 {
 
-	public function getIsActivated()
+	protected function getterIsActivated()
 	{
 		return $this->signUpTokenHash === NULL;
 	}

@@ -1,29 +1,26 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Table;
 
-use Nette,
-	Nette\Database\Context,
-	Nette\Database\IConventions;
+use Nette;
+use Nette\Database\Context;
+use Nette\Database\IConventions;
 
 
 /**
  * Filtered table representation.
  * Selection is based on the great library NotORM http://www.notorm.com written by Jakub Vrana.
  *
- * @author     Jakub Vrana
- * @author     Jan Skrasek
- *
  * @property-read string $sql
  */
 class Selection extends Nette\Object implements \Iterator, IRowContainer, \ArrayAccess, \Countable
 {
-	/** @var Nette\Database\Context */
+	/** @var Context */
 	protected $context;
 
 	/** @var IConventions */
@@ -38,7 +35,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 	/** @var string table name */
 	protected $name;
 
-	/** @var string primary key field name */
+	/** @var string|array|NULL primary key field name */
 	protected $primary;
 
 	/** @var string|bool primary column sequence name, FALSE for autodetection */
@@ -143,7 +140,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 
 	/**
 	 * @param  bool
-	 * @return string|array
+	 * @return string|array|NULL
 	 */
 	public function getPrimary($need = TRUE)
 	{
@@ -243,11 +240,31 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 
 
 	/**
+	 * Fetches single field.
+	 * @param  string|NULL
+	 * @return mixed|FALSE
+	 */
+	public function fetchField($column = NULL)
+	{
+		if ($column) {
+			$this->select($column);
+		}
+
+		$row = $this->fetch();
+		if ($row) {
+			return $column ? $row[$column] : current($row->toArray());
+		}
+
+		return FALSE;
+	}
+
+
+	/**
 	 * @inheritDoc
 	 */
 	public function fetchPairs($key = NULL, $value = NULL)
 	{
-		return Nette\Database\Helpers::toPairs(iterator_to_array($this), $key, $value);
+		return Nette\Database\Helpers::toPairs($this->fetchAll(), $key, $value);
 	}
 
 
@@ -257,6 +274,16 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 	public function fetchAll()
 	{
 		return iterator_to_array($this);
+	}
+
+
+	/**
+	 * @inheritDoc
+	 */
+	public function fetchAssoc($path)
+	{
+		$rows = array_map('iterator_to_array', $this->fetchAll());
+		return Nette\Utils\Arrays::associate($rows, $path);
 	}
 
 
@@ -480,7 +507,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 		try {
 			$result = $this->query($this->getSql());
 
-		} catch (\PDOException $exception) {
+		} catch (Nette\Database\DriverException $exception) {
 			if (!$this->sqlBuilder->getSelect() && $this->previousAccessedColumns) {
 				$this->previousAccessedColumns = FALSE;
 				$this->accessedColumns = array();
@@ -495,8 +522,8 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 		foreach ($result->getPdoStatement() as $key => $row) {
 			$row = $this->createRow($result->normalizeRow($row));
 			$primary = $row->getSignature(FALSE);
-			$usedPrimary = $usedPrimary && $primary;
-			$this->rows[$primary ?: $key] = $row;
+			$usedPrimary = $usedPrimary && (string) $primary !== '';
+			$this->rows[$usedPrimary ? $primary : $key] = $row;
 		}
 		$this->data = $this->rows;
 
@@ -516,7 +543,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 
 	public function createSelectionInstance($table = NULL)
 	{
-		return new Selection($this->context, $this->conventions, $table ?: $this->name, $this->cache ? $this->cache->getStorage() : NULL);
+		return new self($this->context, $this->conventions, $table ?: $this->name, $this->cache ? $this->cache->getStorage() : NULL);
 	}
 
 
@@ -532,7 +559,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 	}
 
 
-	protected function emptyResultSet($saveCache = TRUE)
+	protected function emptyResultSet($saveCache = TRUE, $deleteRererencedCache = TRUE)
 	{
 		if ($this->rows !== NULL && $saveCache) {
 			$this->saveCacheState();
@@ -547,6 +574,9 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 		$this->specificCacheKey = NULL;
 		$this->generalCacheKey = NULL;
 		$this->refCache['referencingPrototype'] = array();
+		if ($deleteRererencedCache) {
+			$this->refCache['referenced'] = array();
+		}
 	}
 
 
@@ -674,7 +704,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 
 			// move iterator to specific key
 			if (isset($currentKey)) {
-				while (key($this->data) !== $currentKey) {
+				while (key($this->data) !== NULL && key($this->data) !== $currentKey) {
 					next($this->data);
 				}
 			}
@@ -714,17 +744,19 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 	 */
 	public function insert($data)
 	{
-		if ($data instanceof Selection) {
-			$data = new Nette\Database\SqlLiteral($data->getSql(), $data->getSqlBuilder()->getParameters());
+		if ($data instanceof self) {
+			$return = $this->context->queryArgs($this->sqlBuilder->buildInsertQuery() . ' ' . $data->getSql(), $data->getSqlBuilder()->getParameters());
 
-		} elseif ($data instanceof \Traversable) {
-			$data = iterator_to_array($data);
+		} else {
+			if ($data instanceof \Traversable) {
+				$data = iterator_to_array($data);
+			}
+			$return = $this->context->query($this->sqlBuilder->buildInsertQuery() . ' ?values', $data);
 		}
 
-		$return = $this->context->query($this->sqlBuilder->buildInsertQuery(), $data);
 		$this->loadRefCache();
 
-		if ($data instanceof Nette\Database\SqlLiteral || $this->primary === NULL) {
+		if ($data instanceof self || $this->primary === NULL) {
 			unset($this->refCache['referencing'][$this->getGeneralCacheKey()][$this->getSpecificCacheKey()]);
 			return $return->getRowCount();
 		}
@@ -829,13 +861,16 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 			}
 			list($table, $column) = $belongsTo;
 		}
+		if (!$row->accessColumn($column)) {
+			return FALSE;
+		}
 
 		$checkPrimaryKey = $row[$column];
 
 		$referenced = & $this->refCache['referenced'][$this->getSpecificCacheKey()]["$table.$column"];
 		$selection = & $referenced['selection'];
 		$cacheKeys = & $referenced['cacheKeys'];
-		if ($selection === NULL || !isset($cacheKeys[$checkPrimaryKey])) {
+		if ($selection === NULL || ($checkPrimaryKey !== NULL && !isset($cacheKeys[$checkPrimaryKey]))) {
 			$this->execute();
 			$cacheKeys = array();
 			foreach ($this->rows as $row) {
@@ -878,7 +913,7 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 			list($table, $column) = $hasMany;
 		}
 
-		$prototype = & $this->refCache['referencingPrototype']["$table.$column"];
+		$prototype = & $this->refCache['referencingPrototype'][$this->getSpecificCacheKey()]["$table.$column"];
 		if (!$prototype) {
 			$prototype = $this->createGroupedSelectionInstance($table, $column);
 			$prototype->where("$table.$column", array_keys((array) $this->rows));

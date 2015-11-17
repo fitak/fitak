@@ -1,19 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\ComponentModel;
 
-use Nette;
-
 
 /**
  * Containers are objects that logically contain zero or more IComponent components.
- *
- * @author     David Grudl
  */
 interface IContainer extends IComponent
 {

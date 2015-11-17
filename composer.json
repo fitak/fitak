@@ -14,7 +14,7 @@
 		"php": "~5.5",
 		"nette/nette": "~2.3@dev",
 		"nette/database": "~2.3@dev",
-		"nextras/orm": "~1.0@dev",
+		"nextras/orm": "^1.1",
 		"nextras/migrations": "~3.0@rc",
 		"nextras/link-factory": "~1.0",
 		"nextras/secured-links": "~1.2",

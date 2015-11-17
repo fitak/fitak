@@ -75,6 +75,14 @@ class Count extends AbstractEndpoint
             'preference',
             'routing',
             'source',
+            'q',
+            'df',
+            'default_operator',
+            'analyzer',
+            'lowercase_expanded_terms',
+            'analyze_wildcard',
+            'lenient',
+            'lowercase_expanded_terms'
         );
     }
 

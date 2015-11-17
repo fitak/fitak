@@ -14,11 +14,11 @@
 
 	{control tagCloud}
 
-	{foreach $news as $message}
 		<div class="panel panel-info">
 			<div class="panel-heading"><h3 class="panel-title">Info</h3></div>
+	{foreach $news as $message}
 			<div class="panel-body">{$message->message|noescape}</div>
-		</div>
 	{/foreach}
+		</div>
 </div>
 {/block}

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\ComponentModel;
@@ -14,8 +14,6 @@ use Nette;
  * Component is the base class for all components.
  *
  * Components are objects implementing IComponent. They has parent component and own name.
- *
- * @author     David Grudl
  *
  * @property-read string $name
  * @property-read IContainer|NULL $parent
@@ -234,7 +232,7 @@ abstract class Component extends Nette\Object implements IComponent
 	{
 		if ($this instanceof IContainer) {
 			foreach ($this->getComponents() as $component) {
-				if ($component instanceof Component) {
+				if ($component instanceof self) {
 					$component->refreshMonitors($depth + 1, $missing, $listeners);
 				}
 			}
@@ -277,8 +275,12 @@ abstract class Component extends Nette\Object implements IComponent
 
 		if ($depth === 0) { // call listeners
 			$method = $missing === NULL ? 'detached' : 'attached';
+			$prev = array();
 			foreach ($listeners as $item) {
-				$item[0]->$method($item[1]);
+				if (!in_array($item, $prev, TRUE)) {
+					$item[0]->$method($item[1]);
+					$prev[] = $item;
+				}
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 
 use Fitak\TagCloudControl;
-
+use Tracy\Debugger;
 
 /**
  * @author     Vojtech Miksu <vojtech@miksu.cz>
@@ -16,7 +16,8 @@ class HomepagePresenter extends BasePresenter
 
 	public function renderDefault()
 	{
-		$this->template->news = $this->orm->news->findRecent();
+
+		$this->template->news = $this->orm->news->findRecent()->fetchAll();
 	}
 
 	protected function createComponentSearchForm()

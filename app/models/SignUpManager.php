@@ -10,7 +10,7 @@ use Nextras\Application\LinkFactory;
 class SignUpManager extends Nette\Object
 {
 
-	/** @var RepositoryContainer */
+	/** @var Orm */
 	private $orm;
 
 	/** @var Nette\Mail\IMailer */
@@ -22,7 +22,7 @@ class SignUpManager extends Nette\Object
 	/** @var TagsImporter */
 	private $tagsImporter;
 
-	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer,
+	public function __construct(Orm $orm, Mail\IMailer $mailer,
                                 LinkFactory $linkFactory, TagsImporter $tagsImporter)
 	{
 		$this->orm = $orm;

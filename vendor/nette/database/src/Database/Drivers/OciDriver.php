@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Drivers;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Supplemental Oracle database driver.
- *
- * @author     David Grudl
  */
 class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriver
 {
@@ -28,6 +26,24 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 	{
 		$this->connection = $connection;
 		$this->fmtDateTime = isset($options['formatDateTime']) ? $options['formatDateTime'] : 'U';
+	}
+
+
+	public function convertException(\PDOException $e)
+	{
+		$code = isset($e->errorInfo[1]) ? $e->errorInfo[1] : NULL;
+		if (in_array($code, array(1, 2299, 38911), TRUE)) {
+			return Nette\Database\UniqueConstraintViolationException::from($e);
+
+		} elseif (in_array($code, array(1400), TRUE)) {
+			return Nette\Database\NotNullConstraintViolationException::from($e);
+
+		} elseif (in_array($code, array(2266, 2291, 2292), TRUE)) {
+			return Nette\Database\ForeignKeyConstraintViolationException::from($e);
+
+		} else {
+			return Nette\Database\DriverException::from($e);
+		}
 	}
 
 
@@ -63,6 +79,15 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 
 
 	/**
+	 * Formats date-time interval for use in a SQL statement.
+	 */
+	public function formatDateInterval(\DateInterval $value)
+	{
+		throw new Nette\NotSupportedException;
+	}
+
+
+	/**
 	 * Encodes string for use in a LIKE statement.
 	 */
 	public function formatLike($value, $pos)
@@ -76,13 +101,16 @@ class OciDriver extends Nette\Object implements Nette\Database\ISupplementalDriv
 	 */
 	public function applyLimit(& $sql, $limit, $offset)
 	{
-		if ($offset > 0) {
+		if ($limit < 0 || $offset < 0) {
+			throw new Nette\InvalidArgumentException('Negative offset or limit.');
+
+		} elseif ($offset) {
 			// see http://www.oracle.com/technology/oramag/oracle/06-sep/o56asktom.html
 			$sql = 'SELECT * FROM (SELECT t.*, ROWNUM AS "__rnum" FROM (' . $sql . ') t '
-				. ($limit >= 0 ? 'WHERE ROWNUM <= ' . ((int) $offset + (int) $limit) : '')
+				. ($limit !== NULL ? 'WHERE ROWNUM <= ' . ((int) $offset + (int) $limit) : '')
 				. ') WHERE "__rnum" > '. (int) $offset;
 
-		} elseif ($limit >= 0) {
+		} elseif ($limit !== NULL) {
 			$sql = 'SELECT * FROM (' . $sql . ') WHERE ROWNUM <= ' . (int) $limit;
 		}
 	}

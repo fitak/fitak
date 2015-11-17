@@ -300,12 +300,16 @@ class EventsExtension extends Nette\DI\CompilerExtension
 	{
 		foreach ($class->getProperties(Nette\Reflection\Property::IS_PUBLIC) as $property) {
 			if (!preg_match('#^on[A-Z]#', $name = $property->getName())) {
-				continue 1;
+				continue;
+			}
+
+			if ($property->hasAnnotation('persistent') || $property->hasAnnotation('inject')) { // definitely not an event
+				continue;
 			}
 
 			$def->addSetup('$' . $name, array(
 				new Nette\DI\Statement($this->prefix('@manager') . '::createEvent', array(
-					array($property->getDeclaringClass()->getName(), $name),
+					array($class->getName(), $name),
 					new Code\PhpLiteral('$service->' . $name)
 				))
 			));
@@ -324,10 +328,26 @@ class EventsExtension extends Nette\DI\CompilerExtension
 			foreach ($eventNames as $eventName) {
 				list($namespace, $event) = Kdyby\Events\Event::parseName($eventName);
 				$listeners[$eventName][] = $serviceName;
-				if ($namespace !== NULL) {
-					$listeners[$event][] = $serviceName;
+
+				if (!$namespace || !class_exists($namespace)) {
+					continue; // it might not even be a "classname" event namespace
+				}
+
+				// find all subclasses and register the listener to all the classes dispatching them
+				foreach ($builder->getDefinitions() as $def) {
+					if (!$class = $def->getClass()) {
+						continue; // ignore unresolved classes
+					}
+
+					if (is_subclass_of($class, $namespace)) {
+						$listeners["$class::$event"][] = $serviceName;
+					}
 				}
 			}
+		}
+
+		foreach ($listeners as $id => $subscribers) {
+			$listeners[$id] = array_unique($subscribers);
 		}
 
 		$builder->getDefinition($this->prefix('manager'))

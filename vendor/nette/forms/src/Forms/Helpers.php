@@ -1,21 +1,19 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms;
 
-use Nette,
-	Nette\Utils\Strings,
-	Nette\Utils\Html;
+use Nette;
+use Nette\Utils\Strings;
+use Nette\Utils\Html;
 
 
 /**
  * Forms helpers.
- *
- * @author     David Grudl
  */
 class Helpers extends Nette\Object
 {
@@ -94,6 +92,46 @@ class Helpers extends Nette\Object
 
 
 	/**
+	 * @return array
+	 */
+	public static function exportRules(Rules $rules)
+	{
+		$payload = array();
+		foreach ($rules as $rule) {
+			if (!is_string($op = $rule->validator)) {
+				if (!Nette\Utils\Callback::isStatic($op)) {
+					continue;
+				}
+				$op = Nette\Utils\Callback::toString($op);
+			}
+			if ($rule->branch) {
+				$item = array(
+					'op' => ($rule->isNegative ? '~' : '') . $op,
+					'rules' => static::exportRules($rule->branch),
+					'control' => $rule->control->getHtmlName(),
+				);
+				if ($rule->branch->getToggles()) {
+					$item['toggle'] = $rule->branch->getToggles();
+				}
+			} else {
+				$item = array('op' => ($rule->isNegative ? '~' : '') . $op, 'msg' => Validator::formatMessage($rule, FALSE));
+			}
+
+			if (is_array($rule->arg)) {
+				foreach ($rule->arg as $key => $value) {
+					$item['arg'][$key] = $value instanceof IControl ? array('control' => $value->getHtmlName()) : $value;
+				}
+			} elseif ($rule->arg !== NULL) {
+				$item['arg'] = $rule->arg instanceof IControl ? array('control' => $rule->arg->getHtmlName()) : $rule->arg;
+			}
+
+			$payload[] = $item;
+		}
+		return $payload;
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public static function createInputList(array $items, array $inputAttrs = NULL, array $labelAttrs = NULL, $wrapper = NULL)
@@ -116,7 +154,7 @@ class Helpers extends Nette\Object
 			$res .= ($res === '' && $wrapperEnd === '' ? '' : $wrapper)
 				. $labelTag . $label->attributes() . '>'
 				. $inputTag . $input->attributes() . (Html::$xhtml ? ' />' : '>')
-				. ($caption instanceof Html ? $caption : htmlspecialchars($caption))
+				. ($caption instanceof Html ? $caption : htmlspecialchars($caption, ENT_NOQUOTES, 'UTF-8'))
 				. '</label>'
 				. $wrapperEnd;
 		}
@@ -125,10 +163,13 @@ class Helpers extends Nette\Object
 
 
 	/**
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
-	public static function createSelectBox(array $items, array $optionAttrs = NULL)
+	public static function createSelectBox(array $items, array $optionAttrs = NULL, $selected = NULL)
 	{
+		if ($selected !== NULL) {
+			$optionAttrs['selected?'] = $selected;
+		}
 		list($optionAttrs, $optionTag) = self::prepareAttrs($optionAttrs, 'option');
 		$option = Html::el();
 		$res = $tmp = '';
@@ -149,7 +190,7 @@ class Helpers extends Nette\Object
 					$res .= $caption->setName('option')->addAttributes($option->attrs);
 				} else {
 					$res .= $optionTag . $option->attributes() . '>'
-						. htmlspecialchars($caption)
+						. htmlspecialchars($caption, ENT_NOQUOTES, 'UTF-8')
 						. '</option>';
 				}
 			}

@@ -7,13 +7,9 @@
 
 namespace Nette\Security;
 
-use Nette;
-
 
 /**
  * Represents the user of application.
- *
- * @author     David Grudl
  */
 interface IIdentity
 {

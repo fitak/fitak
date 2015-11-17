@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\TestHelper;
@@ -13,6 +11,7 @@ namespace Nextras\Orm\TestHelper;
 use DateTime;
 use Nextras\Orm\Entity\IEntity;
 use Nextras\Orm\Entity\Reflection\PropertyMetadata;
+use Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata;
 use Nextras\Orm\Model\IModel;
 
 
@@ -64,13 +63,12 @@ class EntityCreator
 
 	protected function random(PropertyMetadata $property)
 	{
-		if (in_array($property->relationshipType, [
-				PropertyMetadata::RELATIONSHIP_MANY_HAS_ONE,
-				PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE,
-				PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED,
+		if ($property->relationship && in_array($property->relationship->type, [
+				PropertyRelationshipMetadata::MANY_HAS_ONE,
+				PropertyRelationshipMetadata::ONE_HAS_ONE,
+				PropertyRelationshipMetadata::ONE_HAS_ONE_DIRECTED,
 		])) {
-			$entityClass = $this->model->getRepository($property->relationshipRepository)->getEntityClassNames()[0];
-			return $this->create($entityClass);
+			return $this->create($property->relationship->entity);
 		}
 
 		$possibilities = [];

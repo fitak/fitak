@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi FirePHP logger.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiFirePhpLogger extends DibiObject
@@ -19,6 +18,9 @@ class DibiFirePhpLogger extends DibiObject
 
 	/** maximum SQL length */
 	static public $maxLength = 1000;
+
+	/** size of json stream chunk */
+	static public $streamChunkSize = 4990;
 
 	/** @var int */
 	public $filter;
@@ -58,18 +60,19 @@ class DibiFirePhpLogger extends DibiObject
 			return;
 		}
 
+		if (!$this->numOfQueries) {
+			header('X-Wf-Protocol-dibi: http://meta.wildfirehq.org/Protocol/JsonStream/0.2');
+			header('X-Wf-dibi-Plugin-1: http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.2.0');
+			header('X-Wf-dibi-Structure-1: http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1');
+		}
 		$this->totalTime += $event->time;
 		$this->numOfQueries++;
 		self::$fireTable[] = array(
 			sprintf('%0.3f', $event->time * 1000),
 			strlen($event->sql) > self::$maxLength ? substr($event->sql, 0, self::$maxLength) . '...' : $event->sql,
 			$event->result instanceof Exception ? 'ERROR' : (string) $event->count,
-			$event->connection->getConfig('driver') . '/' . $event->connection->getConfig('name')
+			$event->connection->getConfig('driver') . '/' . $event->connection->getConfig('name'),
 		);
-
-		header('X-Wf-Protocol-dibi: http://meta.wildfirehq.org/Protocol/JsonStream/0.2');
-		header('X-Wf-dibi-Plugin-1: http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.2.0');
-		header('X-Wf-dibi-Structure-1: http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1');
 
 		$payload = json_encode(array(
 			array(
@@ -78,7 +81,7 @@ class DibiFirePhpLogger extends DibiObject
 			),
 			self::$fireTable,
 		));
-		foreach (str_split($payload, 4990) as $num => $s) {
+		foreach (str_split($payload, self::$streamChunkSize) as $num => $s) {
 			$num++;
 			header("X-Wf-dibi-1-1-d$num: |$s|\\"); // protocol-, structure-, plugin-, message-index
 		}

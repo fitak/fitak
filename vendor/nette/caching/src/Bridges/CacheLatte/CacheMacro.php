@@ -7,14 +7,12 @@
 
 namespace Nette\Bridges\CacheLatte;
 
-use Nette,
-	Latte;
+use Nette;
+use Latte;
 
 
 /**
  * Macro {cache} ... {/cache}
- *
- * @author     David Grudl
  */
 class CacheMacro extends Nette\Object implements Latte\IMacro
 {
@@ -105,6 +103,9 @@ class CacheMacro extends Nette\Object implements Latte\IMacro
 
 		$cache = new Nette\Caching\Cache($cacheStorage, 'Nette.Templating.Cache');
 		if ($helper = $cache->start($key)) {
+			if (isset($args['dependencies'])) {
+				$args += call_user_func($args['dependencies']);
+			}
 			if (isset($args['expire'])) {
 				$args['expiration'] = $args['expire']; // back compatibility
 			}

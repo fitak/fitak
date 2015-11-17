@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -10,8 +10,6 @@ namespace Latte;
 
 /**
  * Macro tag tokenizer.
- *
- * @author     David Grudl
  */
 class MacroTokens extends TokenIterator
 {
@@ -58,7 +56,7 @@ class MacroTokens extends TokenIterator
 
 	/**
 	 * Appends simple token or string (will be parsed).
-	 * @return MacroTokens
+	 * @return self
 	 */
 	public function append($val, $position = NULL)
 	{
@@ -75,7 +73,7 @@ class MacroTokens extends TokenIterator
 
 	/**
 	 * Prepends simple token or string (will be parsed).
-	 * @return MacroTokens
+	 * @return self
 	 */
 	public function prepend($val)
 	{
@@ -108,6 +106,12 @@ class MacroTokens extends TokenIterator
 		do {
 			$words[] = $this->joinUntil(self::T_WHITESPACE, ',', ':');
 		} while ($this->nextToken(':'));
+
+		if (count($words) === 1 && ($space = $this->nextValue(self::T_WHITESPACE))
+			&& (($dot = $this->nextValue('.')) || $this->isPrev('.')))
+		{
+			$words[0] .= $space . $dot . $this->joinUntil(',');
+		}
 		$this->nextToken(',');
 		$this->nextAll(self::T_WHITESPACE, self::T_COMMENT);
 		return $words === array('') ? array() : $words;

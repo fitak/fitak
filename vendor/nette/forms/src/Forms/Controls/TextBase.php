@@ -1,32 +1,24 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms\Controls;
 
-use Nette,
-	Nette\Forms\Form,
-	Nette\Utils\Strings,
-	Nette\Utils\Validators;
+use Nette;
+use Nette\Forms\Form;
+use Nette\Utils\Strings;
 
 
 /**
  * Implements the basic functionality common to text input controls.
- *
- * @author     David Grudl
- *
- * @property   string $emptyValue
  */
 abstract class TextBase extends BaseControl
 {
 	/** @var string */
 	protected $emptyValue = '';
-
-	/** @var array */
-	protected $filters = array();
 
 	/** @var mixed unfiltered submitted value */
 	protected $rawValue = '';
@@ -55,14 +47,7 @@ abstract class TextBase extends BaseControl
 	 */
 	public function getValue()
 	{
-		$value = $this->value;
-		if (!empty($this->control->maxlength)) {
-			$value = Nette\Utils\Strings::substring($value, 0, $this->control->maxlength);
-		}
-		foreach ($this->filters as $filter) {
-			$value = (string) call_user_func($filter, $value);
-		}
-		return $value === $this->translate($this->emptyValue) ? '' : $value;
+		return $this->value === Strings::trim($this->translate($this->emptyValue)) ? '' : $this->value;
 	}
 
 
@@ -89,14 +74,25 @@ abstract class TextBase extends BaseControl
 
 
 	/**
+	 * Sets the maximum number of allowed characters.
+	 * @param  int
+	 * @return self
+	 */
+	public function setMaxLength($length)
+	{
+		$this->control->maxlength = $length;
+		return $this;
+	}
+
+
+	/**
 	 * Appends input string filter callback.
 	 * @param  callable
 	 * @return self
-	 * @deprecated
 	 */
 	public function addFilter($filter)
 	{
-		$this->filters[] = Nette\Utils\Callback::check($filter);
+		$this->rules->addFilter($filter);
 		return $this;
 	}
 
@@ -105,7 +101,7 @@ abstract class TextBase extends BaseControl
 	{
 		$el = parent::getControl();
 		if ($this->emptyValue !== '') {
-			$el->attrs['data-nette-empty-value'] = $this->translate($this->emptyValue);
+			$el->attrs['data-nette-empty-value'] = Strings::trim($this->translate($this->emptyValue));
 		}
 		if (isset($el->placeholder)) {
 			$el->placeholder = $this->translate($el->placeholder);
@@ -123,102 +119,6 @@ abstract class TextBase extends BaseControl
 			}
 		}
 		return parent::addRule($validator, $message, $arg);
-	}
-
-
-	/********************* validators ****************d*g**/
-
-
-	/**
-	 * Is control's value valid email address?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateEmail(TextBase $control)
-	{
-		return Validators::isEmail($control->getValue());
-	}
-
-
-	/**
-	 * Is control's value valid URL?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateUrl(TextBase $control)
-	{
-		if (Validators::isUrl($value = $control->getValue())) {
-			return TRUE;
-
-		} elseif (Validators::isUrl($value = "http://$value")) {
-			$control->setValue($value);
-			return TRUE;
-		}
-		return FALSE;
-	}
-
-
-	/** @deprecated */
-	public static function validateRegexp(TextBase $control, $regexp)
-	{
-		trigger_error('Validator REGEXP is deprecated; use PATTERN instead (which is matched against the entire value and is case sensitive).', E_USER_DEPRECATED);
-		return (bool) Strings::match($control->getValue(), $regexp);
-	}
-
-
-	/**
-	 * Matches control's value regular expression?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validatePattern(TextBase $control, $pattern)
-	{
-		return (bool) Strings::match($control->getValue(), "\x01^($pattern)\\z\x01u");
-	}
-
-
-	/**
-	 * Is a control's value decimal number?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateInteger(TextBase $control)
-	{
-		if (Validators::isNumericInt($value = $control->getValue())) {
-			if (!is_float($tmp = $value * 1)) { // bigint leave as string
-				$control->setValue($tmp);
-			}
-			return TRUE;
-		}
-		return FALSE;
-	}
-
-
-	/**
-	 * Is a control's value float number?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateFloat(TextBase $control)
-	{
-		$value = self::filterFloat($control->getValue());
-		if (Validators::isNumeric($value)) {
-			$control->setValue((float) $value);
-			return TRUE;
-		}
-		return FALSE;
-	}
-
-
-	/**
-	 * Float string cleanup.
-	 * @param  string
-	 * @return string
-	 * @internal
-	 */
-	public static function filterFloat($s)
-	{
-		return str_replace(array(' ', ','), array('', '.'), $s);
 	}
 
 }

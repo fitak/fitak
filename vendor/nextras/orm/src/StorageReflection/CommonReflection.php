@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\StorageReflection;
@@ -22,11 +20,15 @@ class CommonReflection extends Object implements IStorageReflection
 	/** @var string */
 	private $storageName;
 
+	/** @var */
+	private $primaryKeys;
 
-	public function __construct(IMapper $mapper, $storageName)
+
+	public function __construct(IMapper $mapper, $storageName, $primaryKeys)
 	{
 		$this->mapper = $mapper;
 		$this->storageName = $storageName;
+		$this->primaryKeys = $primaryKeys;
 	}
 
 
@@ -38,7 +40,7 @@ class CommonReflection extends Object implements IStorageReflection
 
 	public function getStoragePrimaryKey()
 	{
-		return ['id'];
+		return $this->primaryKeys;
 	}
 
 
@@ -65,15 +67,6 @@ class CommonReflection extends Object implements IStorageReflection
 	public function convertStorageToEntityKey($key)
 	{
 		return $key;
-	}
-
-
-	private function renameKey(& $array, $oldKey, $newKey)
-	{
-		if ($oldKey !== $newKey && array_key_exists($oldKey, $array)) {
-			$array[$newKey] = $array[$oldKey];
-			unset($array[$oldKey]);
-		}
 	}
 
 }

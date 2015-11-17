@@ -7,14 +7,12 @@
 
 namespace Nette\Reflection;
 
-use Nette,
-	Nette\Utils\Strings;
+use Nette;
+use Nette\Utils\Strings;
 
 
 /**
  * Annotations support for PHP.
- *
- * @author     David Grudl
  * @Annotation
  */
 class AnnotationsParser
@@ -155,14 +153,16 @@ class AnnotationsParser
 	{
 		if (empty($name)) {
 			throw new Nette\InvalidArgumentException('Class name must not be empty.');
-		}
 
-		if ($name[0] === '\\') { // already fully qualified
+		} elseif ($name === 'self') {
+			return $reflector->getName();
+
+		} elseif ($name[0] === '\\') { // already fully qualified
 			return ltrim($name, '\\');
 		}
 
 		$filename = $reflector->getFileName();
-		$parsed = static::getCache()->load($filename, function(& $dp) use ($filename) {
+		$parsed = static::getCache()->load($filename, function (& $dp) use ($filename) {
 			if (AnnotationsParser::$autoRefresh) {
 				$dp[Nette\Caching\Cache::FILES] = $filename;
 			}
@@ -270,18 +270,19 @@ class AnnotationsParser
 	 * Parses PHP file.
 	 * @param  string
 	 * @return array [class => [prop => comment (or 'use' => [alias => class])]
+	 * @internal
 	 */
 	public static function parsePhp($code)
 	{
 		if (Strings::match($code, '#//nette'.'loader=(\S*)#')) {
-			return; // TODO: allways ignore?
+			return;
 		}
 
 		$tokens = @token_get_all($code);
 		$namespace = $class = $classLevel = $level = $docComment = NULL;
 		$res = $uses = array();
 
-		while (list($key, $token) = each($tokens)) {
+		while (list(, $token) = each($tokens)) {
 			switch (is_array($token) ? $token[0] : $token) {
 				case T_DOC_COMMENT:
 					$docComment = $token[1];

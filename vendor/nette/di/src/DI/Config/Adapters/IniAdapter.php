@@ -7,14 +7,12 @@
 
 namespace Nette\DI\Config\Adapters;
 
-use Nette,
-	Nette\DI\Config\Helpers;
+use Nette;
+use Nette\DI\Config\Helpers;
 
 
 /**
  * Reading and generating INI files.
- *
- * @author     David Grudl
  */
 class IniAdapter extends Nette\Object implements Nette\DI\Config\IAdapter
 {
@@ -33,7 +31,7 @@ class IniAdapter extends Nette\Object implements Nette\DI\Config\IAdapter
 	 */
 	public function load($file)
 	{
-		$ini = @parse_ini_file($file, TRUE); // intentionally @
+		$ini = @parse_ini_file($file, TRUE); // @ escalated to exception
 		if ($ini === FALSE) {
 			$error = error_get_last();
 			throw new Nette\InvalidStateException("parse_ini_file(): $error[message]");

@@ -3,6 +3,7 @@
 namespace Fitak;
 
 use Nette\Application\UI;
+use Tracy\Debugger;
 
 
 class TagCloudControl extends UI\Control
@@ -30,7 +31,7 @@ class TagCloudControl extends UI\Control
 
 		if ($this->trendingTags)
 		{
-			$maximum = $this->trendingTags[0]['count'];
+			$maximum = $this->trendingTags[0]->toArray()['count'];
 			foreach ($this->trendingTags as $tag)
 			{
 				if ($tag->name === 'mute') continue;

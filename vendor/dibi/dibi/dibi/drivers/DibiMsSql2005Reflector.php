@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * The dibi reflector for MSSQL2005 databases.
  *
- * @author     Daniel Kouba
  * @package    dibi\drivers
  * @internal
  */
@@ -104,7 +103,7 @@ class DibiMsSql2005Reflector extends DibiObject implements IDibiReflector
 	{
 		$keyUsagesRes = $this->driver->query("SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME = {$this->driver->escape($table, dibi::TEXT)}");
 		$keyUsages = array();
-		while( $row = $keyUsagesRes->fetch(TRUE) ) {
+		while ($row = $keyUsagesRes->fetch(TRUE)) {
 			$keyUsages[$row['CONSTRAINT_NAME']][(int) $row['ORDINAL_POSITION'] - 1] = $row['COLUMN_NAME'];
 		}
 

@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi file logger.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiFileLogger extends DibiObject
@@ -58,7 +57,7 @@ class DibiFileLogger extends DibiObject
 			);
 		} else {
 			fwrite($handle,
-				"OK: " . $event->sql
+				'OK: ' . $event->sql
 				. ($event->count ? ";\n-- rows: " . $event->count : '')
 				. "\n-- takes: " . sprintf('%0.3f ms', $event->time * 1000)
 				. "\n-- source: " . implode(':', $event->source)

@@ -10,17 +10,21 @@
          stopOnError="false"
          stopOnFailure="false"
          syntaxCheck="true"
-         strict="false"
          verbose="true">
 >
     <testsuites>
         <testsuite name="Mockery Test Suite">
             <directory suffix="Test.php">./tests</directory>
+            <exclude>./tests/Mockery/MockingVariadicArgumentsTest.php</exclude>
+            <file phpVersion="5.6.0" phpVersionOperator=">=">./tests/Mockery/MockingVariadicArgumentsTest.php</file>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./library/</directory>
+            <exclude>
+                <file>./library/Mockery/Adapter/Phpunit/MockeryPHPUnitIntegration.php</file>
+            </exclude>
         </whitelist>
     </filter>
     <listeners>

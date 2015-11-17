@@ -7,17 +7,14 @@
 
 namespace Nette\Neon;
 
-use Nette;
-
 
 /**
  * Simple parser & generator for Nette Object Notation.
- *
- * @author     David Grudl
  */
 class Neon
 {
 	const BLOCK = Encoder::BLOCK;
+	const CHAIN = '!!chain';
 
 
 	/**

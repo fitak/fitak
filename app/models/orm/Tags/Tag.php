@@ -2,7 +2,7 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\ManyHasMany;
 
 
@@ -13,7 +13,7 @@ use Nextras\Orm\Relationships\ManyHasMany;
  * @property ManyHasMany|Post[] $posts  {m:n PostsRepository $tags}
  * @property ManyHasMany|User[] $favoredBy {m:n UsersRepository $favoriteTags}
  */
-class Tag extends Orm\Entity\Entity
+class Tag extends Entity
 {
 
 }

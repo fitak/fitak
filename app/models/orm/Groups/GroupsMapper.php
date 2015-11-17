@@ -2,10 +2,10 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Mapper\Mapper;
 
 
-class GroupsMapper extends Orm\Mapper\Mapper
+class GroupsMapper extends Mapper
 {
 
 }

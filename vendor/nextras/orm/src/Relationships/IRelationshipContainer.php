@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
@@ -32,15 +30,16 @@ interface IRelationshipContainer extends IPropertyContainer
 
 
 	/**
-	 * @return mixed
-	 */
-	public function getPrimaryValue();
-
-
-	/**
 	 * Returns true if container was loaded.
 	 * @return bool
 	 */
 	public function isLoaded();
+
+
+	/**
+	 * Returns true if relationship is modified.
+	 * @return bool
+	 */
+	public function isModified();
 
 }

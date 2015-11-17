@@ -3,4 +3,5 @@
 // require __DIR__ . '/../app/templates/maintenance.phtml';
 
 $container = require __DIR__ . '/../app/bootstrap.php';
-$container->application->run();
+//$container->application->run();
+$container->getByType('Nette\Application\Application')->run();

@@ -2,7 +2,7 @@ Nette Database
 ==============
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/database.svg)](https://packagist.org/packages/nette/database)
-[![Build Status](https://travis-ci.org/nette/database.svg?branch=master)](https://travis-ci.org/nette/database)
+[![Build Status](https://travis-ci.org/nette/database.svg?branch=v2.3)](https://travis-ci.org/nette/database)
 
 Nette provides a powerful layer for accessing your database easily.
 
@@ -81,7 +81,7 @@ As we mentioned in the chapter intro, Database\Table layer maintains the table r
 
 In provided examples we will work with this database schema below. There are common OneHasMany and ManyHasMany relationships. OneHasMany relationship is doubled, a book must have an author and could have a translator (`translator_id` could be a `NULL`).
 
-![](http://files.nette.org/git/doc-2.1/db-schema-1-.png)
+![](https://files.nette.org/git/doc-2.1/db-schema-1-.png)
 
 In example below we are getting related data for fetched books. In author property (of book ActiveRow instances) is available another ActiveRow instance, which represents author of the book. Getting book_tag instances is done by `related()` method, which returns collection of this instances. In the cycle we get the tag name from another ActiveRow instance available in book_tag instance.
 

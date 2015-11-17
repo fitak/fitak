@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Responses;
@@ -12,11 +12,6 @@ use Nette;
 
 /**
  * JSON response used mainly for AJAX requests.
- *
- * @author     David Grudl
- *
- * @property-read array|\stdClass $payload
- * @property-read string $contentType
  */
 class JsonResponse extends Nette\Object implements Nette\Application\IResponse
 {

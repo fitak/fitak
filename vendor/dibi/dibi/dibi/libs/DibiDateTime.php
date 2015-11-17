@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * DateTime with serialization and timestamp support for PHP 5.2.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiDateTime extends DateTime
@@ -44,7 +43,7 @@ class DibiDateTime extends DateTime
 
 	public function setTimestamp($timestamp)
 	{
-		$zone = PHP_VERSION_ID === 50206 ? new \DateTimeZone($this->getTimezone()->getName()) : $this->getTimezone();
+		$zone = PHP_VERSION_ID === 50206 ? new DateTimeZone($this->getTimezone()->getName()) : $this->getTimezone();
 		$this->__construct('@' . $timestamp);
 		$this->setTimeZone($zone);
 		return $this;

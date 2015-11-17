@@ -2,19 +2,15 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi SQL builder via fluent interfaces. EXPERIMENTAL!
  *
- * @author     David Grudl
  * @package    dibi
  *
- * @property-read string $command
- * @property-read DibiConnection $connection
- * @property-read DibiResultIterator $iterator
  * @method DibiFluent select($field)
  * @method DibiFluent distinct()
  * @method DibiFluent from($table)
@@ -24,6 +20,8 @@
  * @method DibiFluent orderBy($field)
  * @method DibiFluent limit(int $limit)
  * @method DibiFluent offset(int $offset)
+ * @method DibiFluent leftJoin($table)
+ * @method DibiFluent on($cond)
  */
 class DibiFluent extends DibiObject implements IDataSource
 {
@@ -189,6 +187,7 @@ class DibiFluent extends DibiObject implements IDataSource
 
 		foreach ($args as $arg) {
 			if ($arg instanceof self) {
+				$this->cursor[] = '%SQL';
 				$arg = "($arg)";
 			}
 			$this->cursor[] = $arg;
@@ -317,7 +316,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	 */
 	public function fetch()
 	{
-		if ($this->command === 'SELECT') {
+		if ($this->command === 'SELECT' && !$this->clauses['LIMIT'] && !$this->clauses['OFFSET']) {
 			return $this->query($this->_export(NULL, array('%lmt', 1)))->fetch();
 		} else {
 			return $this->query($this->_export())->fetch();
@@ -331,7 +330,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	 */
 	public function fetchSingle()
 	{
-		if ($this->command === 'SELECT') {
+		if ($this->command === 'SELECT' && !$this->clauses['LIMIT'] && !$this->clauses['OFFSET']) {
 			return $this->query($this->_export(NULL, array('%lmt', 1)))->fetchSingle();
 		} else {
 			return $this->query($this->_export())->fetchSingle();
@@ -403,7 +402,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	public function count()
 	{
 		return (int) $this->query(array(
-			'SELECT COUNT(*) FROM (%ex', $this->_export(), ') AS [data]'
+			'SELECT COUNT(*) FROM (%ex', $this->_export(), ') [data]',
 		))->fetchSingle();
 	}
 

@@ -3,6 +3,7 @@
 namespace Nette\Bridges\DITracy;
 
 use Nette,
+	Tracy\Helpers,
 	Tracy\Dumper;
 
 ?>
@@ -45,13 +46,13 @@ use Nette,
 		</thead>
 		<tbody>
 		<?php foreach ($services as $name => $class): ?>
-		<?php $autowired = in_array($name, $container->findByType($class)); ?>
+		<?php $autowired = !empty($meta[Nette\DI\Container::TYPES][$class][TRUE]) && in_array($name, $meta[Nette\DI\Container::TYPES][$class][TRUE]) ?>
 		<tr>
 			<td class="<?php echo isset($registry[$name]) ? 'created' : '' ?>"><?php echo htmlSpecialChars($name) ?></td>
 			<td class="<?php echo $autowired ? 'yes' : '' ?>"><?php echo $autowired ? 'yes' : 'no' ?></td>
 			<td>
 				<?php if (isset($registry[$name]) && !$registry[$name] instanceof Nette\DI\Container): ?>
-					<?php echo Dumper::toHtml($registry[$name], array(Dumper::COLLAPSE => TRUE)); ?>
+					<?php echo Dumper::toHtml($registry[$name], array(Dumper::COLLAPSE => TRUE, Dumper::LIVE => TRUE)); ?>
 				<?php elseif (isset($registry[$name])): ?>
 					<code><?php echo get_class($registry[$name]) ?></code>
 				<?php elseif (is_string($class)): ?>
@@ -69,5 +70,7 @@ use Nette,
 	<div class="nette-ContainerPanel-parameters">
 		<?php echo Dumper::toHtml($container->parameters); ?>
 	</div>
+
+	<p>Source: <?php echo Helpers::editorLink($file) ?></p>
 </div>
 </div>

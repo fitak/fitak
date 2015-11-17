@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -28,7 +28,6 @@ require_once dirname(__FILE__) . '/DibiMySqlReflector.php';
  *   - resource (mysqli) => existing connection resource
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
@@ -79,7 +78,7 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 				'timezone' => date('P'),
 				'username' => ini_get('mysqli.default_user'),
 				'password' => ini_get('mysqli.default_pw'),
-				'socket' => ini_get('mysqli.default_socket'),
+				'socket' => (string) ini_get('mysqli.default_socket'),
 				'port' => NULL,
 			);
 			if (!isset($config['host'])) {
@@ -389,8 +388,8 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 * @throws DibiException
 	 */
 	public function seek($row)
@@ -420,9 +419,10 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 	public function getResultColumns()
 	{
 		static $types;
-		if (empty($types)) {
+		if ($types === NULL) {
 			$consts = get_defined_constants(TRUE);
-			foreach ($consts['mysqli'] as $key => $value) {
+			$types = array();
+			foreach (isset($consts['mysqli']) ? $consts['mysqli'] : array() as $key => $value) {
 				if (strncmp($key, 'MYSQLI_TYPE_', 12) === 0) {
 					$types[$value] = substr($key, 12);
 				}
@@ -438,7 +438,7 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 				'name' => $row['name'],
 				'table' => $row['orgtable'],
 				'fullname' => $row['table'] ? $row['table'] . '.' . $row['name'] : $row['name'],
-				'nativetype' => $types[$row['type']],
+				'nativetype' => isset($types[$row['type']]) ? $types[$row['type']] : $row['type'],
 				'vendor' => $row,
 			);
 		}
@@ -453,7 +453,7 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 	public function getResultResource()
 	{
 		$this->autoFree = FALSE;
-		return $this->resultSet === NULL || $this->resultSet->type === NULL ? NULL : $this->resultSet;
+		return $this->resultSet;
 	}
 
 }

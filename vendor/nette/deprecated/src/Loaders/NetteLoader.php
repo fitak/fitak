@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Nette auto loader is responsible for loading Nette classes and interfaces.
- *
- * @author     David Grudl
  */
 class NetteLoader
 {

@@ -1,21 +1,19 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Mapper;
 
-use Nextras\Orm\Mapper\Nette\NetteMapper;
+use Nextras\Orm\Mapper\Dbal\DbalMapper;
 
 
 /**
  * Default mapper.
  */
-abstract class Mapper extends NetteMapper
+abstract class Mapper extends DbalMapper
 {
 }

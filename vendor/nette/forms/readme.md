@@ -2,7 +2,7 @@ Nette Forms: greatly facilitates web forms
 ==========================================
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/forms.svg)](https://packagist.org/packages/nette/forms)
-[![Build Status](https://travis-ci.org/nette/forms.svg?branch=v2.2)](https://travis-ci.org/nette/forms)
+[![Build Status](https://travis-ci.org/nette/forms.svg?branch=v2.3)](https://travis-ci.org/nette/forms)
 
 Nette\Forms greatly facilitates creating and processing web forms. What it can really do?
 
@@ -15,7 +15,7 @@ Why should you bother setting up framework for a simple web form? You won't have
 
 Nette Framework puts a great effort to be safe and since forms are the most common user input, Nette forms are as good as impenetrable. All is maintained dynamically and transparently, nothing has to be set manually. Well known vulnerabilities such as Cross Site Scripting (XSS) and Cross-Site Request Forgery (CSRF) are filtered, as well as special control characters. All inputs are checked for UTF-8 validity. Every multiple-choice, select boxe and similar are checked for forged values upon validating. Sounds good? Let's try it out.
 
-[See documentation](http://doc.nette.org/en/forms).
+[See documentation](https://doc.nette.org/en/forms).
 
 First form
 ----------
@@ -40,7 +40,7 @@ $form->addText('name', 'Name:')
 	->setRequired('Please fill your name.');
 ```
 
-Try submitting a form without the name - you will se this very message until you meet the validation rules. All that is left for us is setting up JavaScript rules. Luckily it's an piece of cake. We only have to link `netteForms.js`, which is located at `/client-side/forms` in the distribution package.
+Try submitting a form without the name - you will keep seeing this message until you meet the validation rules. All that is left for us is setting up JavaScript rules. Luckily it's a piece of cake. We only have to link `netteForms.js`, which is located at `/client-side/forms` in the distribution package.
 
 ```html
 <script src="netteForms.js"></script>
@@ -54,4 +54,4 @@ Nette Framework adds `required` class to all mandatory elements. Adding the foll
 </style>
 ```
 
-[Continue…](http://doc.nette.org/en/forms).
+[Continue…](https://doc.nette.org/en/forms).

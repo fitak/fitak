@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -10,8 +10,6 @@ namespace Latte;
 
 /**
  * Latte compiler.
- *
- * @author     David Grudl
  */
 class Compiler extends Object
 {
@@ -48,15 +46,18 @@ class Compiler extends Object
 	/** @var string */
 	private $templateId;
 
+	/** @var mixed */
+	private $lastAttrValue;
+
 	/** Context-aware escaping content types */
-	const CONTENT_HTML = 'html',
-		CONTENT_XHTML = 'xhtml',
-		CONTENT_XML = 'xml',
-		CONTENT_JS = 'js',
-		CONTENT_CSS = 'css',
-		CONTENT_URL = 'url',
-		CONTENT_ICAL = 'ical',
-		CONTENT_TEXT = 'text';
+	const CONTENT_HTML = Engine::CONTENT_HTML,
+		CONTENT_XHTML = Engine::CONTENT_XHTML,
+		CONTENT_XML = Engine::CONTENT_XML,
+		CONTENT_JS = Engine::CONTENT_JS,
+		CONTENT_CSS = Engine::CONTENT_CSS,
+		CONTENT_URL = Engine::CONTENT_URL,
+		CONTENT_ICAL = Engine::CONTENT_ICAL,
+		CONTENT_TEXT = Engine::CONTENT_TEXT;
 
 	/** @internal Context-aware escaping HTML contexts */
 	const CONTEXT_COMMENT = 'comment',
@@ -89,9 +90,9 @@ class Compiler extends Object
 	 * @param  Token[]
 	 * @return string
 	 */
-	public function compile(array $tokens)
+	public function compile(array $tokens, $className)
 	{
-		$this->templateId = substr(lcg_value(), 2, 10);
+		$this->templateId = substr(md5($className), 0, 10);
 		$this->tokens = $tokens;
 		$output = '';
 		$this->output = & $output;
@@ -126,6 +127,12 @@ class Compiler extends Object
 		}
 
 		$output = $this->expandTokens($output);
+		$output = "<?php\n"
+			. "class $className extends Latte\\Template {\n"
+			. "function render() {\n"
+			. 'foreach ($this->params as $__k => $__v) $$__k = $__v; unset($__k, $__v);'
+			. '?>' . $output . "<?php\n}}";
+
 		return $output;
 	}
 
@@ -206,10 +213,12 @@ class Compiler extends Object
 
 	private function processText(Token $token)
 	{
-		if (in_array($this->context[0], array(self::CONTEXT_SINGLE_QUOTED_ATTR, self::CONTEXT_DOUBLE_QUOTED_ATTR), TRUE)
-			&& $token->text === $this->context[0]
-		) {
-			$this->setContext(self::CONTEXT_UNQUOTED_ATTR);
+		if (in_array($this->context[0], array(self::CONTEXT_SINGLE_QUOTED_ATTR, self::CONTEXT_DOUBLE_QUOTED_ATTR), TRUE)) {
+			if ($token->text === $this->context[0]) {
+				$this->setContext(self::CONTEXT_UNQUOTED_ATTR);
+			} elseif ($this->lastAttrValue === '') {
+				$this->lastAttrValue = $token->text;
+			}
 		}
 		$this->output .= $token->text;
 	}
@@ -217,6 +226,10 @@ class Compiler extends Object
 
 	private function processMacroTag(Token $token)
 	{
+		if (in_array($this->context[0], array(self::CONTEXT_SINGLE_QUOTED_ATTR, self::CONTEXT_DOUBLE_QUOTED_ATTR, self::CONTEXT_UNQUOTED_ATTR), TRUE)) {
+			$this->lastAttrValue = TRUE;
+		}
+
 		$isRightmost = !isset($this->tokens[$this->position + 1])
 			|| substr($this->tokens[$this->position + 1]->text, 0, 1) === "\n";
 
@@ -255,8 +268,6 @@ class Compiler extends Object
 
 		} else {
 			$this->htmlNode = new HtmlNode($token->name, $this->htmlNode);
-			$this->htmlNode->isEmpty = in_array($this->contentType, array(self::CONTENT_HTML, self::CONTENT_XHTML), TRUE)
-				&& isset(Helpers::$emptyElements[strtolower($token->name)]);
 			$this->htmlNode->offset = strlen($this->output);
 			$this->setContext(self::CONTEXT_UNQUOTED_ATTR);
 		}
@@ -273,40 +284,49 @@ class Compiler extends Object
 		}
 
 		$htmlNode = $this->htmlNode;
-		$isEmpty = !$htmlNode->closing && (strpos($token->text, '/') !== FALSE || $htmlNode->isEmpty);
 		$end = '';
 
-		if ($isEmpty && in_array($this->contentType, array(self::CONTENT_HTML, self::CONTENT_XHTML), TRUE)) { // auto-correct
-			$token->text = preg_replace('#^.*>#', $htmlNode->isEmpty && $this->contentType === self::CONTENT_XHTML ? ' />' : '>', $token->text);
-			if (!$htmlNode->isEmpty) {
-				$end = "</$htmlNode->name>";
+		if (!$htmlNode->closing) {
+			$htmlNode->isEmpty = strpos($token->text, '/') !== FALSE;
+			if (in_array($this->contentType, array(self::CONTENT_HTML, self::CONTENT_XHTML), TRUE)) {
+				$emptyElement = isset(Helpers::$emptyElements[strtolower($htmlNode->name)]);
+				$htmlNode->isEmpty = $htmlNode->isEmpty || $emptyElement;
+				if ($htmlNode->isEmpty) { // auto-correct
+					$space = substr(strstr($token->text, '>'), 1);
+					if ($emptyElement) {
+						$token->text = ($this->contentType === self::CONTENT_XHTML ? ' />' : '>') . $space;
+					} else {
+						$token->text = '>';
+						$end = "</$htmlNode->name>" . $space;
+					}
+				}
 			}
 		}
 
-		if (empty($htmlNode->macroAttrs)) {
-			$this->output .= $token->text . $end;
-		} else {
+		if ($htmlNode->macroAttrs) {
 			$code = substr($this->output, $htmlNode->offset) . $token->text;
 			$this->output = substr($this->output, 0, $htmlNode->offset);
 			$this->writeAttrsMacro($code);
-			if ($isEmpty) {
-				$htmlNode->closing = TRUE;
+		} else {
+			$this->output .= $token->text . $end;
+		}
+
+		if ($htmlNode->isEmpty) {
+			$htmlNode->closing = TRUE;
+			if ($htmlNode->macroAttrs) {
 				$this->writeAttrsMacro($end);
 			}
 		}
 
-		if ($isEmpty) {
-			$htmlNode->closing = TRUE;
-		}
+		$this->setContext(NULL);
 
-		$lower = strtolower($htmlNode->name);
-		if (!$htmlNode->closing && ($lower === 'script' || $lower === 'style')) {
+		if ($htmlNode->closing) {
+			$this->htmlNode = $this->htmlNode->parentNode;
+
+		} elseif ((($lower = strtolower($htmlNode->name)) === 'script' || $lower === 'style')
+			&& (!isset($htmlNode->attrs['type']) || preg_match('#(java|j|ecma|live)script|json|css#i', $htmlNode->attrs['type']))
+		) {
 			$this->setContext($lower === 'script' ? self::CONTENT_JS : self::CONTENT_CSS);
-		} else {
-			$this->setContext(NULL);
-			if ($htmlNode->closing) {
-				$this->htmlNode = $this->htmlNode->parentNode;
-			}
 		}
 	}
 
@@ -325,12 +345,16 @@ class Compiler extends Object
 			return;
 		}
 
-		$this->htmlNode->attrs[$token->name] = TRUE;
+		$this->lastAttrValue = & $this->htmlNode->attrs[$token->name];
 		$this->output .= $token->text;
 
-		$contextMain = in_array($token->value, array(self::CONTEXT_SINGLE_QUOTED_ATTR, self::CONTEXT_DOUBLE_QUOTED_ATTR), TRUE)
-			? $token->value
-			: self::CONTEXT_UNQUOTED_ATTR;
+		if (in_array($token->value, array(self::CONTEXT_SINGLE_QUOTED_ATTR, self::CONTEXT_DOUBLE_QUOTED_ATTR), TRUE)) {
+			$this->lastAttrValue = '';
+			$contextMain = $token->value;
+		} else {
+			$this->lastAttrValue = $token->value;
+			$contextMain = self::CONTEXT_UNQUOTED_ATTR;
+		}
 
 		$context = NULL;
 		if (in_array($this->contentType, array(self::CONTENT_HTML, self::CONTENT_XHTML), TRUE)) {
@@ -537,23 +561,26 @@ class Compiler extends Object
 		$inScript = in_array($this->context[0], array(self::CONTENT_JS, self::CONTENT_CSS), TRUE);
 
 		if (empty($this->macros[$name])) {
-			throw new CompileException("Unknown macro {{$name}}" . ($inScript ? ' (in JavaScript or CSS, try to put a space after bracket.)' : ''));
+			$hint = ($t = Helpers::getSuggestion(array_keys($this->macros), $name)) ? ", did you mean {{$t}}?" : '';
+			throw new CompileException("Unknown macro {{$name}}$hint" . ($inScript ? ' (in JavaScript or CSS, try to put a space after bracket.)' : ''));
 		}
 
-		if ($this->context[1] === self::CONTENT_URL) {
-			$modifiers = preg_replace('#\|nosafeurl\s?(?=\||\z)#i', '', $modifiers, -1, $found);
-			if (!$found && !preg_match('#\|datastream(?=\s|\||\z)#i', $modifiers)) {
-				$modifiers .= '|safeurl';
+		if (strpbrk($name, '=~%^&_')) {
+			if ($this->context[1] === self::CONTENT_URL) {
+				$modifiers = preg_replace('#\|nosafeurl\s?(?=\||\z)#i', '', $modifiers, -1, $found);
+				if (!$found && !preg_match('#\|datastream(?=\s|\||\z)#i', $modifiers)) {
+					$modifiers .= '|safeurl';
+				}
 			}
-		}
 
-		$modifiers = preg_replace('#\|noescape\s?(?=\||\z)#i', '', $modifiers, -1, $found);
-		if (!$found && strpbrk($name, '=~%^&_')) {
-			$modifiers .= '|escape';
-		}
+			$modifiers = preg_replace('#\|noescape\s?(?=\||\z)#i', '', $modifiers, -1, $found);
+			if (!$found) {
+				$modifiers .= '|escape';
+			}
 
-		if (!$found && $inScript && $name === '=' && preg_match('#["\'] *\z#', $this->tokens[$this->position - 1]->text)) {
-			throw new CompileException("Do not place {$this->tokens[$this->position]->text} inside quotes.");
+			if (!$found && $inScript && $name === '=' && preg_match('#["\'] *\z#', $this->tokens[$this->position - 1]->text)) {
+				throw new CompileException("Do not place {$this->tokens[$this->position]->text} inside quotes.");
+			}
 		}
 
 		foreach (array_reverse($this->macros[$name]) as $macro) {

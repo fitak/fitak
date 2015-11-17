@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity\Reflection;
@@ -25,9 +23,6 @@ class EntityMetadata extends Object
 	/** @var array Primary key. */
 	private $primaryKey = [];
 
-	/** @var array Array of properties for entity persisting. */
-	private $storageProperties = [];
-
 	/** @var PropertyMetadata[] */
 	private $properties = [];
 
@@ -41,18 +36,6 @@ class EntityMetadata extends Object
 	public function getClassName()
 	{
 		return $this->className;
-	}
-
-
-	public function setStorageProperties(array $storageProperties)
-	{
-		$this->storageProperties = $storageProperties;
-	}
-
-
-	public function getStorageProperties()
-	{
-		return $this->storageProperties;
 	}
 
 
@@ -76,7 +59,7 @@ class EntityMetadata extends Object
 	public function getProperty($name)
 	{
 		if (!isset($this->properties[$name])) {
-			throw new InvalidArgumentException("Undefined property '$name'.");
+			throw new InvalidArgumentException("Undefined property {$this->className}::\${$name}.");
 		}
 
 		return $this->properties[$name];

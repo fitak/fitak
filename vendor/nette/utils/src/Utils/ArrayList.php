@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -12,10 +12,6 @@ use Nette;
 
 /**
  * Provides the base class for a generic list (items can be accessed by index).
- *
- * @author     David Grudl
- *
- * @property-read \ArrayIterator $iterator
  */
 class ArrayList extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAggregate
 {
@@ -44,10 +40,10 @@ class ArrayList extends Nette\Object implements \ArrayAccess, \Countable, \Itera
 
 	/**
 	 * Replaces or appends a item.
-	 * @param  int
+	 * @param  int|NULL
 	 * @param  mixed
 	 * @return void
-	 * @throws OutOfRangeException
+	 * @throws Nette\OutOfRangeException
 	 */
 	public function offsetSet($index, $value)
 	{
@@ -67,7 +63,7 @@ class ArrayList extends Nette\Object implements \ArrayAccess, \Countable, \Itera
 	 * Returns a item.
 	 * @param  int
 	 * @return mixed
-	 * @throws OutOfRangeException
+	 * @throws Nette\OutOfRangeException
 	 */
 	public function offsetGet($index)
 	{
@@ -93,7 +89,7 @@ class ArrayList extends Nette\Object implements \ArrayAccess, \Countable, \Itera
 	 * Removes the element at the specified position in this list.
 	 * @param  int
 	 * @return void
-	 * @throws OutOfRangeException
+	 * @throws Nette\OutOfRangeException
 	 */
 	public function offsetUnset($index)
 	{

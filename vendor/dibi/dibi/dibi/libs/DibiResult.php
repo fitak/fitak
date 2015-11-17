@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -22,15 +22,9 @@
  * unset($result);
  * </code>
  *
- * @author     David Grudl
  * @package    dibi
  *
- * @property-read mixed $resource
- * @property-read IDibiResultDriver $driver
  * @property-read int $rowCount
- * @property-read DibiResultIterator $iterator
- * @property string $rowClass
- * @property-read DibiResultInfo $info
  */
 class DibiResult extends DibiObject implements IDataSource
 {
@@ -109,7 +103,7 @@ class DibiResult extends DibiObject implements IDataSource
 	/**
 	 * Moves cursor position without fetching row.
 	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @return bool     TRUE on success, FALSE if unable to seek to specified record
 	 * @throws DibiException
 	 */
 	final public function seek($row)
@@ -188,7 +182,7 @@ class DibiResult extends DibiObject implements IDataSource
 	/**
 	 * Fetches the row at current position, process optional type conversion.
 	 * and moves the internal cursor to the next position
-	 * @return DibiRow|FALSE  array on success, FALSE if no next record
+	 * @return DibiRow|FALSE array on success, FALSE if no next record
 	 */
 	final public function fetch()
 	{
@@ -209,7 +203,7 @@ class DibiResult extends DibiObject implements IDataSource
 
 	/**
 	 * Like fetch(), but returns only first field.
-	 * @return mixed  value on success, FALSE if no next record
+	 * @return mixed value on success, FALSE if no next record
 	 */
 	final public function fetchSingle()
 	{
@@ -303,16 +297,16 @@ class DibiResult extends DibiObject implements IDataSource
 					$x = & $x[];
 
 				} elseif ($as === '=') { // "value" node
-					$x = $row->{$assoc[$i+1]};
+					$x = $row->{$assoc[$i + 1]};
 					continue 2;
 
 				} elseif ($as === '->') { // "object" node
 					if ($x === NULL) {
 						$x = clone $row;
-						$x = & $x->{$assoc[$i+1]};
+						$x = & $x->{$assoc[$i + 1]};
 						$x = NULL; // prepare child node
 					} else {
-						$x = & $x->{$assoc[$i+1]};
+						$x = & $x->{$assoc[$i + 1]};
 					}
 
 				} elseif ($as !== '|') { // associative-array node
@@ -369,21 +363,20 @@ class DibiResult extends DibiObject implements IDataSource
 				} elseif ($as === '=') { // "record" node
 					if ($x === NULL) {
 						$x = $row->toArray();
-						$x = & $x[ $assoc[$i+1] ];
+						$x = & $x[ $assoc[$i + 1] ];
 						$x = NULL; // prepare child node
 					} else {
-						$x = & $x[ $assoc[$i+1] ];
+						$x = & $x[ $assoc[$i + 1] ];
 					}
 
 				} elseif ($as === '@') { // "object" node
 					if ($x === NULL) {
 						$x = clone $row;
-						$x = & $x->{$assoc[$i+1]};
+						$x = & $x->{$assoc[$i + 1]};
 						$x = NULL; // prepare child node
 					} else {
-						$x = & $x->{$assoc[$i+1]};
+						$x = & $x->{$assoc[$i + 1]};
 					}
-
 
 				} else { // associative-array node
 					$x = & $x[$row->$as];
@@ -424,7 +417,7 @@ class DibiResult extends DibiObject implements IDataSource
 
 		if ($value === NULL) {
 			if ($key !== NULL) {
-				throw new InvalidArgumentException("Either none or both columns must be specified.");
+				throw new InvalidArgumentException('Either none or both columns must be specified.');
 			}
 
 			// autodetect
@@ -478,7 +471,8 @@ class DibiResult extends DibiObject implements IDataSource
 			foreach ($this->getResultDriver()->getResultColumns() as $col) {
 				$this->types[$col['name']] = $cache->{$col['nativetype']};
 			}
-		} catch (DibiNotSupportedException $e) {}
+		} catch (DibiNotSupportedException $e) {
+		}
 	}
 
 
@@ -494,13 +488,23 @@ class DibiResult extends DibiObject implements IDataSource
 				continue;
 			}
 			$value = $row[$key];
-			if ($value === FALSE || $type === dibi::TEXT) {
+			if ($type === dibi::TEXT) {
 
 			} elseif ($type === dibi::INTEGER) {
 				$row[$key] = is_float($tmp = $value * 1) ? $value : $tmp;
 
 			} elseif ($type === dibi::FLOAT) {
-				$row[$key] = ltrim((string) ($tmp = (float) $value), '0') === ltrim(rtrim(rtrim($value, '0'), '.'), '0') ? $tmp : $value;
+				$value = ltrim($value, '0');
+				$p = strpos($value, '.');
+				if ($p !== FALSE) {
+					$value = rtrim(rtrim($value, '0'), '.');
+				}
+				if ($value === '' || $value[0] === '.') {
+					$value = '0' . $value;
+				}
+				$row[$key] = $value === str_replace(',', '.', (string) ($float = (float) $value))
+					? $float
+					: $value;
 
 			} elseif ($type === dibi::BOOL) {
 				$row[$key] = ((bool) $value) && $value !== 'f' && $value !== 'F';
@@ -619,7 +623,7 @@ class DibiResult extends DibiObject implements IDataSource
 
 				foreach ($row as $col => $val) {
 					$spaces = $maxLen - mb_strlen($col) + 2;
-					echo "$col" . str_repeat(" ", $spaces) .  "$val\n";
+					echo "$col" . str_repeat(' ', $spaces) .  "$val\n";
 				}
 
 				echo "\n";

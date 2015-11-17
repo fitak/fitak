@@ -16,7 +16,9 @@
 
 namespace test\Mockery;
 
-class MockClassWithUnknownTypeHintTest extends \PHPUnit_Framework_TestCase
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+
+class MockClassWithUnknownTypeHintTest extends MockeryTestCase
 {
     protected function setUp()
     {
@@ -33,13 +35,11 @@ class MockClassWithUnknownTypeHintTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->mock("test\Mockery\HasUnknownClassAsTypeHintOnMethod");
     }
-
 }
 
 class HasUnknownClassAsTypeHintOnMethod
 {
     public function foo(\UnknownTestClass\Bar $bar)
     {
-
     }
 }

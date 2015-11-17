@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms;
@@ -13,18 +13,13 @@ use Nette;
 /**
  * Container for form controls.
  *
- * @author     David Grudl
- *
- * @property-write $defaults
  * @property   Nette\Utils\ArrayHash $values
- * @property-read bool $valid
- * @property   ControlGroup $currentGroup
  * @property-read \ArrayIterator $controls
  * @property-read Form $form
  */
 class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 {
-	/** @var array of function(Container $sender); Occurs when the form is validated */
+	/** @var callable[]  function (Container $sender); Occurs when the form is validated */
 	public $onValidate;
 
 	/** @var ControlGroup */
@@ -77,7 +72,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 					$control->setValue(NULL);
 				}
 
-			} elseif ($control instanceof Container) {
+			} elseif ($control instanceof self) {
 				if (array_key_exists($name, $values)) {
 					$control->setValues($values[$name], $erase);
 
@@ -102,7 +97,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 			if ($control instanceof IControl && !$control->isOmitted()) {
 				$values[$name] = $control->getValue();
 
-			} elseif ($control instanceof Container) {
+			} elseif ($control instanceof self) {
 				$values[$name] = $control->getValues($asArray);
 			}
 		}
@@ -136,10 +131,19 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function validate(array $controls = NULL)
 	{
-		foreach ($controls === NULL ? $this->getControls() : $controls as $control) {
+		foreach ($controls === NULL ? $this->getComponents() : $controls as $control) {
 			$control->validate();
 		}
-		$this->onValidate($this);
+		if ($this->onValidate !== NULL) {
+			if (!is_array($this->onValidate) && !$this->onValidate instanceof \Traversable) {
+				throw new Nette\UnexpectedValueException('Property Form::$onValidate must be array or Traversable, ' . gettype($this->onValidate) . ' given.');
+			}
+			foreach ($this->onValidate as $handler) {
+				$params = Nette\Utils\Callback::toReflection($handler)->getParameters();
+				$values = isset($params[1]) ? $this->getValues($params[1]->isArray()) : NULL;
+				Nette\Utils\Callback::invoke($handler, $this, $values);
+			}
+		}
 		$this->validated = TRUE;
 	}
 
@@ -183,7 +187,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 
 	/**
 	 * Adds the specified component to the IContainer.
-	 * @param  IComponent
+	 * @param  Nette\ComponentModel\IComponent
 	 * @param  string
 	 * @param  string
 	 * @return self
@@ -281,6 +285,18 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	public function addUpload($name, $label = NULL, $multiple = FALSE)
 	{
 		return $this[$name] = new Controls\UploadControl($label, $multiple);
+	}
+
+
+	/**
+	 * Adds control that allows the user to upload multiple files.
+	 * @param  string  control name
+	 * @param  string  label
+	 * @return Nette\Forms\Controls\UploadControl
+	 */
+	public function addMultiUpload($name, $label = NULL)
+	{
+		return $this[$name] = new Controls\UploadControl($label, TRUE);
 	}
 
 
@@ -413,7 +429,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addContainer($name)
 	{
-		$control = new Container;
+		$control = new self;
 		$control->currentGroup = $this->currentGroup;
 		return $this[$name] = $control;
 	}

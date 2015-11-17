@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi SQL translator.
  *
- * @author     David Grudl
  * @package    dibi
  */
 final class DibiTranslator extends DibiObject
@@ -160,7 +159,7 @@ final class DibiTranslator extends DibiObject
 
 
 		if ($comment) {
-			$sql[] = "*/";
+			$sql[] = '*/';
 		}
 
 		$sql = implode(' ', $sql);
@@ -187,7 +186,7 @@ final class DibiTranslator extends DibiObject
 	public function formatValue($value, $modifier)
 	{
 		if ($this->comment) {
-			return "...";
+			return '...';
 		}
 
 		if (!$this->driver) {
@@ -216,7 +215,7 @@ final class DibiTranslator extends DibiObject
 								$v = $this->formatValue($v, FALSE);
 								$vx[] = $k . ($v === 'NULL' ? 'IS ' : '= ') . $v;
 
-							} elseif ($pair[1] === 'ex') { // TODO: this will be removed
+							} elseif ($pair[1] === 'ex') {
 								$vx[] = $k . $this->formatValue($v, 'ex');
 
 							} else {
@@ -357,19 +356,24 @@ final class DibiTranslator extends DibiObject
 
 				case 'i':  // signed int
 				case 'u':  // unsigned int, ignored
-					// support for long numbers - keep them unchanged
-					if (is_string($value) && preg_match('#[+-]?\d++(e\d+)?\z#A', $value)) {
-						return $value;
+					if ($value === NULL) {
+						return 'NULL';
+					} elseif (is_string($value) && preg_match('#[+-]?\d++(?:e\d+)?\z#A', $value)) {
+						return $value; // support for long numbers - keep them unchanged
+					} elseif (is_string($value) && substr($value, 1, 1) === 'x' && is_numeric($value)) {
+						trigger_error('Support for hex strings has been deprecated.', E_USER_DEPRECATED);
+						return (string) hexdec($value);
 					} else {
-						return $value === NULL ? 'NULL' : (string) (int) ($value + 0);
+						return (string) (int) $value;
 					}
 
 				case 'f':  // float
-					// support for extreme numbers - keep them unchanged
-					if (is_string($value) && is_numeric($value) && strpos($value, 'x') === FALSE) {
-						return $value; // something like -9E-005 is accepted by SQL, HEX values are not
+					if ($value === NULL) {
+						return 'NULL';
+					} elseif (is_string($value) && is_numeric($value) && substr($value, 1, 1) !== 'x') {
+						return $value; // support for extreme numbers - keep them unchanged
 					} else {
-						return $value === NULL ? 'NULL' : rtrim(rtrim(number_format($value + 0, 10, '.', ''), '0'), '.');
+						return rtrim(rtrim(number_format($value + 0, 10, '.', ''), '0'), '.');
 					}
 
 				case 'd':  // date
@@ -489,7 +493,7 @@ final class DibiTranslator extends DibiObject
 
 			if ($cursor >= count($this->args)) {
 				$this->hasError = TRUE;
-				return "**Extra placeholder**";
+				return '**Extra placeholder**';
 			}
 
 			$cursor++;
@@ -512,7 +516,7 @@ final class DibiTranslator extends DibiObject
 					// open comment
 					$this->ifLevelStart = $this->ifLevel;
 					$this->comment = TRUE;
-					return "/*";
+					return '/*';
 				}
 				return '';
 
@@ -520,11 +524,11 @@ final class DibiTranslator extends DibiObject
 				if ($this->ifLevelStart === $this->ifLevel) {
 					$this->ifLevelStart = 0;
 					$this->comment = FALSE;
-					return "*/";
+					return '*/';
 				} elseif (!$this->comment) {
 					$this->ifLevelStart = $this->ifLevel;
 					$this->comment = TRUE;
-					return "/*";
+					return '/*';
 				}
 
 			} elseif ($mod === 'end') {
@@ -533,7 +537,7 @@ final class DibiTranslator extends DibiObject
 					// close comment
 					$this->ifLevelStart = 0;
 					$this->comment = FALSE;
-					return "*/";
+					return '*/';
 				}
 				return '';
 
@@ -542,17 +546,23 @@ final class DibiTranslator extends DibiObject
 				return '';
 
 			} elseif ($mod === 'lmt') { // apply limit
-				if ($this->args[$cursor] !== NULL) {
-					$this->limit = (int) $this->args[$cursor];
+				$arg = $this->args[$cursor++];
+				if ($arg === NULL) {
+				} elseif ($this->comment) {
+					return "(limit $arg)";
+				} else {
+					$this->limit = (int) $arg;
 				}
-				$cursor++;
 				return '';
 
 			} elseif ($mod === 'ofs') { // apply offset
-				if ($this->args[$cursor] !== NULL) {
-					$this->offset = (int) $this->args[$cursor];
+				$arg = $this->args[$cursor++];
+				if ($arg === NULL) {
+				} elseif ($this->comment) {
+					return "(offset $arg)";
+				} else {
+					$this->offset = (int) $arg;
 				}
-				$cursor++;
 				return '';
 
 			} else { // default processing
@@ -572,10 +582,10 @@ final class DibiTranslator extends DibiObject
 			return $this->identifiers->{$matches[2]};
 
 		} elseif ($matches[3]) { // SQL strings: '...'
-			return $this->driver->escape( str_replace("''", "'", $matches[4]), dibi::TEXT);
+			return $this->driver->escape(str_replace("''", "'", $matches[4]), dibi::TEXT);
 
 		} elseif ($matches[5]) { // SQL strings: "..."
-			return $this->driver->escape( str_replace('""', '"', $matches[6]), dibi::TEXT);
+			return $this->driver->escape(str_replace('""', '"', $matches[6]), dibi::TEXT);
 
 		} elseif ($matches[7]) { // string quote
 			$this->hasError = TRUE;
@@ -588,7 +598,7 @@ final class DibiTranslator extends DibiObject
 			return $matches[9] == '' ? $this->formatValue($m, FALSE) : $m . $matches[9]; // value or identifier
 		}
 
-		die('this should be never executed');
+		throw new Exception('this should be never executed');
 	}
 
 

@@ -18,7 +18,8 @@ class SearchPresenter extends BasePresenter
 
 	public function actionDefault($s, $from = NULL, array $groups = NULL, $limit = NULL, $streamView = NULL)
 	{
-		$parsed = $this->context->searchQueryParser->parseQuery($s);
+//		$parsed = $this->context->searchQueryParser->parseQuery($s);
+		$parsed = $this->context->getService('searchQueryParser')->parseQuery($s);
 
 		$this->searchRequest = new SearchRequest();
 		$this->searchRequest->query = $parsed['query'];
@@ -27,7 +28,8 @@ class SearchPresenter extends BasePresenter
 		$this->searchRequest->groups = ($groups ? array_map('strval', $groups) : NULL);
 		$this->searchRequest->timeLimit = $limit;
 
-		$dataModel = $this->context->data;
+//		$dataModel = $this->context->data;
+		$dataModel = $this->context->getService('data');
 		$this['stream']->dataSource = new SearchDataSource($dataModel, $this->searchRequest);
 	}
 

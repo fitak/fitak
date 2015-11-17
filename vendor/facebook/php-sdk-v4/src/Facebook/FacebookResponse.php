@@ -148,7 +148,8 @@ class FacebookResponse
   public function getGraphObjectList($type = 'Facebook\GraphObject') {
     $out = array();
     $data = $this->responseData->data;
-    for ($i = 0; $i < count($data); $i++) {
+    $dataLength = count($data);
+    for ($i = 0; $i < $dataLength; $i++) {
       $out[] = (new GraphObject($data[$i]))->cast($type);
     }
     return $out;
@@ -188,6 +189,9 @@ class FacebookResponse
       $url = parse_url($this->responseData->paging->$direction);
       parse_str($url['query'], $params);
 
+      if (isset($params['type']) && strpos($this->request->getPath(), $params['type']) !== false){
+        unset($params['type']);
+      }
       return new FacebookRequest(
         $this->request->getSession(),
         $this->request->getMethod(),

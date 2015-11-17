@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\UI;
@@ -13,10 +13,7 @@ use Nette;
 /**
  * Control is renderable Presenter component.
  *
- * @author     David Grudl
- *
  * @property-read ITemplate $template
- * @property-read string $snippetId
  */
 abstract class Control extends PresenterComponent implements IRenderable
 {
@@ -109,7 +106,7 @@ abstract class Control extends PresenterComponent implements IRenderable
 	public function redrawControl($snippet = NULL, $redraw = TRUE)
 	{
 		if ($redraw) {
-			$this->invalidSnippets[$snippet] = TRUE;
+			$this->invalidSnippets[$snippet === NULL ? "\0" : $snippet] = TRUE;
 
 		} elseif ($snippet === NULL) {
 			$this->invalidSnippets = array();
@@ -164,7 +161,7 @@ abstract class Control extends PresenterComponent implements IRenderable
 			}
 
 		} else {
-			return isset($this->invalidSnippets[NULL]) || isset($this->invalidSnippets[$snippet]);
+			return isset($this->invalidSnippets["\0"]) || isset($this->invalidSnippets[$snippet]);
 		}
 	}
 

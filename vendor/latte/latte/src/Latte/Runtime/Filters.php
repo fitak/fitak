@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Runtime;
@@ -12,16 +12,14 @@ use Latte;
 
 /**
  * Template filters.
- *
- * @author     David Grudl
  * @internal
  */
 class Filters
 {
-	/** @var string default date format */
+	/** @deprecated */
 	public static $dateFormat = '%x';
 
-	/** @var bool  use XHTML syntax? */
+	/** @internal @var bool  use XHTML syntax? */
 	public static $xhtml = FALSE;
 
 
@@ -40,7 +38,7 @@ class Filters
 		if ($quotes !== ENT_NOQUOTES && strpos($s, '`') !== FALSE && strpbrk($s, ' <>"\'') === FALSE) {
 			$s .= ' ';
 		}
-		return htmlSpecialChars($s, $quotes);
+		return htmlSpecialChars($s, $quotes, 'UTF-8');
 	}
 
 
@@ -69,7 +67,7 @@ class Filters
 		// XML 1.0: \x09 \x0A \x0D and C1 allowed directly, C0 forbidden
 		// XML 1.1: \x00 forbidden directly and as a character reference,
 		//   \x09 \x0A \x0D \x85 allowed directly, C0, C1 and \x7F allowed as character references
-		return htmlSpecialChars(preg_replace('#[\x00-\x08\x0B\x0C\x0E-\x1F]+#', '', $s), ENT_QUOTES);
+		return htmlSpecialChars(preg_replace('#[\x00-\x08\x0B\x0C\x0E-\x1F]+#', '', $s), ENT_QUOTES, 'UTF-8');
 	}
 
 
@@ -112,7 +110,7 @@ class Filters
 	 */
 	public static function escapeICal($s)
 	{
-		// http://www.ietf.org/rfc/rfc5545.txt
+		// https://www.ietf.org/rfc/rfc5545.txt
 		return addcslashes(preg_replace('#[\x00-\x08\x0B\x0C-\x1F]+#', '', $s), "\";\\,:\n");
 	}
 
@@ -137,7 +135,7 @@ class Filters
 	{
 		return preg_replace_callback(
 			'#(</textarea|</pre|</script|^).*?(?=<textarea|<pre|<script|\z)#si',
-			function($m) {
+			function ($m) {
 				return trim(preg_replace('#[ \t\r\n]+#', ' ', $m[0]));
 			},
 			$s
@@ -155,7 +153,7 @@ class Filters
 	public static function indent($s, $level = 1, $chars = "\t")
 	{
 		if ($level >= 1) {
-			$s = preg_replace_callback('#<(textarea|pre).*?</\\1#si', function($m) {
+			$s = preg_replace_callback('#<(textarea|pre).*?</\\1#si', function ($m) {
 				return strtr($m[0], " \t\r\n", "\x1F\x1E\x1D\x1A");
 			}, $s);
 			if (preg_last_error()) {
@@ -170,7 +168,7 @@ class Filters
 
 	/**
 	 * Date/time formatting.
-	 * @param  string|int|DateTime|DateInterval
+	 * @param  string|int|\DateTime|\DateInterval
 	 * @param  string
 	 * @return string
 	 */
@@ -427,8 +425,12 @@ class Filters
 			}
 
 			$q = strpos($value, '"') === FALSE ? '"' : "'";
-			$s .= ' ' . $key . '='
-				. $q . str_replace(array('&', $q), array('&amp;', $q === '"' ? '&quot;' : '&#39;'), $value)
+			$s .= ' ' . $key . '=' . $q
+				. str_replace(
+					array('&', $q, '<'),
+					array('&amp;', $q === '"' ? '&quot;' : '&#39;', self::$xhtml ? '&lt;' : '<'),
+					$value
+				)
 				. (strpos($value, '`') !== FALSE && strpbrk($value, ' <>"\'') === FALSE ? ' ' : '')
 				. $q;
 		}

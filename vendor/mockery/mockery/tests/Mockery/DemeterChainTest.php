@@ -19,8 +19,9 @@
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
  */
 
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 
-class DemeterChainTest extends \PHPUnit_Framework_TestCase
+class DemeterChainTest extends MockeryTestCase
 {
     /** @var  Mockery\Mock $this->mock */
     private $mock;
@@ -147,7 +148,6 @@ class DemeterChainTest extends \PHPUnit_Framework_TestCase
             ->andReturn('somethingElse');
 
         $this->assertEquals('somethingElse', $this->mock->getElement()->getFirst());
-
     }
 
     public function testMultiLevelDemeterChain()
