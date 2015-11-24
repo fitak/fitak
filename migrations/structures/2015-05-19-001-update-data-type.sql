@@ -3,4 +3,4 @@
 
 ALTER TABLE `data`
 CHANGE `type` `type` enum('link','status','photo','video','offer','event')
-COLLATE 'utf8_czech_ci' NOT NULL DEFAULT 'status' AFTER `from_id`;
+COLLATE 'utf8mb4_czech_ci' NOT NULL DEFAULT 'status' AFTER `from_id`;

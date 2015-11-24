@@ -5,4 +5,4 @@ CREATE TABLE `tags_favorite` (
 	KEY `tag_id` (`tag_id`),
 	CONSTRAINT `tags_favorite_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
 	CONSTRAINT `tags_favorite_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
