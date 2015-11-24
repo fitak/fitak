@@ -48,7 +48,7 @@ dbal:
 	user: %database.user%
 	password: %database.password%
 	database: %database.database%
-	charset: utf8
+	charset: utf8mb4
 	debugger: true
 	explain: true
 
