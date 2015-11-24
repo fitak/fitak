@@ -6,6 +6,9 @@ extensions:
 	facebook: Kdyby\Facebook\DI\FacebookExtension
 	dbal: Nextras\Dbal\Bridges\NetteDI\DbalExtension
 
+http:
+	frames: yes
+
 php:
 	date.timezone: Europe/Prague
 
@@ -45,6 +48,7 @@ dbal:
 	user: %database.user%
 	password: %database.password%
 	database: %database.database%
+	charset: utf8
 	debugger: true
 	explain: true
 
