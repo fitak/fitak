@@ -77,7 +77,8 @@ dibi:
 
 parameters:
 	fb:
-		graphVersion: v2.3
+		permissions: [user_groups, read_stream]
+		graphVersion: "v2.3"
 	elastic:
 		solrPath: %appDir%/../synonyms.solr
 		hosts:
@@ -109,4 +110,4 @@ services:
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
 	keyValueStorage: KeyValueStorage
-	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%)
+	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%, %fb.graphVersion%)
