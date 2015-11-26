@@ -1,7 +1,6 @@
 <?php
 
 use Fitak\TagCloudControl;
-use Tracy\Debugger;
 
 /**
  * @author     Vojtech Miksu <vojtech@miksu.cz>

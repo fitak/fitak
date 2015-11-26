@@ -36,9 +36,6 @@ class Facebook
 	private $graphVersion;
 
 	/**
-	 * This object is constructed automatically by Nette.
-	 * Its parameters are defined in config file and defined as parameters
-	 * in crawler.facebook service (in config file).
 	 *
 	 * @param string   $appId
 	 * @param string   $appSecret

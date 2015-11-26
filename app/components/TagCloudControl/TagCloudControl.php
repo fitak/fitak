@@ -3,7 +3,6 @@
 namespace Fitak;
 
 use Nette\Application\UI;
-use Tracy\Debugger;
 
 
 class TagCloudControl extends UI\Control
