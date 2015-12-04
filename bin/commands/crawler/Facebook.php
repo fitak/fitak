@@ -116,6 +116,10 @@ class Facebook extends Command
 			foreach ($fb->getComments($post) as $comment)
 			{
 				$this->indexEntry($group, $comment, $post);
+				foreach ($fb->getComments($comment) as $reply)
+				{
+					$this->indexEntry($group, $reply, $comment);
+				}
 			}
 
 			if (++$flushCounter > $flushLimit)
