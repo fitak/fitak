@@ -67,11 +67,19 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	}
 
 	/**
-	 * Add global variables to template (FB groups list and user data).
+	 * Add global variables to template (FB groups list and user data)
+	 * and register custom filters and macros.
+	 *
+	 * @param null $class
+	 *
+	 * @return \Nette\Application\UI\ITemplate
 	 */
-	protected function beforeRender()
+	protected function createTemplate($class = NULL)
 	{
-		$this->template->groupList = $this->orm->groups->findAllSorted();
-		$this->template->user = $this->getLoggedInUser();
+		$template = $this->templateFactory->createTemplate($this);
+		$template->groupList = $this->orm->groups->findAllSorted();
+		$template->user = $this->getLoggedInUser();
+
+		return $template;
 	}
 }
