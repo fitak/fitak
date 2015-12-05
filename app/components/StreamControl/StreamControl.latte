@@ -7,13 +7,13 @@
 	            {if $reply->parent->topic->group_closed}
 	                Skryto
 	            {else}
-	                <a href="https://www.facebook.com/profile.php?id={$reply->from_id}">{$reply->from_name}</a>
+	                <a href="https://www.facebook.com/{$reply->from_id}">{$reply->from_name}</a>
 	            {/if}
 	        </div>
 
             <div class="col-xs-3">
 	            <strong>Kdy:</strong>
-	            <a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
+	            <a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
             </div>
         </div>
 
@@ -32,7 +32,7 @@
 	            {if $comment->topic->group_closed}
 	                Skryto
 	            {else}
-	                <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
+	                <a href="https://www.facebook.com/{$comment->from_id}">{$comment->from_name}</a>
 	            {/if}
 	        </div>
 
@@ -61,7 +61,7 @@
 	        {if $topic->group_closed}
 	            Skryto
 	        {else}
-	            <a href="https://www.facebook.com/profile.php?id={$topic->from_id}">{$topic->from_name}</a>
+	            <a href="https://www.facebook.com/{$topic->from_id}">{$topic->from_name}</a>
 	        {/if}
         </div>
 

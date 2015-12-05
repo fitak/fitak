@@ -19,7 +19,7 @@ use Tags;
  * @property DateTime          $updatedTime
  * @property int|NULL          $commentsCount
  * @property string            $fromName
- * @property int               $fromId
+ * @property string            $fromId
  * @property string            $type     {enum self::TYPE_*}
  * @property string|NULL       $link
  * @property string|NULL       $name
