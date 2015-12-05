@@ -204,6 +204,22 @@ class Facebook extends Command
 		{
 		}
 
+		//This is for attachments in comments
+		//TODO add other special types too
+		if ($entry->attachment)
+		{
+			$post->type = $entry->attachment->type;
+			if ($post->type === $post::TYPE_PHOTO)
+			{
+				$post->link = $entry->attachment->url;
+				$post->picture = $entry->attachment->media->image->src;
+				if ($entry->attachment->title)
+				{
+					$post->description = $entry->attachment->title;
+				}
+			}
+		}
+
 		$this->orm->posts->attach($post);
 
 		$post->parent = $this->parseId($parentTopic->id);

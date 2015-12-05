@@ -1,86 +1,112 @@
 {define #comment-reply}
-    {default $marked = $reply->marked}
-    <div n:class="$marked ? 'comment-marked' : 'comment'">
-        <div class="row header">
-            <div class="col-xs-3">
-	            <strong>Od:</strong>
-	            {if $reply->parent->topic->group_closed}
-	                Skryto
-	            {else}
-	                <a href="https://www.facebook.com/{$reply->from_id}">{$reply->from_name}</a>
-	            {/if}
-	        </div>
+	{default $marked = $reply->marked}
+	<div n:class="$marked ? 'comment-marked' : 'comment'">
+		<div class="row header">
+			<div class="col-xs-3">
+				<strong>Od:</strong>
+				{if $reply->parent->topic->group_closed}
+					Skryto
+				{else}
+					<a href="https://www.facebook.com/{$reply->from_id}">{$reply->from_name}</a>
+				{/if}
+			</div>
 
-            <div class="col-xs-3">
-	            <strong>Kdy:</strong>
-	            <a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
-            </div>
-        </div>
+			<div class="col-xs-3">
+				<strong>Kdy:</strong>
+				<a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
+			</div>
+		</div>
 
-        <div class="row message">
-            {$topics->getHighlight($reply)|noescape|highlight|nl2br|urlsToLinks}
-        </div>
-    </div>
+		<div class="row message">
+			{$topics->getHighlight($reply)|noescape|highlight|nl2br|urlsToLinks}
+			<blockquote n:tag-if="$reply->name" style="margin-top:15px">
+				<strong n:if="$reply->name">
+					{$reply->name}
+				</strong>
+				<a n:tag-if="$reply->link" href="{$reply->link}">
+					{if $reply->description}
+						<br /><small>{$reply->description}</small>
+					{/if}
+					{if $reply->picture}
+						<br /><img src="{$reply->picture}" title="{$reply->name}" />
+					{/if}
+				</a>
+			</blockquote>
+		</div>
+	</div>
 {/define}
 
 {define #comment}
-    {default $marked = $comment->marked}
-    <div n:class="$marked ? 'comment-marked' : 'comment'">
-        <div class="row header">
-            <div class="col-xs-3">
-	            <strong>Od:</strong>
-	            {if $comment->topic->group_closed}
-	                Skryto
-	            {else}
-	                <a href="https://www.facebook.com/{$comment->from_id}">{$comment->from_name}</a>
-	            {/if}
-	        </div>
+	{default $marked = $comment->marked}
+	<div n:class="$marked ? 'comment-marked' : 'comment'">
+		<div class="row header">
+			<div class="col-xs-3">
+				<strong>Od:</strong>
+				{if $comment->topic->group_closed}
+					Skryto
+				{else}
+					<a href="https://www.facebook.com/{$comment->from_id}">{$comment->from_name}</a>
+				{/if}
+			</div>
 
-            <div class="col-xs-3">
-	            <strong>Kdy:</strong>
-	            <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-            </div>
-        </div>
+			<div class="col-xs-3">
+				<strong>Kdy:</strong>
+				<a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
+			</div>
+		</div>
 
-        <div class="row message">
-            {$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
-        </div>
+		<div class="row message">
+			{$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
+			<blockquote n:tag-if="$comment->name" style="margin-top:15px">
+				<strong n:if="$comment->name">
+					{$comment->name}
+				</strong>
+				<a n:tag-if="$comment->link" href="{$comment->link}">
+					{if $comment->description}
+						<br /><small>{$comment->description}</small>
+					{/if}
+					{if $comment->picture}
+						<br /><img src="{$comment->picture}" title="{$comment->name}" />
+					{/if}
+				</a>
+			</blockquote>
+		</div>
 
 		{foreach $comment->replies as $reply}
 			{include #comment-reply, $reply}
 		{/foreach}
-    </div>
+	</div>
 {/define}
 
 {control paginator}
 
 <div n:foreach="$topics as $topic" class="topic">
-    <div class="row header">
-	    <div class="col-xs-3">
-	        <strong>Od:</strong>
-	        {if $topic->group_closed}
-	            Skryto
-	        {else}
-	            <a href="https://www.facebook.com/{$topic->from_id}">{$topic->from_name}</a>
-	        {/if}
-        </div>
+	<div class="row header">
+		<div class="col-xs-3">
+			<strong>Od:</strong>
+			{if $topic->group_closed}
+				Skryto
+			{else}
+				<a href="https://www.facebook.com/{$topic->from_id}">{$topic->from_name}</a>
+			{/if}
+		</div>
 
-        <div class="col-xs-3">
-	        <strong>Kdy:</strong>
-	        <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
-        </div>
+		<div class="col-xs-3">
+			<strong>Kdy:</strong>
+			<a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
+		</div>
 
-        <div class="col-xs-6 hidden-sm">
-		    <strong>Zdroj:</strong>
-		    <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:45}</a>
-        </div>
-    </div>
+		<div class="col-xs-6 hidden-sm">
+			<strong>Zdroj:</strong>
+			<a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:45}</a>
+		</div>
+	</div>
 
-    <div class="row message">
-        <a n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
-            <span class="label label-info">{$tag}</span>
+	<div class="row message">
+		<a n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
+			<span class="label label-info">{$tag}</span>
 		</a>
-        {$topics->getHighlight($topic)|noescape|highlight|nl2br|urlsToLinks}
+		{$topics->getHighlight($topic)|noescape|highlight|nl2br|urlsToLinks}
 
 		<blockquote n:tag-if="$topic->name" style="margin-top:15px">
 			<strong n:if="$topic->name">
@@ -88,39 +114,39 @@
 			</strong>
 			<a n:tag-if="$topic->link" href="{$topic->link}">
 				{if $topic->description}
-		            <br /><small>{$topic->description}</small>
-		        {/if}
-		        {if $topic->picture}
-		            <br /><img src="{$topic->picture}" title="{$topic->name}" />
-		        {/if}
+					<br /><small>{$topic->description}</small>
+				{/if}
+				{if $topic->picture}
+					<br /><img src="{$topic->picture}" title="{$topic->name}" />
+				{/if}
 			</a>
 		</blockquote>
-    </div>
+	</div>
 
-    <div class="comments">
-	    {default $anyMarked = false}
+	<div class="comments">
+		{default $anyMarked = false}
 		{foreach $topic->comments as $comment}
-		    {include #comment, $comment}
-		    {if $comment->marked}
-			    {var $anyMarked = true}
-		    {/if}
+			{include #comment, $comment}
+			{if $comment->marked}
+				{var $anyMarked = true}
+			{/if}
 		{/foreach}
-    </div>
+	</div>
 
-    {if count($topic->comments)}
-        <span class="show-comments">
-            <button class="btn btn-small btn-success">
-                <i class="icon-comment"></i>
-                Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
-            </button>
-        </span>
-	    <span class="hide-comments">
-	        <button class="btn btn-small btn-warning">
-	            <i class="icon-comment"></i>
-	            Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
-	        </button>
-        </span>
-    {/if}
+	{if count($topic->comments)}
+		<span class="show-comments">
+			<button class="btn btn-small btn-success">
+				<i class="icon-comment"></i>
+				Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
+			</button>
+		</span>
+		<span class="hide-comments">
+			<button class="btn btn-small btn-warning">
+				<i class="icon-comment"></i>
+				Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
+			</button>
+		</span>
+	{/if}
 </div>
 
 {control paginator}

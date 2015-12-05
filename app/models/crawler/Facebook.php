@@ -120,8 +120,8 @@ class Facebook
 		}
 		$fields = "id,message,created_time,updated_time,from,caption,type," .
 			"picture,link,description,source," .
-			"comments{comments{message,created_time,from}," .
-			"message,created_time,from}";
+			"comments{comments{message,created_time,from,attachment}," .
+			"message,created_time,from,attachment}";
 		$req = new FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since&fields=$fields", NULL, $this->graphVersion);
 		do
 		{
