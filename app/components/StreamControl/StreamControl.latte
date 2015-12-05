@@ -1,3 +1,28 @@
+{define #comment-reply}
+    {default $marked = $reply->marked}
+    <div n:class="$marked ? 'comment-marked' : 'comment'">
+        <div class="row header">
+            <div class="col-xs-3">
+	            <strong>Od:</strong>
+	            {if $reply->parent->topic->group_closed}
+	                Skryto
+	            {else}
+	                <a href="https://www.facebook.com/profile.php?id={$reply->from_id}">{$reply->from_name}</a>
+	            {/if}
+	        </div>
+
+            <div class="col-xs-3">
+	            <strong>Kdy:</strong>
+	            <a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
+            </div>
+        </div>
+
+        <div class="row message">
+            {$topics->getHighlight($reply)|noescape|highlight|nl2br|urlsToLinks}
+        </div>
+    </div>
+{/define}
+
 {define #comment}
     {default $marked = $comment->marked}
     <div n:class="$marked ? 'comment-marked' : 'comment'">
@@ -20,6 +45,10 @@
         <div class="row message">
             {$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
         </div>
+
+		{foreach $comment->replies as $reply}
+			{include #comment-reply, $reply}
+		{/foreach}
     </div>
 {/define}
 

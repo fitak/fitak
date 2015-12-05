@@ -61,7 +61,7 @@ class Data extends BaseModel
 		$map = [];
 		foreach ($response['hits']['hits'] as $hit)
 		{
-			$map[$hit['_id']] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
+			$map[ $hit['_id'] ] = isset($hit['highlight']['message'][0]) ? $hit['highlight']['message'][0] : NULL;
 		}
 
 		if (!$map)
@@ -71,6 +71,7 @@ class Data extends BaseModel
 
 		$topics = $this->db->query('SELECT * FROM data WHERE id IN %in ORDER BY Field([id], ?)', array_keys($map), array_keys($map));
 		$result = $this->processRawResult($topics);
+
 		return new SearchResponse($result, $map, $response['hits']['total'], $this->tagParser);
 	}
 
@@ -112,7 +113,7 @@ class Data extends BaseModel
 		$topics = [];
 		foreach ($topicsIds as $topicId)
 		{
-			$topics[$topicId] = $topicsResult[$topicId];
+			$topics[ $topicId ] = $topicsResult[ $topicId ];
 		}
 
 		$this->addComments($topics, $commentsIds);
@@ -152,13 +153,33 @@ class Data extends BaseModel
 		{
 			// $topic->likesData = $this->getLikes( $topic->id );
 
-			if (isset($comments[$topic->id]))
+			// If this topic has comments
+			if (isset($comments[ $topic->id ]))
 			{
-				$topic->comments = $comments[$topic->id];
+				$topic->comments = $comments[ $topic->id ];
+				$replies = $this->getComments(array_keys($topic->comments));
+
 				foreach ($topic->comments as $comment)
 				{
 					$comment->topic = $topic;
 					$comment->marked = in_array($comment->id, $marked);
+
+					if (isset($replies[ $comment->id ]))
+					{
+						$comment->replies = $replies[ $comment->id ];
+						foreach ($comment->replies as $reply)
+						{
+							$reply->parent = $comment;
+							$reply->marked = in_array($reply->id, $marked);
+						}
+
+					}
+					else
+					{
+						$comment->replies = [];
+					}
+
+
 				}
 			}
 			else
