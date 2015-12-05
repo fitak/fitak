@@ -5,6 +5,8 @@ namespace Bin\Commands\Crawler;
 use Facebook\FacebookRequestException;
 use Fitak\Crawler\Facebook as FbCrawler;
 use Bin\Commands\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use ElasticSearch;
 use Facebook\Entities\AccessToken;
 use Fitak\DuplicateEntryException;
@@ -41,6 +43,11 @@ class Facebook extends Command
 	protected function configure()
 	{
 		$this->setName('crawler:facebook');
+		$this->addOption('flushLimit', null, InputOption::VALUE_OPTIONAL,
+			'After how many persists posts should be flushed to DB (default 50)',
+			5);
+		$this->addOption('exit', null, InputOption::VALUE_NONE,
+			'If set, crawler exits after DB flush (debugging option)');
 	}
 
 	public function invoke(FbCrawler $fb, KeyValueStorage $kvs)
@@ -96,8 +103,8 @@ class Facebook extends Command
 	 */
 	private function indexGroup(FbCrawler $fb, $group, KeyValueStorage $kvs)
 	{
-		$flushLimit = 50;
-
+		//number of posts to persist before flush to DB
+		$flushLimit = $this->in->getOption('flushLimit') - 1;
 		$this->out->writeln("<info>Processing '$group->name'</info>");
 
 		$timestamp = time();
@@ -121,12 +128,15 @@ class Facebook extends Command
 					$this->indexEntry($group, $reply, $comment);
 				}
 			}
-
 			if (++$flushCounter > $flushLimit)
 			{
 				$this->orm->flush();
 				$flushCounter = 0;
-				exit();
+				if ($this->in->getOption('exit'))
+				{
+					//exit after flush (for debugging purposes)
+					exit();
+				}
 			}
 		}
 
