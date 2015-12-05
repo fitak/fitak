@@ -205,10 +205,37 @@ class Facebook extends Command
 		}
 
 		//This is for attachments in comments
-		//TODO add other special types too
 		if ($entry->attachment)
 		{
-			$post->type = $entry->attachment->type;
+			if ($entry->attachment->type == "share")
+			{
+				$post->type = $post::TYPE_LINK;
+			}
+			elseif ($entry->attachment->type == "photo")
+			{
+				$post->type = $post::TYPE_PHOTO;
+			}
+			elseif ($entry->attachment->type == "video_share_youtube")
+			{
+				$post->type = $post::TYPE_VIDEO;
+			}
+			else
+			{
+				/* TODO there can be some other types
+				 * In FB documentation there is no list of attachment
+				 * types, because they tell that attachment is already
+				 * deprecated and not used but it isn't.
+				 * Due to this there could be some types which are not
+				 * properly recognized, but because ORM checks the type
+				 * of "type" field and it needs to be some value in enum,
+				 * there is set the type "status".
+				 * It is better to have no attachment than cause crawled
+				 * stop. Maybe there should be some exception which log
+				 * unrecognised types...
+				 */
+				$post->type = $post::TYPE_STATUS;
+			}
+
 			if ($post->type === $post::TYPE_PHOTO)
 			{
 				$post->link = $entry->attachment->url;
@@ -217,6 +244,18 @@ class Facebook extends Command
 				{
 					$post->description = $entry->attachment->title;
 				}
+			}
+			elseif ($post->type === $post::TYPE_LINK)
+			{
+				$post->picture = $entry->attachment->media->image->src;
+				$post->link = $entry->attachment->url;
+				$post->description = $entry->attachment->description;
+			}
+			elseif ($post->type === $post::TYPE_VIDEO)
+			{
+				//TODO titles and descriptions are not properly defined
+				$post->source = $entry->attachment->url;
+				$post->description = $entry->attachment->title;
 			}
 		}
 
