@@ -45,7 +45,7 @@ class Facebook extends Command
 		$this->setName('crawler:facebook');
 		$this->addOption('flushLimit', null, InputOption::VALUE_OPTIONAL,
 			'After how many persists posts should be flushed to DB (default 50)',
-			5);
+			50);
 		$this->addOption('exit', null, InputOption::VALUE_NONE,
 			'If set, crawler exits after DB flush (debugging option)');
 	}
