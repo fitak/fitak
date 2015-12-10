@@ -17,6 +17,9 @@ DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `data`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT FIRST;
+
+ALTER TABLE `data`
 MODIFY COLUMN `parent_id` int(11) NULL DEFAULT NULL,
 ADD FOREIGN KEY `data_ibfk_1` (`parent_id`) REFERENCES `data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD FOREIGN KEY `data_ibfk_2` (`group_id`) REFERENCES `groups` (`id`);
