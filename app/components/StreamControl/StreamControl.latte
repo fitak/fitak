@@ -4,7 +4,7 @@
 		<div class="row header">
 			<div class="col-xs-3">
 				<strong>Od:</strong>
-				{if $reply->parent->topic->group_closed}
+				{if $reply->parent->parent->group_closed}
 					Skryto
 				{else}
 					<a href="https://www.facebook.com/{$reply->from_id}">{$reply->from_name}</a>
@@ -13,7 +13,7 @@
 
 			<div class="col-xs-3">
 				<strong>Kdy:</strong>
-				<a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent_id}/?comment_id={$reply->id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
+				<a href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent->fb_id}/?comment_id={$reply->fb_id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
 			</div>
 		</div>
 
@@ -42,7 +42,7 @@
 		<div class="row header">
 			<div class="col-xs-3">
 				<strong>Od:</strong>
-				{if $comment->topic->group_closed}
+				{if $comment->parent->group_closed}
 					Skryto
 				{else}
 					<a href="https://www.facebook.com/{$comment->from_id}">{$comment->from_name}</a>
@@ -51,7 +51,7 @@
 
 			<div class="col-xs-3">
 				<strong>Kdy:</strong>
-				<a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
+				<a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent->fb_id}/?comment_id={$comment->fb_id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
 			</div>
 		</div>
 
@@ -93,7 +93,7 @@
 
 		<div class="col-xs-3">
 			<strong>Kdy:</strong>
-			<a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
+			<a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->fb_id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
 		</div>
 
 		<div class="col-xs-6 hidden-sm">

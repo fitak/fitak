@@ -161,7 +161,7 @@ class Data extends BaseModel
 
 				foreach ($topic->comments as $comment)
 				{
-					$comment->topic = $topic;
+					$comment->parent = $topic;
 					$comment->marked = in_array($comment->id, $marked);
 
 					if (isset($replies[ $comment->id ]))
