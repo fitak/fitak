@@ -17,8 +17,6 @@ use KeyValueStorage;
 use Tags;
 use Fitak\Orm;
 
-
-
 class Facebook extends Command
 {
 
@@ -43,11 +41,96 @@ class Facebook extends Command
 	protected function configure()
 	{
 		$this->setName('crawler:facebook');
-		$this->addOption('flushLimit', null, InputOption::VALUE_OPTIONAL,
+		$this->addOption('flushLimit', NULL, InputOption::VALUE_OPTIONAL,
 			'After how many persists posts should be flushed to DB (default 50)',
 			50);
-		$this->addOption('exit', null, InputOption::VALUE_NONE,
+		$this->addOption('exit', NULL, InputOption::VALUE_NONE,
 			'If set, crawler exits after DB flush (debugging option)');
+	}
+
+	/**
+	 * Helper function for printing to Symfony console
+	 *
+	 * It's not fully functional - it has only two levels:
+	 * normal - when no verbose level is set
+	 * verbose - when it set some level of verbosity (-v|-vv|-vvv)
+	 *
+	 * @param string $message   given string for printing
+	 * @param string $level     possible values:
+	 *                          "always" - it is printed in every setting
+	 *                          "normal" - it is printed only when no verbose settings is set
+	 *                          "verbose" - it is printed when -v or higher level is set
+	 *                          default "always"
+	 * @param int    $newLine   values:
+	 *                          0 - no newline after print
+	 *                          otherwise print newline
+	 *                          default: 1
+	 */
+	private function consolePrint($message, $level = "always", $newLine = 1)
+	{
+		// normal
+		if ($this->out->getVerbosity() === 1 && $level === "normal")
+		{
+			$this->out->write($message, $newLine);
+		}
+
+		// verbose
+		elseif ($this->out->getVerbosity() >= 2 && $level === "verbose")
+		{
+			$this->out->write($message, $newLine);
+		}
+
+		elseif ($level === "always")
+		{
+			$this->out->write($message, $newLine);
+		}
+
+		// other possibilities not implemented - this is just very quick tool
+		return;
+	}
+
+	/**
+	 * Helper function for printing formatted posts/comments/replies
+	 *
+	 * It takes basic information (id, updated time and message) and prints
+	 * it in some pretty formatting
+	 *
+	 * @param $id             id which is parsed for printing
+	 * @param $time           time which is formatted to pretty format
+	 * @param $message        message which is truncated
+	 * @param $type           type of data:
+	 *                        "p" post
+	 *                        "c" comment
+	 *                        "r" reply
+	 * @param $level          resending level of verbosity to consolePrint
+	 */
+	private function consolePrintFormatted($id, $time, $message, $type, $level)
+	{
+		$id = $this->parseId($id);
+
+		$time = date("Y-m-d H:i", strtotime($time));
+
+		$message = mb_substr($message, 0, 70, "utf-8") . "...";
+		$message = str_replace("\n", " ", $message);
+
+		$typeChar = "";
+		if ($type === "c")
+		{
+			$typeChar = "  ";
+		}
+		elseif ($type === "r")
+		{
+			$typeChar = "    ";
+		}
+
+		$this->consolePrint("$typeChar<comment>$id ($time)</comment> $message", $level);
+
+		return;
+	}
+
+	private function parseId($longId)
+	{
+		return preg_replace('~^\d+_~', '', $longId);
 	}
 
 	public function invoke(FbCrawler $fb, KeyValueStorage $kvs)
@@ -97,15 +180,15 @@ class Facebook extends Command
 	}
 
 	/**
-	 * @param FbCrawler $fb
-	 * @param \StdClass $group
+	 * @param FbCrawler       $fb
+	 * @param \StdClass       $group
 	 * @param KeyValueStorage $kvs
 	 */
 	private function indexGroup(FbCrawler $fb, $group, KeyValueStorage $kvs)
 	{
 		//number of posts to persist before flush to DB
 		$flushLimit = $this->in->getOption('flushLimit') - 1;
-		$this->out->writeln("<info>Processing '$group->name'</info>");
+		$this->consolePrint("<info>Processing '$group->name'</info>");
 
 		$timestamp = time();
 		$key = $kvs::CRAWLER_SINCE . '.' . $group->id;
@@ -114,30 +197,38 @@ class Facebook extends Command
 		$flushCounter = 0;
 		foreach ($fb->getGroupFeedSince($group->id, $since) as $post)
 		{
-			if ($this->out->isVerbose() && !$this->out->isVeryVerbose())
-			{
-				$this->out->writeln("    <info>post $post->id ($post->created_time)</info>");
-			}
+			$this->consolePrint("p", "normal", 0);
+			$this->consolePrintFormatted($post->id, $post->created_time, $post->message, "p", "verbose");
 			$this->indexEntry($group, $post, NULL);
 
 			foreach ($fb->getComments($post) as $comment)
 			{
+				$this->consolePrint("c", "normal", 0);
+				$this->consolePrintFormatted($comment->id, $comment->created_time, $comment->message, "c", "verbose");
 				$this->indexEntry($group, $comment, $post);
 				foreach ($fb->getComments($comment) as $reply)
 				{
+					$this->consolePrint("r", "normal", 0);
+					$this->consolePrintFormatted($reply->id, $reply->created_time, $reply->message, "r", "verbose");
 					$this->indexEntry($group, $reply, $comment);
 				}
 			}
-			if (++$flushCounter > $flushLimit)
+			if (++ $flushCounter > $flushLimit)
 			{
+				$this->consolePrint("|<question>-></question>", "normal", 0);
+				$this->consolePrint("<question>/// FLUSH ///</question>", "verbose");
 				$this->orm->flush();
 				$flushCounter = 0;
+
+				//exit after flush (for debugging purposes)
 				if ($this->in->getOption('exit'))
 				{
-					//exit after flush (for debugging purposes)
 					exit();
 				}
 			}
+
+			$this->consolePrint("|", "normal", 0);
+			$this->consolePrint("------", "verbose");
 		}
 
 		// We are saving timestamp from before the crawl so
@@ -147,22 +238,13 @@ class Facebook extends Command
 		$this->orm->flush();
 	}
 
-	private function parseId($longId)
-	{
-		return preg_replace('~^\d+_~', '', $longId);
-	}
-
 	/**
-	 * @param \StdClass $group
-	 * @param \StdClass $entry
+	 * @param \StdClass      $group
+	 * @param \StdClass      $entry
 	 * @param NULL|\StdClass $parentTopic
 	 */
 	protected function indexEntry($group, $entry, $parentTopic = NULL)
 	{
-		if ($this->out->isVeryVerbose())
-		{
-			$this->out->write($parentTopic ? 'c' : 'p');
-		}
 		$fb_id = $this->parseId($entry->id);
 		$post = $this->orm->posts->getBy(["fb_id" => $fb_id]);
 		if (!$post)
@@ -172,9 +254,6 @@ class Facebook extends Command
 		}
 		$post->fb_id = $fb_id;
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
-		$this->out->writeln("Post message: $entry->message");
-		$this->out->writeln("$post->message");
-		$this->out->writeln("-");
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
 		//$post->commentsCount; // TODO deprecate
