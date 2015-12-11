@@ -163,15 +163,14 @@ class Facebook extends Command
 		{
 			$this->out->write($parentTopic ? 'c' : 'p');
 		}
-		$id = $this->parseId($entry->id);
-		$this->out->writeln("Id: $id");
-		$post = $this->orm->posts->getById($id);
+		$fb_id = $this->parseId($entry->id);
+		$post = $this->orm->posts->getBy(["fb_id" => $fb_id]);
 		if (!$post)
 		{
 			$post = new Post;
 			$post->tagParser = $this->tagParser;
-			$post->id = $id;
 		}
+		$post->fb_id = $fb_id;
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
 		$this->out->writeln("Post message: $entry->message");
 		$this->out->writeln("$post->message");
@@ -260,21 +259,24 @@ class Facebook extends Command
 		}
 
 		$this->orm->posts->attach($post);
-
-		$post->parent = $this->parseId($parentTopic->id);
+		$parentFbId = $this->parseId($parentTopic->id);
+		$post->parent = $this->orm->posts->getBy(['fb_id' => $parentFbId]);
 		$post->group = $group->id;
+
 
 		if (!$post->parent)
 		{
+			$tags = array();
 			foreach ($post->getParsedTags()[0] as $tag)
 			{
-				$post->tags->add($this->orm->tags->getByNameOrCreate($tag));
+				array_push($tags, $this->orm->tags->getByNameOrCreate($tag));
 			}
+			$post->tags->set($tags);
 		}
 
 		try
 		{
-			$this->orm->posts->persist($post);
+			$this->orm->posts->persistAndFlush($post);
 		}
 		catch (DuplicateEntryException $e)
 		{
