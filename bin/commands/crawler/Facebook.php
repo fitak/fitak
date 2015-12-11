@@ -276,7 +276,7 @@ class Facebook extends Command
 
 		try
 		{
-			$this->orm->posts->persistAndFlush($post);
+			$this->orm->posts->persist($post);
 		}
 		catch (DuplicateEntryException $e)
 		{
