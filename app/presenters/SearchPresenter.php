@@ -72,7 +72,7 @@ class SearchPresenter extends BasePresenter
 
 	protected function createComponentPostForm()
 	{
-		$form = new postForm($this->orm);
+		$form = new PostForm($this->orm);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;

@@ -1,6 +1,6 @@
 <?php
 
-use Fitak\RepositoryContainer;
+use Fitak\Orm;
 use Fitak\PostManager;
 use Nette\Application\UI\Form;
 
@@ -13,7 +13,7 @@ class PostForm extends Form
 
 	const SEMESTER = 'semester';
 
-	public function __construct(RepositoryContainer $orm)
+	public function __construct(Orm $orm)
 	{
 		parent::__construct();
 
