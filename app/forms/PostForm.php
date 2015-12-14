@@ -11,14 +11,16 @@ class PostForm extends Form
 
 	private $orm;
 
+	private $user;
+
 	const SEMESTER = 'semester';
 
-	public function __construct(Orm $orm)
+	public function __construct(Orm $orm, $user)
 	{
 		parent::__construct();
 
 		$this->orm = $orm;
-
+		$this->user = $user;
 		$this->addText('message', 'zprava');
 
 		$this->addSubmit('send', 'Vyhledat');
@@ -29,14 +31,13 @@ class PostForm extends Form
 		$values = $form->getValues(TRUE);
 		$message = $values['message'];
 
-		$this->postManager = new PostManager($this->orm, $message);
-		$this->postManager->savePost($message);
+		$this->postManager = new PostManager($this->orm);
+		$this->postManager->savePost($message, $this->user);
 
-//		$this->orm->groups;
+		$parameters = $this->getPresenter()->getParameters();
+		unset($parameters['do']);
 
-//
-//		$this->presenter->redirect('Search:', $params);
-//		$this->
+		$this->presenter->redirect('Search:', $parameters);
 	}
 
 }

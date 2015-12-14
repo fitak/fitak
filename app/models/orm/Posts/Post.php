@@ -11,7 +11,7 @@ use Tags;
 
 
 /**
- * @property string            $fbId
+ * @property string|NULL       $fbId
  * @property Post|NULL         $parent   {m:1 PostsRepository $comments}
  * @property Group|NULL        $group    {m:1 GroupsRepository $posts}
  * @property string            $message
