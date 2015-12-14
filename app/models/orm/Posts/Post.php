@@ -13,7 +13,7 @@ use Tags;
 /**
  * @property string            $fbId
  * @property Post|NULL         $parent   {m:1 PostsRepository $comments}
- * @property Group             $group    {m:1 GroupsRepository $posts}
+ * @property Group|NULL        $group    {m:1 GroupsRepository $posts}
  * @property string            $message
  * @property DateTime          $createdTime
  * @property DateTime          $updatedTime
