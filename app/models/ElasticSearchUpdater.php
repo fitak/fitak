@@ -48,7 +48,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 		if ($post instanceof Post)
 		{
 			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
-				'author' => $post->fromName,
+				'author' => $post->user->name,
 				'is_topic' => ($post->parent === NULL),
 				'updated_time' => $post->updatedTime->getTimestamp(),
 				'group' => $post->group->id,

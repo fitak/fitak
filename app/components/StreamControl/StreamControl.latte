@@ -7,7 +7,8 @@
 				{if $reply->parent->parent->group_closed}
 					Skryto
 				{else}
-					<a target="_blank" href="https://www.facebook.com/{$reply->from_id}">{$reply->from_name}</a>
+					<img src="{$reply->user->profilePicture}">
+					<a target="_blank" href="https://www.facebook.com/{$reply->user->fbId}">{$reply->user->name}</a>
 				{/if}
 			</div>
 
@@ -45,7 +46,8 @@
 				{if $comment->parent->group_closed}
 					Skryto
 				{else}
-					<a target="_blank" href="https://www.facebook.com/{$comment->from_id}">{$comment->from_name}</a>
+					<img src="{$comment->user->profilePicture}">
+					<a target="_blank" href="https://www.facebook.com/{$comment->user->fbId}">{$comment->user->name}</a>
 				{/if}
 			</div>
 
@@ -87,7 +89,8 @@
 			{if $topic->group_closed}
 				Skryto
 			{else}
-				<a target="_blank" href="https://www.facebook.com/{$topic->from_id}">{$topic->from_name}</a>
+				<img src="{$topic->user->profilePicture}">
+				<a target="_blank" href="https://www.facebook.com/{$topic->user->fbId}">{$topic->user->name}</a>
 			{/if}
 		</div>
 

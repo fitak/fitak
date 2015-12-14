@@ -118,11 +118,15 @@ class Facebook
 		{
 			throw new \ImplementationException('Call setSession prior to calling ' . __METHOD__);
 		}
-		$fields = "id,message,created_time,updated_time,from,caption,type," .
-			"picture,link,description,source," .
-			"comments{comments{message,created_time,from,attachment}," .
-			"message,created_time,from,attachment}";
-		$req = new FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since&fields=$fields", NULL, $this->graphVersion);
+
+		$fields = "id,message,created_time,updated_time," .
+			"from{name,picture}," .
+			"caption,type,picture,link,description,source," .
+			"comments{comments{message,created_time," .
+			"from{name,picture}}," .
+			"message,created_time," .
+			"from{name,picture}}";
+		$req = new  FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since&fields=$fields", NULL, $this->graphVersion);
 		do
 		{
 			$res = $req->execute();

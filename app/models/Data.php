@@ -42,7 +42,7 @@ class Data extends BaseModel
 
 		$topics = $sql->fetchAssoc("id");
 		$this->addComments($topics);
-
+		$this->addUsers($topics);
 		return $topics;
 	}
 
@@ -117,6 +117,7 @@ class Data extends BaseModel
 		}
 
 		$this->addComments($topics, $commentsIds);
+		$this->addUsers($topics);
 
 		return $topics;
 	}
@@ -144,6 +145,15 @@ class Data extends BaseModel
 		return $comments;
 	}
 
+	private function addUsers(array $topics)
+	{
+		foreach ($topics as $topic)
+		{
+			$topic->user = $this->orm->users->getById($topic->user);
+		}
+
+	}
+
 	// add comments to given topics
 	private function addComments(array $topics, array $marked = [])
 	{
@@ -158,6 +168,7 @@ class Data extends BaseModel
 			{
 				$topic->comments = $comments[ $topic->id ];
 				$replies = $this->getComments(array_keys($topic->comments));
+				$this->addUsers($topic->comments);
 
 				foreach ($topic->comments as $comment)
 				{
@@ -167,6 +178,7 @@ class Data extends BaseModel
 					if (isset($replies[ $comment->id ]))
 					{
 						$comment->replies = $replies[ $comment->id ];
+						$this->addUsers($comment->replies);
 						foreach ($comment->replies as $reply)
 						{
 							$reply->parent = $comment;

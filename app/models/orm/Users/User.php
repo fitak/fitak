@@ -6,19 +6,23 @@ use DateTime;
 use Nette\Utils\Strings;
 use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\ManyHasMany;
+use Nextras\Orm\Relationships\OneHasMany;
 
 
 /**
- * @property string            $email
- * @property string|NULL       $facebookId
- * @property string|NULL       $facebookAccessToken
- * @property string            $passwordHash
- * @property string|NULL       $firstName
- * @property string|NULL       $lastName
+ * @property string|NULL       $email
+ * @property string|NULL       $passwordHash
+ * @property string|NULL       $fbId
+ * @property string|NULL       $fbAccessToken
+ * @property string            $name
  * @property string|NULL       $signUpTokenHash
- * @property DateTime          $signUpTime
+ * @property DateTime|NULL     $signUpTime
  * @property string|NULL       $passwordResetTokenHash
+ * @property string|NULL       $profilePicture
+ * @property bool              $registered
+ *
  * @property ManyHasMany|Tag[] $favoriteTags        {m:n TagsRepository $favoredBy primary}
+ * @property OneHasMany|Post[] $posts  {1:m PostsRepository $user}
  *
  * @property-read bool         $isActivated {virtual} only activated users can sign in
  */

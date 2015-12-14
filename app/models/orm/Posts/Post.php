@@ -11,15 +11,13 @@ use Tags;
 
 
 /**
- * @property string            $fb_id
+ * @property string            $fbId
  * @property Post|NULL         $parent   {m:1 PostsRepository $comments}
  * @property Group             $group    {m:1 GroupsRepository $posts}
  * @property string            $message
  * @property DateTime          $createdTime
  * @property DateTime          $updatedTime
  * @property int|NULL          $commentsCount
- * @property string            $fromName
- * @property string            $fromId
  * @property string            $type     {enum self::TYPE_*}
  * @property string|NULL       $link
  * @property string|NULL       $name
@@ -27,6 +25,7 @@ use Tags;
  * @property string|NULL       $description
  * @property string|NULL       $picture
  * @property string|NULL       $source
+ * @property User              $user {m:1 UsersRepository $posts}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}

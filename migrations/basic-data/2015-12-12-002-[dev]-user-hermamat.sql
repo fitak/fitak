@@ -1,0 +1,2 @@
+INSERT INTO `users` (`id`, `email`, `password_hash`, `sign_up_time`, `name`, `registered`)
+VALUES ('1', 'hermamat@fit.cvut.cz', '$2y$10$qJrNK8XPCsptu8vviCSRAu2PS6BIxBw4TI5ZPcI2Gc3owDMkRV9L2', '2015-12-11 20:56:44', 'Matěj Heřman', '1');

@@ -12,6 +12,7 @@ use Facebook\Entities\AccessToken;
 use Fitak\DuplicateEntryException;
 use Fitak\InvalidAccessTokenException;
 use Fitak\Post;
+use Fitak\User;
 //use Fitak\RepositoryContainer;
 use KeyValueStorage;
 use Tags;
@@ -246,19 +247,34 @@ class Facebook extends Command
 	protected function indexEntry($group, $entry, $parentTopic = NULL)
 	{
 		$fb_id = $this->parseId($entry->id);
-		$post = $this->orm->posts->getBy(["fb_id" => $fb_id]);
+		$post = $this->orm->posts->getBy(["fbId" => $fb_id]);
 		if (!$post)
 		{
 			$post = new Post;
 			$post->tagParser = $this->tagParser;
 		}
-		$post->fb_id = $fb_id;
+		$post->fbId = $fb_id;
 		$post->message = $entry->message !== NULL ? $entry->message : ''; // can be NULL if caption only picture post is shared
 		$post->createdTime = $entry->created_time;
 		$post->updatedTime = $entry->updated_time ?: $entry->created_time;
 		//$post->commentsCount; // TODO deprecate
-		$post->fromName = $entry->from->name;
-		$post->fromId = $entry->from->id;
+
+		$user = $this->orm->users->getBy(["fbId" => $entry->from->id]);
+		if (!$user)
+		{
+			$user = new User();
+			$user->fbId = $entry->from->id;
+			$user->name = $entry->from->name;
+
+			if (!$entry->from->picture->data->is_silhouette)
+			{
+				$user->profilePicture = $entry->from->picture->data->url;
+			}
+
+			$user->registered = 0;
+		}
+		$post->user = $user;
+
 		$post->caption = strpos($entry->caption, 'Attachment Unavailable') === FALSE ? $entry->caption : NULL;
 
 		$post->type = $entry->type ?: $post::TYPE_STATUS;
@@ -339,7 +355,7 @@ class Facebook extends Command
 
 		$this->orm->posts->attach($post);
 		$parentFbId = $this->parseId($parentTopic->id);
-		$post->parent = $this->orm->posts->getBy(['fb_id' => $parentFbId]);
+		$post->parent = $this->orm->posts->getBy(['fbId' => $parentFbId]);
 		$post->group = $group->id;
 
 
