@@ -4,22 +4,22 @@
 	{*<div n:tag-if="$type != 'post'" n:class="$marked ? 'comment-marked' : 'comment'">*}
 		<div class="row header">
 			<div class="col-xs-6">
-				<img src="{$entry->user->profilePicture}">
-				<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}">{$entry->user->name}</a>
+			<img src="{$entry->user->profilePicture}" n:class="$type == 'post' ? post-user-image, $type == 'comment' ? comment-user-image, $type == 'reply' ? reply-user-image, user-image">
+			<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}" class="user-name">{$entry->user->name}</a>
+			<br>
+			{if $type == "post"}
+				{var top_parent_id = $entry->fb_id}
+			{elseif $type == "comment"}
+				{var top_parent_id = $entry->parent->fb_id}
+			{elseif $type == "reply"}
+				{var top_parent_id = $entry->parent->parent->fb_id}
+			{/if}
 
-				{if $type == "post"}
-					{var top_parent_id = $entry->fb_id}
-				{elseif $type == "comment"}
-					{var top_parent_id = $entry->parent->fb_id}
-				{elseif $type == "reply"}
-					{var top_parent_id = $entry->parent->parent->fb_id}
-				{/if}
-
-				{var $fb_url = "https://www.facebook.com/groups/{$entry->group_id}/permalink/{$top_parent_id}"}
-				{if $type != "post"}
-					{var fb_url = $fb_url . "/?comment_id={$entry->fb_id}"}
-				{/if}
-				<a target="_blank" href="{$fb_url}">{$entry->created_time|date: "j.n.Y G:i:s"}</a>
+			{var $fb_url = "https://www.facebook.com/groups/{$entry->group_id}/permalink/{$top_parent_id}"}
+			{if $type != "post"}
+				{var fb_url = $fb_url . "/?comment_id={$entry->fb_id}"}
+			{/if}
+			<a target="_blank" href="{$fb_url}">{$entry->created_time|date: "j.n.Y G:i:s"}</a>
 			</div>
 			<div n:if="$type == 'post'" class="col-xs-6">
 				<a target="_blank" href="http://www.facebook.com/groups/{$entry->group_id}" title="{$entry->group_name}">{$entry->group_name|truncate:45}</a>

@@ -31,6 +31,9 @@ body {
 	display: none;
 }
 
+table.user-info {
+    color: grey;
+}
 
 .navbg {
   background-color: #43609c;
@@ -73,9 +76,8 @@ a[href^="error:"] {
 
 .post {
 	border: 1px solid #BBBBBB;
-	border-radius: 5px;
-	padding: 1em;
-	margin-bottom: 1em;
+	padding: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 .post .header {
@@ -83,7 +85,8 @@ a[href^="error:"] {
 }
 
 .post .message {
-	padding: 1em;
+	padding: 0.5em 0;
+    margin: 0;
 }
 
 .post .comment,
@@ -93,19 +96,60 @@ a[href^="error:"] {
 }
 
 .post .comment,
-.post .comment-marked
-.post .reply {
-	padding: 1em;
-	margin-bottom: 1em;
-	border-top-left-radius: 3px;
-	border-top: 1px solid #CCCCCC;
-	border-left: 1px solid #CCCCCC;
+.post .comment-marked {
+	padding: 0.5em;
+	/*margin-bottom: 1em;*/
+    background-color: #e1e2e3;
+    font-size: 90%;
 }
+
+.comment .reply {
+    padding: 0.5em 0.5em 0.5em 2em;
+    background-color: #e1e2e3;
+}
+
+.post-user-image {
+    width: 40px;
+    height: 40px;
+}
+
+.comment-user-image {
+    width: 32px;
+    height: 32px;
+}
+
+.reply-user-image {
+    width: 20px;
+    height: 20px;
+}
+
+.user-image {
+    float: left;
+    margin-right: 5px;
+}
+
+.user-name {
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.show-comments .btn,
+.hide-comments .btn {
+    padding: 1px 10px;
+    border-radius: 2px;
+    font-size: 80%;
+}
+
+.comment .show-comments .btn,
+.comment .hide-comments .btn {
+    margin-left: 30px;
+}
+
 
 .highlight {
 	background-color: yellow;
 	padding: 1px 0;
-	border-radius: 3px;
 }
 
 /* Clear floats */
@@ -146,6 +190,8 @@ form .error {
 	color: #e00000;
 	font-weight: bold;
 }
+
+
 
 /* fix blur font on Windows in Chrome */
 .navbar-fixed-top,
