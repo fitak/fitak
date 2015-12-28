@@ -1,155 +1,108 @@
-{define #comment-reply}
-	{default $marked = $reply->marked}
-	<div n:class="$marked ? 'comment-marked' : 'comment'">
+{define #entry}
+	{default $marked = $entry->marked}
+	<div n:class="entry, $type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply'">
+	{*<div n:tag-if="$type != 'post'" n:class="$marked ? 'comment-marked' : 'comment'">*}
 		<div class="row header">
-			<div class="col-xs-3">
-				<strong>Od:</strong>
-				{if $reply->parent->parent->group_closed}
-					Skryto
-				{else}
-					<img src="{$reply->user->profilePicture}">
-					<a target="_blank" href="https://www.facebook.com/{$reply->user->fbId}">{$reply->user->name}</a>
-				{/if}
-			</div>
+			<div class="col-xs-6">
+				<img src="{$entry->user->profilePicture}">
+				<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}">{$entry->user->name}</a>
 
-			<div class="col-xs-3">
-				<strong>Kdy:</strong>
-				<a target="_blank" href="https://www.facebook.com/groups/{$reply->group_id}/permalink/{$reply->parent->parent->fb_id}/?comment_id={$reply->fb_id}">{$reply->created_time|date: "j.n.Y G:i:s"}</a>
+				{if $type == "post"}
+					{var top_parent_id = $entry->fb_id}
+				{elseif $type == "comment"}
+					{var top_parent_id = $entry->parent->fb_id}
+				{elseif $type == "reply"}
+					{var top_parent_id = $entry->parent->parent->fb_id}
+				{/if}
+
+				{var $fb_url = "https://www.facebook.com/groups/{$entry->group_id}/permalink/{$top_parent_id}"}
+				{if $type != "post"}
+					{var fb_url = $fb_url . "/?comment_id={$entry->fb_id}"}
+				{/if}
+				<a target="_blank" href="{$fb_url}">{$entry->created_time|date: "j.n.Y G:i:s"}</a>
+			</div>
+			<div n:if="$type == 'post'" class="col-xs-6">
+				<a target="_blank" href="http://www.facebook.com/groups/{$entry->group_id}" title="{$entry->group_name}">{$entry->group_name|truncate:45}</a>
 			</div>
 		</div>
 
 		<div class="row message">
-			{$topics->getHighlight($reply)|noescape|highlight|nl2br|urlsToLinks}
-			<blockquote n:tag-if="$reply->name" style="margin-top:15px">
-				<strong n:if="$reply->name">
-					{$reply->name}
-				</strong>
-				<a n:tag-if="$reply->link" href="{$reply->link}">
-					{if $reply->description}
-						<br /><small>{$reply->description}</small>
+			<a n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
+				<span class="label label-info">{$tag}</span>
+			</a>
+			{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+
+			<blockquote n:tag-if="$entry->name" style="margin-top:15px">
+				<strong n:if="$entry->name">{$entry->name}</strong>
+				<a n:tag-if="$entry->link" href="{$entry->link}">
+					{if $entry->description}
+						<br><small>{$entry->description}</small>
 					{/if}
-					{if $reply->picture}
-						<br /><img src="{$reply->picture}" title="{$reply->name}" />
+					{if $entry->picture}
+						<br><img src="{$entry->picture}" title="{$entry->name}">
 					{/if}
 				</a>
 			</blockquote>
-		</div>
-	</div>
-{/define}
 
-{define #comment}
-	{default $marked = $comment->marked}
-	<div n:class="$marked ? 'comment-marked' : 'comment'">
-		<div class="row header">
-			<div class="col-xs-3">
-				<strong>Od:</strong>
-				{if $comment->parent->group_closed}
-					Skryto
-				{else}
-					<img src="{$comment->user->profilePicture}">
-					<a target="_blank" href="https://www.facebook.com/{$comment->user->fbId}">{$comment->user->name}</a>
+		</div>
+		{default $anyMarked = false}
+		{if $type == "comment"}
+			{foreach $entry->children as $reply}
+				{include #entry, entry => $reply, type => "reply"}
+				{if $marked}
+					{var $anyMarked = true}
 				{/if}
-			</div>
+			{/foreach}
+		{elseif $type == "post"}
+			{foreach $entry->children as $comment}
+				{include #entry, entry => $comment, type => "comment"}
+				{if $marked}
+					{var $anyMarked = true}
+				{/if}
+			{/foreach}
+		{/if}
 
-			<div class="col-xs-3">
-				<strong>Kdy:</strong>
-				<a target="_blank" href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent->fb_id}/?comment_id={$comment->fb_id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-			</div>
-		</div>
-
-		<div class="row message">
-			{$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
-			<blockquote n:tag-if="$comment->name" style="margin-top:15px">
-				<strong n:if="$comment->name">
-					{$comment->name}
-				</strong>
-				<a n:tag-if="$comment->link" href="{$comment->link}">
-					{if $comment->description}
-						<br /><small>{$comment->description}</small>
+		{if $type != "reply"}
+		{if count($entry->children)}
+			<span class="show-comments">
+				<button class="btn btn-small btn-success">
+					<i class="icon-comment"></i>
+					Zobrazit
+					{if $anyMarked}všechny{/if}
+					{if $type == 'post'}
+						komentáře
+					{else}
+						odpovědi
 					{/if}
-					{if $comment->picture}
-						<br /><img src="{$comment->picture}" title="{$comment->name}" />
+					 ({count($entry->children)})
+				</button>
+			</span>
+			<span class="hide-comments">
+				<button class="btn btn-small btn-warning">
+					<i class="icon-comment"></i>
+					Skrýt
+					{if $anyMarked}všechny{/if}
+					{if $type == 'post'}
+						komentáře
+					{else}
+						odpovědi
 					{/if}
-				</a>
-			</blockquote>
-		</div>
+					 ({count($entry->children)})
+				</button>
+			</span>
+		{/if}
+		{/if}
 
-		{foreach $comment->replies as $reply}
-			{include #comment-reply, $reply}
-		{/foreach}
+	{*</div>*}
 	</div>
 {/define}
 
 {control paginator}
 
-<div n:foreach="$topics as $topic" class="topic">
-	<div class="row header">
-		<div class="col-xs-3">
-			<strong>Od:</strong>
-			{if $topic->group_closed}
-				Skryto
-			{else}
-				<img src="{$topic->user->profilePicture}">
-				<a target="_blank" href="https://www.facebook.com/{$topic->user->fbId}">{$topic->user->name}</a>
-			{/if}
-		</div>
-
-		<div class="col-xs-3">
-			<strong>Kdy:</strong>
-			<a target="_blank" href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->fb_id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
-		</div>
-
-		<div class="col-xs-6 hidden-sm">
-			<strong>Zdroj:</strong>
-			<a target="_blank" href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:45}</a>
-		</div>
-	</div>
-
-	<div class="row message">
-		<a n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
-			<span class="label label-info">{$tag}</span>
-		</a>
-		{$topics->getHighlight($topic)|noescape|highlight|nl2br|urlsToLinks}
-
-		<blockquote n:tag-if="$topic->name" style="margin-top:15px">
-			<strong n:if="$topic->name">
-				{$topic->name}
-			</strong>
-			<a n:tag-if="$topic->link" href="{$topic->link}">
-				{if $topic->description}
-					<br /><small>{$topic->description}</small>
-				{/if}
-				{if $topic->picture}
-					<br /><img src="{$topic->picture}" title="{$topic->name}" />
-				{/if}
-			</a>
-		</blockquote>
-	</div>
-
-	<div class="comments">
-		{default $anyMarked = false}
-		{foreach $topic->comments as $comment}
-			{include #comment, $comment}
-			{if $comment->marked}
-				{var $anyMarked = true}
-			{/if}
-		{/foreach}
-	</div>
-
-	{if count($topic->comments)}
-		<span class="show-comments">
-			<button class="btn btn-small btn-success">
-				<i class="icon-comment"></i>
-				Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
-			</button>
-		</span>
-		<span class="hide-comments">
-			<button class="btn btn-small btn-warning">
-				<i class="icon-comment"></i>
-				Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
-			</button>
-		</span>
-	{/if}
-</div>
+{*<div n:foreach="$topics as $topic" class="entry topic">*}
+{foreach $topics as $topic}
+	{include #entry, entry => $topic, type => "post"}
+{/foreach}
+{*</div>*}
 
 {control paginator}

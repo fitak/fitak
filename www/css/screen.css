@@ -71,28 +71,30 @@ a[href^="error:"] {
     color: white;
 }
 
-.topic {
+.post {
 	border: 1px solid #BBBBBB;
 	border-radius: 5px;
 	padding: 1em;
 	margin-bottom: 1em;
 }
 
-.topic .header {
+.post .header {
 	font-size: 0.8em;
 }
 
-.topic .message {
+.post .message {
 	padding: 1em;
 }
 
-.topic .comment,
-.topic .hide-comments {
+.post .comment,
+.post .reply,
+.post .hide-comments {
     display: none;
 }
 
-.topic .comment,
-.topic .comment-marked {
+.post .comment,
+.post .comment-marked
+.post .reply {
 	padding: 1em;
 	margin-bottom: 1em;
 	border-top-left-radius: 3px;

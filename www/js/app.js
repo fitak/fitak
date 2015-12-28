@@ -1,9 +1,9 @@
 $(document).ready(function() {
 	// StreamControl
 	$('.show-comments, .hide-comments').on('click', function() {
-		var topic = $(this).closest('.topic');
-		topic.find('.show-comments, .hide-comments').toggle();
-		topic.find('.comment').toggle();
+		var entry = $(this).closest('.entry');
+		entry.children('.show-comments, .hide-comments').toggle();
+		entry.children('.entry').toggle();
 		return false;
 	});
 

@@ -162,24 +162,24 @@ class Data extends BaseModel
 		foreach ($topics as $topic)
 		{
 			// $topic->likesData = $this->getLikes( $topic->id );
-
+			$topic->marked = in_array($topic->id, $marked);
 			// If this topic has comments
 			if (isset($comments[ $topic->id ]))
 			{
-				$topic->comments = $comments[ $topic->id ];
-				$replies = $this->getComments(array_keys($topic->comments));
-				$this->addUsers($topic->comments);
+				$topic->children = $comments[ $topic->id ];
+				$replies = $this->getComments(array_keys($topic->children));
+				$this->addUsers($topic->children);
 
-				foreach ($topic->comments as $comment)
+				foreach ($topic->children as $comment)
 				{
 					$comment->parent = $topic;
 					$comment->marked = in_array($comment->id, $marked);
 
 					if (isset($replies[ $comment->id ]))
 					{
-						$comment->replies = $replies[ $comment->id ];
-						$this->addUsers($comment->replies);
-						foreach ($comment->replies as $reply)
+						$comment->children = $replies[ $comment->id ];
+						$this->addUsers($comment->children);
+						foreach ($comment->children as $reply)
 						{
 							$reply->parent = $comment;
 							$reply->marked = in_array($reply->id, $marked);
@@ -188,7 +188,7 @@ class Data extends BaseModel
 					}
 					else
 					{
-						$comment->replies = [];
+						$comment->children = [];
 					}
 
 
@@ -196,7 +196,7 @@ class Data extends BaseModel
 			}
 			else
 			{
-				$topic->comments = [];
+				$topic->children = [];
 			}
 		}
 
