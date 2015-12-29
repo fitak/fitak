@@ -1,10 +1,27 @@
+{define #commentForm}
+{form commentForm, class => 'form-horizontal'}
+	<fieldset>
+			<span class="input-group comment-field">
+				{input message, class => 'form-control'}
+				{input parent_id, value => $parent_id}
+			</span>
+	</fieldset>
+{/form}
+{/define}
+
 {define #entry}
 	{default $marked = $entry->marked}
 	<div n:class="entry, $type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply'">
 	{*<div n:tag-if="$type != 'post'" n:class="$marked ? 'comment-marked' : 'comment'">*}
 		<div class="row header">
 			<div class="col-xs-6">
-			<img src="{$entry->user->profilePicture}" n:class="$type == 'post' ? post-user-image, $type == 'comment' ? comment-user-image, $type == 'reply' ? reply-user-image, user-image">
+			<div n:class="$type == 'post' ? post-user-image, $type == 'comment' ? comment-user-image, $type == 'reply' ? reply-user-image, user-image">
+				{if $entry->user->profilePicture}
+				<img src="{$entry->user->profilePicture}">
+				{else}
+				<img src="{$basePath}/img/anonymous_user.gif">
+				{/if}
+			</div>
 			<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}" class="user-name">{$entry->user->name}</a>
 			<br>
 			{if $type == "post"}
@@ -63,34 +80,36 @@
 		{/if}
 
 		{if $type != "reply"}
-		{if count($entry->children)}
-			<span class="show-comments">
-				<button class="btn btn-small btn-success">
-					<i class="icon-comment"></i>
-					Zobrazit
-					{if $anyMarked}všechny{/if}
-					{if $type == 'post'}
-						komentáře
-					{else}
-						odpovědi
-					{/if}
-					 ({count($entry->children)})
-				</button>
-			</span>
-			<span class="hide-comments">
-				<button class="btn btn-small btn-warning">
-					<i class="icon-comment"></i>
-					Skrýt
-					{if $anyMarked}všechny{/if}
-					{if $type == 'post'}
-						komentáře
-					{else}
-						odpovědi
-					{/if}
-					 ({count($entry->children)})
-				</button>
-			</span>
-		{/if}
+			{if count($entry->children)}
+				<span class="show-comments">
+					<button class="btn btn-small btn-success">
+						<i class="icon-comment"></i>
+						Zobrazit
+						{if $anyMarked}všechny{/if}
+						{if $type == 'post'}
+							komentáře
+						{else}
+							odpovědi
+						{/if}
+						 ({count($entry->children)})
+					</button>
+				</span>
+				<span class="hide-comments">
+					<button class="btn btn-small btn-warning">
+						<i class="icon-comment"></i>
+						Skrýt
+						{if $anyMarked}všechny{/if}
+						{if $type == 'post'}
+							komentáře
+						{else}
+							odpovědi
+						{/if}
+						 ({count($entry->children)})
+					</button>
+				</span>
+
+			{/if}
+			{include #commentForm, parent_id => $entry->id}
 		{/if}
 
 	{*</div>*}

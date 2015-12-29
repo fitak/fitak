@@ -79,9 +79,10 @@ class SearchPresenter extends BasePresenter
 		return $form;
 	}
 
+
 	protected function createComponentStream()
 	{
-		return new StreamControl($this->templateFactory);
+		return new StreamControl($this->templateFactory, $this->orm, $this->userStorage);
 	}
 
 }
