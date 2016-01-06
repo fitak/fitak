@@ -7,7 +7,7 @@ use Nextras\Orm\Repository\Repository;
 
 /**
  * @method User getByEmail(string $email)
- * @method User getByFacebookId(string $id)
+ * @method User getByFbId(string $id)
  */
 class UsersRepository extends Repository
 {
