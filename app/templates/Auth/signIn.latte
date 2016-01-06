@@ -40,7 +40,7 @@
             if (response.status === 'connected') {
                 sendData.accessToken = response.authResponse.accessToken;
                 sendData.accountId = response.authResponse.userID;
-                FB.api('/me', function(userData) {
+                FB.api('/me', { fields: 'name, picture' }, function(userData) {
                     sendData.userData = userData;
 
                     $.post({link facebookLogin!}, sendData,
