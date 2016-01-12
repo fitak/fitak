@@ -44,61 +44,35 @@ class AuthPresenter extends BasePresenter
 			->setRequired('Vyplň heslo.');
 		$form->addSubmit('signIn', 'Přihlásit');
 		$form->onSuccess[] = [$this, 'processSignInForm'];
+
 		return $form;
 	}
 
-    public function processSignInForm(UI\Form $form, array $values)
-    {
-        try
-        {
-            $this->signInManager->signIn($values['email'], $values['password']);
-            $this->restoreRequest($this->backlink);
-            $this->redirect('Homepage:');
-        }
-        catch (AuthenticationException $e)
-        {
-            /** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
-            if ($e->getCode() === IAuthenticator::IDENTITY_NOT_FOUND)
-            {
-                $form['email']->addError('S tímto e-mailem tu není nikdo zaregistrovaný.');
-            }
-            elseif ($e->getCode() === IAuthenticator::NOT_APPROVED)
-            {
-                $form['email']->addError('Účet není ještě aktivován. Klikni na odkaz v e-mailu.');
-            }
-            elseif ($e->getCode() === IAuthenticator::INVALID_CREDENTIAL)
-            {
-                $form['password']->addError('Neplatné heslo.');
-            }
-            else
-            {
-                throw new \LogicException();
-            }
-        }
-    }
-
-    public function handleFacebookLogin()
+	public function processSignInForm(UI\Form $form, array $values)
 	{
-		$array = $this->getRequest()->getPost();
-
 		try {
-			$this->signInManager->signInFacebook($array["accountId"]);
+			$this->signInManager->signIn($values['email'], $values['password']);
+			$this->restoreRequest($this->backlink);
 			$this->redirect('Homepage:');
 		} catch (AuthenticationException $e) {
-			$this->signUpManager->signUpUsingFacebook($array);
-		} catch (AuthenticationException $e) {
-			$this->payload->errorMessage = "Zle profilove data.";
-			\Tracy\Debugger::log($array);
-		} catch (DuplicateEmailException $e) {
-			$this->payload->errorMessage = "Tento pouzivatel s takymto emailom uz existuje.";
+			/** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
+			if ($e->getCode() === IAuthenticator::IDENTITY_NOT_FOUND) {
+				$form['email']->addError('S tímto e-mailem tu není nikdo zaregistrovaný.');
+			} elseif ($e->getCode() === IAuthenticator::NOT_APPROVED) {
+				$form['email']->addError('Účet není ještě aktivován. Klikni na odkaz v e-mailu.');
+			} elseif ($e->getCode() === IAuthenticator::INVALID_CREDENTIAL) {
+				$form['password']->addError('Neplatné heslo.');
+			} else {
+				throw new \LogicException();
+			}
 		}
-
-		$this->sendPayload();
 	}
 
+	public function handleFacebookLogin()
+	{
 
+	}
 // === password reset ==================================================================================================
-
 	/**
 	 * @return UI\Form
 	 */
@@ -118,9 +92,9 @@ class AuthPresenter extends BasePresenter
 	public function processLostPasswordForm(UI\Form $form, array $values)
 	{
 		$user = $this->orm->users->getByEmail($values['email']);
-		if (!$user)
-		{
+		if (!$user) {
 			$form['email']->addError('S tímto mailem tu není nikdo zaregistrovaný.');
+
 			return;
 		}
 
@@ -149,17 +123,16 @@ class AuthPresenter extends BasePresenter
 	public function processPasswordResetForm(UI\Form $form, array $values)
 	{
 		$user = $this->orm->users->getById($values['userId']);
-		if (!$user) $this->error();
+		if (!$user) {
+			$this->error();
+		}
 
-		try
-		{
+		try {
 			$this->passwordResetManager->resetPassword($user, $values['token'], $values['password']);
 			$this->signInManager->signInWithoutPassword($user);
 			$this->flashMessage('Heslo bylo úspěšně změněno');
 			$this->redirect('Homepage:');
-		}
-		catch (InvalidPasswordResetTokenException $e)
-		{
+		} catch (InvalidPasswordResetTokenException $e) {
 			$this->flashMessage('Neplatný token pro reset hesla.', 'danger');
 			$this->redirect('passwordReset');
 		}
@@ -192,7 +165,19 @@ class AuthPresenter extends BasePresenter
 			->setOmitted()
 			->setRequired('Vyplň heslo ještě jednou, pro kontrolu.')
 			->addRule($form::EQUAL, 'Zadané hesla se musí shodovat, zkontroluj si překlepy.', $form['password']);
-	    $form->addSubmit('signUp', 'Zaregistrovat se');
+		$form->addButton('fbConnect', 'Propojit s Facebookem')
+			->setAttribute('onclick', 'checkLoginState()')
+			->setHtmlId('fbConnect');
+		$form->addHidden('fbId', NULL)
+			->setHtmlId('fbId');
+		$form->addHidden('fbAccessToken', NULL)
+			->setHtmlId('fbAccessToken');
+		$form->addText('name', 'Jméno uživatele')
+			->setRequired('Jméno je povinná položka')
+			->setHtmlId('name');
+		$form->addText('profilePicture', 'Odkaz na profilovou fotku')
+			->setHtmlId('profilePicture');
+		$form->addSubmit('signUp', 'Zaregistrovat se');
 		$form->onSuccess[] = [$this, 'processSignUpForm'];
 
 		return $form;
@@ -200,13 +185,10 @@ class AuthPresenter extends BasePresenter
 
 	public function processSignUpForm(UI\Form $form, array $values)
 	{
-		try
-		{
-			$this->signUpManager->signUp($values['email'], $values['password']);
+		try {
+			$this->signUpManager->signUp($values);
 			$this->redirect('signUpAfter');
-		}
-		catch (DuplicateEmailException $e)
-		{
+		} catch (DuplicateEmailException $e) {
 			/** @var UI\Form|\Nette\Forms\Controls\BaseControl[] $form */
 			$form['email']->addError('S tímto mailem je tu již někdo zaregistrovaný.');
 		}
@@ -216,21 +198,18 @@ class AuthPresenter extends BasePresenter
 	{
 		/** @var User $user */
 		$user = $this->orm->users->getById($userId);
-		if (!$user) $this->error();
+		if (!$user) {
+			$this->error();
+		}
 
-		try
-		{
+		try {
 			$this->signUpManager->confirmSignUp($user, $token);
-			$this->signInManager->signInWithoutPassword($user);
 			$this->flashMessage('Účet byl úspěšně aktivován.');
+			$this->signInManager->signInWithoutPassword($user);
 			$this->redirect('Homepage:');
-		}
-		catch (UserAlreadyActivatedException $e)
-		{
+		} catch (UserAlreadyActivatedException $e) {
 			$this->flashMessage('Tento účet byl již aktivován v minulosti.', 'warning');
-		}
-		catch (InvalidSignUpTokenException $e)
-		{
+		} catch (InvalidSignUpTokenException $e) {
 			$this->flashMessage('Neplatný aktivační token.', 'danger');
 		}
 	}

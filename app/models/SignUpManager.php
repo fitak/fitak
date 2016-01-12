@@ -6,6 +6,7 @@ use Nette;
 use Nette\Mail;
 use Nette\Utils\Random;
 use Nextras\Application\LinkFactory;
+use Nextras\Dbal\UniqueConstraintViolationException;
 
 class SignUpManager extends Nette\Object
 {
@@ -23,7 +24,7 @@ class SignUpManager extends Nette\Object
 	private $tagsImporter;
 
 	public function __construct(Orm $orm, Mail\IMailer $mailer,
-                                LinkFactory $linkFactory, TagsImporter $tagsImporter)
+		LinkFactory $linkFactory, TagsImporter $tagsImporter)
 	{
 		$this->orm = $orm;
 		$this->mailer = $mailer;
@@ -31,57 +32,48 @@ class SignUpManager extends Nette\Object
 		$this->tagsImporter = $tagsImporter;
 	}
 
-    /**
-	 * @param \Nette\Utils\ArrayHash $data
-	 * @return void
-     * @throws \Nette\Security\AuthenticationException
-	 * @throws DuplicateEmailException
-     */
-	public function signUpUsingFacebook($data)
-	{
-		if ($data === NULL) {
-			throw new Nette\Security\AuthenticationException('Registracia nezdarena - ziadne data k registracii.');
-		}
-
-		$user = new User();
-		$user->signUpTime = 'now';
-		$user->email = $data['userData']['email'];
-		$user->firstName = $data['userData']['first_name'];
-		$user->lastName = $data['userData']['last_name'];
-		$user->passwordHash = "00000";
-		$user->facebookId = $data['accountId'];
-		$user->facebookAccessToken = $data['accessToken'];
-
-		try {
-			$this->orm->users->persistAndFlush($user);
-		} catch(DuplicateEntryException $e) {
-			throw new DuplicateEmailException();
-		}
-	}
-
 	/**
-	 * @param  string $email
-	 * @param  string $password
+	 * @param $values
+	 *
+	 * @internal param string $email
+	 * @internal param string $password
+	 *
 	 * @return void
-	 * @throws DuplicateEmailException
 	 */
-	public function signUp($email, $password)
+	public function signUp($values)
 	{
 		$signUpToken = Random::generate(10);
 
-		$user = new User();
-		$user->email = $email;
-		$user->passwordHash = password_hash($password, PASSWORD_BCRYPT);
+		foreach ($values as $key => $value) {
+			if ($values[$key] == "") {
+				$values[$key] = NULL;
+			}
+		}
+
+		$user = NULL;
+		if ($values['fbId']) {
+			$user = $this->orm->users->getByFbId($values['fbId']);
+		}
+		if (!$user) {
+			$user = new User();
+		}
+
+		$user->email = $values['email'];
+		$user->passwordHash = password_hash($values['password'], PASSWORD_BCRYPT);
 		$user->signUpTokenHash = password_hash($signUpToken, PASSWORD_BCRYPT);
 		$user->signUpTime = 'now';
+		$user->registered = 0;
+		$user->fbId = $values['fbId'];
+		$user->fbAccessToken = $values['fbAccessToken'];
+		$user->name = $values['name'];
+		$user->profilePicture = $values['profilePicture'];
 
-		try
-		{
+		try {
 //			$this->tagsImporter->importTags($user);
 			$this->orm->users->persistAndFlush($user);
-		}
-		catch (DuplicateEntryException $e)
-		{
+		} catch (DuplicateEntryException $e) {
+			throw new DuplicateEmailException();
+		} catch (UniqueConstraintViolationException $e) {
 			throw new DuplicateEmailException();
 		}
 
@@ -92,7 +84,7 @@ class SignUpManager extends Nette\Object
 
 		$mail = new Mail\Message();
 		$mail->setFrom('admin@fitak.cz');
-		$mail->addTo($email);
+		$mail->addTo($user->email);
 		$mail->setSubject('Potvrzení registrace na Fiťák.cz');
 		$mail->setHtmlBody(
 			"Ahoj,<br>" .
@@ -102,7 +94,12 @@ class SignUpManager extends Nette\Object
 			"Fiťák.cz"
 		);
 
-		$this->mailer->send($mail);
+		try {
+			$this->mailer->send($mail);
+		} catch (Mail\SmtpException $e) {
+//			throw new CannotSendEmail("Link: $confirmLink");
+			throw new CannotSendEmail("Nelze odeslat e-mail, zkontrolujte připojení.");
+		}
 	}
 
 	/**
@@ -110,27 +107,27 @@ class SignUpManager extends Nette\Object
 	 *
 	 * @param  User   $user
 	 * @param  string $token
+	 *
 	 * @return void
 	 * @throws UserAlreadyActivatedException
 	 * @throws InvalidSignUpTokenException
 	 */
 	public function confirmSignUp(User $user, $token)
 	{
-		if ($user->signUpTokenHash === NULL)
-		{
+		if ($user->signUpTokenHash === NULL) {
 			throw new UserAlreadyActivatedException();
 		}
 
-		if (!password_verify($token, $user->signUpTokenHash))
-		{
+		if (!password_verify($token, $user->signUpTokenHash)) {
 			throw new InvalidSignUpTokenException();
 		}
 
 		$user->signUpTokenHash = NULL;
+		$user->registered = 1;
 		$this->orm->users->persistAndFlush($user);
 	}
-
 }
+
 
 class DuplicateEmailException extends \RuntimeException
 {
@@ -143,6 +140,11 @@ class UserAlreadyActivatedException extends \RuntimeException
 }
 
 class InvalidSignUpTokenException extends \RuntimeException
+{
+
+}
+
+class CannotSendEmail extends \RuntimeException
 {
 
 }
