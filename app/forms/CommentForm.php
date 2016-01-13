@@ -1,18 +1,13 @@
 <?php
 
 use Fitak\Orm;
-use Fitak\CommentManager;
-use Nette\Application\UI\Form;
+use Fitak\Post;
+use \Nette\Application\UI\Form;
 
 class CommentForm extends Form
 {
-	/** @var commentManager @inject */
-	public $commentManager;
-
 	private $orm;
-
 	private $user;
-
 	const SEMESTER = 'semester';
 
 	public function __construct(Orm $orm, $user)
@@ -32,13 +27,26 @@ class CommentForm extends Form
 		$message = $values['message'];
 		$parent_id = $values['parent_id'];
 
-		$this->commentManager = new CommentManager($this->orm);
-		$this->commentManager->saveComment($message, $this->user, $parent_id);
+		$this->saveComment($message, $this->user, $parent_id);
 
 		$parameters = $this->getPresenter()->getParameters();
 		unset($parameters['do']);
 
 		$this->presenter->redirect('Search:', $parameters);
+	}
+
+	public function saveComment($message, $user, $parent_id)
+	{
+		$comment = new Post();
+		$comment->message = $message;
+		$comment->user = $user;
+		$comment->createdTime = 'now';
+		$comment->updatedTime = 'now';
+		$comment->type = $comment::TYPE_STATUS;
+		$this->orm->posts->attach($comment);
+		$comment->parent = $this->orm->posts->getById($parent_id);
+
+		$this->orm->posts->persistAndFlush($comment);
 	}
 
 }

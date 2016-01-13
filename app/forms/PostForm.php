@@ -1,13 +1,11 @@
 <?php
 
 use Fitak\Orm;
-use Fitak\PostManager;
+use Fitak\Post;
 use Nette\Application\UI\Form;
 
 class PostForm extends Form
 {
-	/** @var postManager @inject */
-	public $postManager;
 
 	private $orm;
 
@@ -31,13 +29,31 @@ class PostForm extends Form
 		$values = $form->getValues(TRUE);
 		$message = $values['message'];
 
-		$this->postManager = new PostManager($this->orm);
-		$this->postManager->savePost($message, $this->user);
+		$this->savePost($message, $this->user);
 
 		$parameters = $this->getPresenter()->getParameters();
 		unset($parameters['do']);
 
 		$this->presenter->redirect('Search:', $parameters);
+	}
+
+	public function savePost($message, $user)
+	{
+		$post = new Post();
+		$post->message = $message;
+		$post->user = $user;
+		$post->createdTime = 'now';
+		$post->updatedTime = 'now';
+
+		$tags = array();
+		foreach ($post->getParsedTags()[0] as $tag)
+		{
+			array_push($tags, $this->orm->tags->getByNameOrCreate($tag));
+		}
+		$post->tags->set($tags);
+
+		$post->type = $post::TYPE_STATUS;
+		$this->orm->posts->persistAndFlush($post);
 	}
 
 }

@@ -98,8 +98,6 @@ services:
 	signUpManager: Fitak\SignUpManager
 #	orm: Fitak\Orm
 #	repositoryContainer: Fitak\Orm
-	postManager: Fitak\PostManager
-	commentManager: Fitak\CommentManager
 	passwordResetManager: Fitak\PasswordResetManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
