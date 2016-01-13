@@ -82,7 +82,7 @@ class SearchPresenter extends BasePresenter
 
 	protected function createComponentStream()
 	{
-		return new StreamControl($this->templateFactory, $this->orm, $this->userStorage);
+		return new StreamControl($this->templateFactory, $this->orm, $this->getLoggedInUser());
 	}
 
 }

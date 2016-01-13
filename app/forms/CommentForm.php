@@ -2,6 +2,7 @@
 
 use Fitak\Orm;
 use Fitak\Post;
+use Fitak\User;
 use \Nette\Application\UI\Form;
 
 class CommentForm extends Form
@@ -10,7 +11,7 @@ class CommentForm extends Form
 	private $user;
 	const SEMESTER = 'semester';
 
-	public function __construct(Orm $orm, $user)
+	public function __construct(Orm $orm, User $user)
 	{
 		parent::__construct();
 

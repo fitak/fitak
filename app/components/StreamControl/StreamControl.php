@@ -2,6 +2,7 @@
 
 use Fitak\Orm;
 use Fitak\TemplateFactory;
+use Fitak\User;
 use Nette\Application\UI;
 
 class StreamControl extends UI\Control
@@ -17,14 +18,14 @@ class StreamControl extends UI\Control
 
 	public $orm;
 
-	public $userStorage;
+	public $user;
 
-	public function __construct(TemplateFactory $templateFactory, Orm $orm, Nette\Security\IUserStorage $userStorage)
+	public function __construct(TemplateFactory $templateFactory, Orm $orm, User $user)
 	{
 		parent::__construct();
 		$this->templateFactory = $templateFactory;
 		$this->orm = $orm;
-		$this->userStorage = $userStorage;
+		$this->user = $user;
 	}
 
 
@@ -49,7 +50,7 @@ class StreamControl extends UI\Control
 	protected function createComponentCommentForm()
 	{
 
-		$form = new CommentForm($this->orm, $this->getLoggedInUser());
+		$form = new CommentForm($this->orm, $this->user);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;
@@ -63,26 +64,4 @@ class StreamControl extends UI\Control
 		return $template;
 	}
 
-
-	/**
-	 * Check if user is authenticated.
-	 *
-	 * If so, it returns ORM object from database with all user data.
-	 * If not, it returns NULL.
-	 *
-	 * @return Fitak\User|NULL
-	 */
-	public function getLoggedInUser()
-	{
-		if ($this->userStorage->isAuthenticated())
-		{
-			$identity = $this->userStorage->getIdentity();
-			if ($identity !== NULL)
-			{
-				return $this->orm->users->getById($identity->getId());
-			}
-		}
-
-		return NULL;
-	}
 }
