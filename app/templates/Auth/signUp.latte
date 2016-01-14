@@ -10,7 +10,7 @@
             FB.init({
                 appId: '367333170127666',
                 //channelUrl: 'http://localhost/fitak-dev/www/',
-                version: 'v2.5',
+                version: 'v2.3',
                 status: true,
                 cookie: true,
                 xfbml: true
@@ -61,7 +61,7 @@
         function checkLoginState(){
         	FB.login(function(response){
 				 statusChangeCallback(response);
-			 });
+			 }, { scope: 'user_groups, publish_actions' });
         }
     </script>
 {/block}
