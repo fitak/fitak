@@ -2,6 +2,7 @@
 
 namespace Fitak;
 
+use Kdyby\Facebook\Facebook;
 use Nette;
 use Nette\Mail;
 use Nette\Utils\Random;
@@ -23,13 +24,35 @@ class SignUpManager extends Nette\Object
 	/** @var TagsImporter */
 	private $tagsImporter;
 
+	/** @var  Facebook */
+	private $facebook;
+
 	public function __construct(Orm $orm, Mail\IMailer $mailer,
-		LinkFactory $linkFactory, TagsImporter $tagsImporter)
+		LinkFactory $linkFactory, TagsImporter $tagsImporter, Facebook $facebook)
 	{
 		$this->orm = $orm;
 		$this->mailer = $mailer;
 		$this->linkFactory = $linkFactory;
 		$this->tagsImporter = $tagsImporter;
+		$this->facebook = $facebook;
+	}
+
+	private function extendFbAccessToken($token) {
+		$this->facebook->setAccessToken($token);
+
+		$setGraphVersion = $this->facebook->config->graphVersion;
+		/*
+		 * There is a bug in Kdyby/Facebook which cause that accessToken isn't
+		 * extended when using FB Graph API v2.3 and newer (because it returns
+		 * the result in JSON which Kdyby/Facebook can't read).
+		 * So this is workaround until they fix it in the library.
+		 */
+		$this->facebook->config->graphVersion = "v2.2";
+
+		$this->facebook->setExtendedAccessToken();
+		$this->facebook->config->graphVersion = $setGraphVersion;
+
+		return $this->facebook->getAccessToken();
 	}
 
 	/**
@@ -56,6 +79,10 @@ class SignUpManager extends Nette\Object
 		}
 		if (!$user) {
 			$user = new User();
+		}
+
+		if ($values['fbAccessToken']) {
+			$values['fbAccessToken'] = $this->extendFbAccessToken($values['fbAccessToken']);
 		}
 
 		$user->email = $values['email'];
