@@ -1,12 +1,16 @@
 <?php
 
 use Fitak\PostManager;
+use Kdyby\Facebook\Dialog\LoginDialog;
+
 
 /**
  * @author Vojtech Miksu <vojtech@miksu.cz>
  */
 class SearchPresenter extends BasePresenter
 {
+	/** @var \Kdyby\Facebook\Facebook @inject */
+	public $facebook;
 
 	/** @var SearchRequest */
 	private $searchRequest;
@@ -82,7 +86,31 @@ class SearchPresenter extends BasePresenter
 
 	protected function createComponentStream()
 	{
-		return new StreamControl($this->templateFactory, $this->orm, $this->getLoggedInUser());
+		return new StreamControl($this->templateFactory, $this->orm, $this->getLoggedInUser(), $this->facebook);
+	}
+
+	protected function createComponentFbLogin()
+	{
+		/** @var FacebookLoginDialog $dialog */
+		$dialog = $this->facebook->createDialog('login');
+		$dialog->onResponse[] = function (LoginDialog $dialog) {
+			$fb = $dialog->getFacebook();
+			try {
+				if (!$fb->getUser()) {
+					$this->flashMessage('auth.flash.fb.denied', 'error');
+					$this->redirect('default');
+				}
+				$me = $fb->api('/me');
+				$this->flashMessage('FB ID: ' . $fb->getUser());
+				$this->flashMessage('FB accessToken: ' . $fb->getAccessToken());
+				$this->flashMessage('FB name: ' . $me['name']);
+			} catch (FacebookApiException $e) {
+				$this->flashMessage('auth.flash.fb.error');
+			}
+//			$this->redirect('Auth:in');
+		};
+
+		return $dialog;
 	}
 
 }
