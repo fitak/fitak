@@ -21,78 +21,149 @@ use Nette\Http\UrlScript;
 class Configuration extends Nette\Object
 {
 
+	/** @deprecated */
 	const USER_EMAIL = 'email';
+	/** @deprecated */
 	const USER_PUBLISH_ACTIONS = "publish_actions";
+	/** @deprecated */
 	const USER_ABOUT_ME = "user_about_me";
+	/** @deprecated */
 	const USER_ACTIVITIES = "user_activities";
+	/** @deprecated */
 	const USER_BIRTHDAY = "user_birthday";
+	/** @deprecated */
 	const USER_EDUCATION_HISTORY = "user_education_history";
+	/** @deprecated */
 	const USER_EVENTS = "user_events";
+	/** @deprecated */
 	const USER_GAMES_ACTIVITY = "user_games_activity";
+	/** @deprecated */
 	const USER_GROUPS = "user_groups";
+	/** @deprecated */
 	const USER_HOMETOWN = "user_hometown";
+	/** @deprecated */
 	const USER_INTERESTS = "user_interests";
+	/** @deprecated */
 	const USER_LIKES = "user_likes";
+	/** @deprecated */
 	const USER_LOCATION = "user_location";
+	/** @deprecated */
 	const USER_NOTES = "user_notes";
+	/** @deprecated */
 	const USER_PHOTOS = "user_photos";
+	/** @deprecated */
 	const USER_QUESTIONS = "user_questions";
+	/** @deprecated */
 	const USER_RELATIONSHIP_DETAILS = "user_relationship_details";
+	/** @deprecated */
 	const USER_RELATIONSHIPS = "user_relationships";
+	/** @deprecated */
 	const USER_RELIGION_POLITICS = "user_religion_politics";
+	/** @deprecated */
 	const USER_STATUS = "user_status";
+	/** @deprecated */
 	const USER_SUBSCRIPTIONS = "user_subscriptions";
+	/** @deprecated */
 	const USER_VIDEOS = "user_videos";
+	/** @deprecated */
 	const USER_WEBSITE = "user_website";
+	/** @deprecated */
 	const USER_WORK_HISTORY = "user_work_history";
 
+	/** @deprecated in v2.0 */
 	const FRIENDS_ABOUT_ME = "friends_about_me";
+	/** @deprecated in v2.0 */
 	const FRIENDS_ACTIVITIES = "friends_activities";
+	/** @deprecated in v2.0 */
 	const FRIENDS_BIRTHDAY = "friends_birthday";
+	/** @deprecated in v2.0 */
 	const FRIENDS_EDUCATION_HISTORY = "friends_education_history";
+	/** @deprecated in v2.0 */
 	const FRIENDS_EVENTS = "friends_events";
+	/** @deprecated in v2.0 */
 	const FRIENDS_GAMES_ACTIVITY = "friends_games_activity";
+	/** @deprecated in v2.0 */
 	const FRIENDS_GROUPS = "friends_groups";
+	/** @deprecated in v2.0 */
 	const FRIENDS_HOMETOWN = "friends_hometown";
+	/** @deprecated in v2.0 */
 	const FRIENDS_INTERESTS = "friends_interests";
+	/** @deprecated in v2.0 */
 	const FRIENDS_LIKES = "friends_likes";
+	/** @deprecated in v2.0 */
 	const FRIENDS_LOCATION = "friends_location";
+	/** @deprecated in v2.0 */
 	const FRIENDS_NOTES = "friends_notes";
+	/** @deprecated in v2.0 */
 	const FRIENDS_PHOTOS = "friends_photos";
+	/** @deprecated in v2.0 */
 	const FRIENDS_QUESTIONS = "friends_questions";
+	/** @deprecated in v2.0 */
 	const FRIENDS_RELATIONSHIP_DETAILS = "friends_relationship_details";
+	/** @deprecated in v2.0 */
 	const FRIENDS_RELATIONSHIPS = "friends_relationships";
+	/** @deprecated in v2.0 */
 	const FRIENDS_RELIGION_POLITICS = "friends_religion_politics";
+	/** @deprecated in v2.0 */
 	const FRIENDS_STATUS = "friends_status";
+	/** @deprecated in v2.0 */
 	const FRIENDS_SUBSCRIPTIONS = "friends_subscriptions";
+	/** @deprecated in v2.0 */
 	const FRIENDS_VIDEOS = "friends_videos";
+	/** @deprecated in v2.0 */
 	const FRIENDS_WEBSITE = "friends_website";
+	/** @deprecated in v2.0 */
 	const FRIENDS_WORK_HISTORY = "friends_work_history";
 
+	/** @deprecated */
 	const EXTENDED_ADS_MANAGEMENT = "ads_management";
+	/** @deprecated */
 	const EXTENDED_CREATE_EVENT = "create_event";
+	/** @deprecated */
 	const EXTENDED_CREATE_NOTE = "create_note";
+	/** @deprecated */
 	const EXTENDED_EXPORT_STREAM = "export_stream";
+	/** @deprecated */
 	const EXTENDED_FRIENDS_ONLINE_PRESENCE = "friends_online_presence";
+	/** @deprecated */
 	const EXTENDED_MANAGE_FRIENDLISTS = "manage_friendlists";
+	/** @deprecated */
 	const EXTENDED_MANAGE_NOTIFICATIONS = "manage_notifications";
+	/** @deprecated */
 	const EXTENDED_MANAGE_PAGES = "manage_pages";
+	/** @deprecated */
 	const EXTENDED_OFFLINE_ACCESS = "offline_access";
+	/** @deprecated */
 	const EXTENDED_PHOTO_UPLOAD = "photo_upload";
+	/** @deprecated */
 	const EXTENDED_PUBLISH_CHECKINS = "publish_checkins";
+	/** @deprecated */
 	const EXTENDED_PUBLISH_STREAM = "publish_stream";
+	/** @deprecated */
 	const EXTENDED_READ_FRIENDLISTS = "read_friendlists";
+	/** @deprecated */
 	const EXTENDED_READ_INSIGHTS = "read_insights";
+	/** @deprecated */
 	const EXTENDED_READ_MAILBOX = "read_mailbox";
+	/** @deprecated */
 	const EXTENDED_READ_PAGE_MAILBOXES = "read_page_mailboxes";
+	/** @deprecated */
 	const EXTENDED_READ_REQUESTS = "read_requests";
+	/** @deprecated */
 	const EXTENDED_READ_STREAM = "read_stream";
+	/** @deprecated */
 	const EXTENDED_RSVP_EVENT = "rsvp_event";
+	/** @deprecated */
 	const EXTENDED_SHARE_ITEM = "share_item";
+	/** @deprecated */
 	const EXTENDED_SMS = "sms";
+	/** @deprecated */
 	const EXTENDED_STATUS_UPDATE = "status_update";
+	/** @deprecated */
 	const EXTENDED_USER_ONLINE_PRESENCE = "user_online_presence";
+	/** @deprecated */
 	const EXTENDED_VIDEO_UPLOAD = "video_upload";
+	/** @deprecated */
 	const EXTENDED_XMPP_LOGIN = "xmpp_login";
 
 	/**
@@ -113,6 +184,12 @@ class Configuration extends Nette\Object
 	public $appSecret;
 
 	/**
+	 * Verify API calls by adding appsecret_proof to all calls
+	 * @var string
+	 */
+	public $verifyApiCalls;
+
+	/**
 	 * Indicates if the CURL based @ syntax for file uploads is enabled.
 	 * @var boolean
 	 */
@@ -126,6 +203,7 @@ class Configuration extends Nette\Object
 
 	/**
 	 * The default scope for login dialog.
+	 * @see https://developers.facebook.com/docs/facebook-login/permissions/v2.1
 	 * @var array
 	 */
 	public $permissions;

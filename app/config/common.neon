@@ -78,7 +78,7 @@ dibi:
 parameters:
 	fb:
 		permissions: []
-		graphVersion: "v2.5"
+		graphVersion: "v2.3"
 	elastic:
 		solrPath: %appDir%/../synonyms.solr
 		hosts:

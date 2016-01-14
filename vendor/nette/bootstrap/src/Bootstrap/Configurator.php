@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette;
@@ -14,9 +14,6 @@ use Tracy;
 
 /**
  * Initial system DI container generator.
- *
- * @property   bool $debugMode
- * @property-write $tempDirectory
  */
 class Configurator extends Object
 {
@@ -216,7 +213,7 @@ class Configurator extends Object
 			$this->parameters['debugMode']
 		);
 		$class = $loader->load(
-			array($this->parameters, $this->files),
+			array($this->parameters, $this->files, PHP_VERSION_ID - PHP_RELEASE_VERSION),
 			array($this, 'generateContainer')
 		);
 

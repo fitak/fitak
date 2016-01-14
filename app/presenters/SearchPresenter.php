@@ -92,6 +92,9 @@ class SearchPresenter extends BasePresenter
 	protected function createComponentFbLogin()
 	{
 		/** @var FacebookLoginDialog $dialog */
+//		$this->facebook->destroySession();
+		$this->facebook->getSession()->clear('user_id');
+		$this->facebook->getSession()->clear('access_token');
 		$dialog = $this->facebook->createDialog('login');
 		$dialog->onResponse[] = function (LoginDialog $dialog) {
 			$fb = $dialog->getFacebook();

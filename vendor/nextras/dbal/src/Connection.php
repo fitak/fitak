@@ -61,6 +61,9 @@ class Connection
 	 */
 	public function connect()
 	{
+		if ($this->connected) {
+			return;
+		}
 		$this->driver->connect($this->config);
 		$this->connected = TRUE;
 		$this->fireEvent('onConnect', [$this]);
@@ -73,6 +76,9 @@ class Connection
 	 */
 	public function disconnect()
 	{
+		if (!$this->connected) {
+			return;
+		}
 		$this->driver->disconnect();
 		$this->connected = FALSE;
 		$this->fireEvent('onDisconnect', [$this]);
@@ -86,6 +92,20 @@ class Connection
 	public function reconnect()
 	{
 		$this->disconnect();
+		$this->connect();
+	}
+
+
+	/**
+	 * Reconnects to a database with new configration.
+	 * @param  array $config
+	 */
+	public function reconnectWithConfig(array $config)
+	{
+		$this->disconnect();
+		$this->config = $this->processConfig($config);
+		$this->driver = $this->createDriver($this->config);
+		$this->sqlPreprocessor = new SqlProcessor($this->driver);
 		$this->connect();
 	}
 

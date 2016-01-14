@@ -19,6 +19,7 @@ class Facebook extends Command
 		$this->setName('auth:facebook');
 	}
 
+	// It's getting user access token
 	public function invoke(FbCrawler $fb, KeyValueStorage $kvs)
 	{
 		$url = $fb->getLoginUrl();
@@ -30,15 +31,19 @@ class Facebook extends Command
 		$question = new Question('Return url: ');
 		$url = $helper->ask($this->in, $this->out, $question);
 
-		$accessToken = $fb->getAccessTokenFromUrl($url)->extend();
+		$accessToken = $fb->getAccessTokenFromUrl($url);
+		$accessToken = $accessToken->extend();
 		$this->out->writeln("<info>Extended access token: $accessToken</info>");
 
 		$exp = $accessToken->getExpiresAt();
 		$kvs->save($kvs::FACEBOOK_ACCESS_TOKEN, (string) $accessToken);
-		$kvs->save($kvs::FACEBOOK_ACCESS_TOKEN_EXPIRES, $exp->getTimestamp());
 
-		$date = $exp->format('c');
-		$this->out->writeln("Token expires at $date");
+		if ($exp) {
+			$kvs->save($kvs::FACEBOOK_ACCESS_TOKEN_EXPIRES, $exp->getTimestamp());
+			$date = $exp->format('c');
+			$this->out->writeln("Token expires at $date");
+		}
+
 	}
 
 }

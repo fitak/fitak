@@ -166,7 +166,7 @@ class Facebook extends Nette\Object
 	 */
 	public function api($pathOrParams, $method = NULL, array $params = array())
 	{
-		if (is_array($pathOrParams)) {
+		if (is_array($pathOrParams) && empty($this->config->graphVersion)) {
 			$response = $this->apiClient->restServer($pathOrParams); // params
 
 		} else {
@@ -528,7 +528,13 @@ class Facebook extends Nette\Object
 		}
 
 		$params = array();
-		parse_str($accessToken, $params);
+		try {
+			$params = Nette\Utils\Json::decode($accessToken, Nette\Utils\Json::FORCE_ARRAY);
+
+		} catch (Nette\Utils\JsonException $e) {
+			parse_str($accessToken, $params);
+		}
+
 		if (!isset($params['access_token'])) {
 			return FALSE;
 		}

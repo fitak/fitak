@@ -26,7 +26,7 @@
 		"kdyby/console": "~2.3",
 		"facebook/php-sdk-v4": "~4.0",
 		"kdyby/curl-ca-bundle": "~1.0",
-		"kdyby/facebook": "~1.2"
+		"kdyby/facebook": "~2.0"
 	},
 	"require-dev": {
 		"nette/tester": "~1.3",

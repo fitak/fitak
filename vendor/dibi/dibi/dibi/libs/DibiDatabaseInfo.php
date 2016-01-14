@@ -390,7 +390,7 @@ class DibiResultInfo extends DibiObject
 			$this->columns = array();
 			$reflector = $this->driver instanceof IDibiReflector ? $this->driver : NULL;
 			foreach ($this->driver->getResultColumns() as $info) {
-				$this->columns[] = $this->names[$info['name']] = new DibiColumnInfo($reflector, $info);
+				$this->columns[] = $this->names[strtolower($info['name'])] = new DibiColumnInfo($reflector, $info);
 			}
 		}
 	}
@@ -566,7 +566,7 @@ class DibiColumnInfo extends DibiObject
 			'^_' => dibi::TEXT, // PostgreSQL arrays
 			'BYTEA|BLOB|BIN' => dibi::BINARY,
 			'TEXT|CHAR|POINT|INTERVAL' => dibi::TEXT,
-			'YEAR|BYTE|COUNTER|SERIAL|INT|LONG|SHORT' => dibi::INTEGER,
+			'YEAR|BYTE|COUNTER|SERIAL|INT|LONG|SHORT|^TINY$' => dibi::INTEGER,
 			'CURRENCY|REAL|MONEY|FLOAT|DOUBLE|DECIMAL|NUMERIC|NUMBER' => dibi::FLOAT,
 			'^TIME$' => dibi::TIME,
 			'TIME' => dibi::DATETIME, // DATETIME, TIMESTAMP

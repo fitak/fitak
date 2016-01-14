@@ -13,7 +13,7 @@ namespace Kdyby\Facebook\Api;
 use Kdyby\CurlCaBundle\CertificateHelper;
 use Kdyby\Facebook;
 use Nette;
-use Nette\Diagnostics\Debugger;
+use Tracy\Debugger;
 use Nette\Http\UrlScript;
 use Nette\Utils\Json;
 use Nette\Utils\Strings;
@@ -89,6 +89,20 @@ class CurlClient extends Nette\Object implements Facebook\ApiClient
 
 
 
+	public function disableCache()
+	{
+		$this->cache = FALSE;
+	}
+
+
+
+	public function enableCache()
+	{
+		$this->cache = [];
+	}
+
+
+
 	/**
 	 * @param Facebook\Facebook $facebook
 	 */
@@ -139,6 +153,13 @@ class CurlClient extends Nette\Object implements Facebook\ApiClient
 			$params = $method;
 			$method = NULL;
 		}
+
+		if (($i = strpos($path, '?')) !== FALSE) {
+			parse_str(substr($path, $i + 1), $tmp);
+			$params += $tmp;
+			$path = substr($path, 0, $i);
+		}
+
 		$params['method'] = $method ?: 'GET'; // method override as we always do a POST
 		$domainKey = Facebook\Helpers::isVideoPost($path, $method) ? 'graph_video' : 'graph';
 
@@ -189,8 +210,12 @@ class CurlClient extends Nette\Object implements Facebook\ApiClient
 			$params['access_token'] = $this->fb->getAccessToken();
 		}
 
-		if (isset($params['access_token']) && !isset($params['appsecret_proof'])) {
+		if ($this->fb->getConfig()->verifyApiCalls && isset($params['access_token']) && !isset($params['appsecret_proof'])) {
 			$params['appsecret_proof'] = $this->fb->config->getAppSecretProof($params['access_token']);
+		}
+
+		if ($params['appsecret_proof'] === false) {
+			unset($params['appsecret_proof']);
 		}
 
 		// json_encode all params values that are not strings
@@ -227,7 +252,7 @@ class CurlClient extends Nette\Object implements Facebook\ApiClient
 	 */
 	protected function makeRequest($url, array $params, $ch = NULL)
 	{
-		if (isset($this->cache[$cacheKey = md5(serialize(array($url, $params)))])) {
+		if (is_array($this->cache) && isset($this->cache[$cacheKey = md5(serialize(array($url, $params)))])) {
 			return $this->cache[$cacheKey];
 		}
 
@@ -322,7 +347,12 @@ class CurlClient extends Nette\Object implements Facebook\ApiClient
 
 		$this->onSuccess($result, $info);
 		curl_close($ch);
-		return $this->cache[$cacheKey] = $result;
+
+		if (is_array($this->cache)) {
+			$this->cache[$cacheKey] = $result;
+		}
+
+		return $result;
 	}
 
 

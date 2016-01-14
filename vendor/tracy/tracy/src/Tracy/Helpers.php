@@ -46,7 +46,7 @@ class Helpers
 	public static function editorUri($file, $line = NULL)
 	{
 		if (Debugger::$editor && $file && is_file($file)) {
-			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line ? (int) $line : ''));
+			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line ? (int) $line : 1));
 		}
 	}
 
@@ -164,9 +164,10 @@ class Helpers
 		$message = $e->getMessage();
 		if (!$e instanceof \Error && !$e instanceof \ErrorException) {
 			// do nothing
-		} elseif (preg_match('#^Call to undefined function (\S+)\(#', $message, $m)) {
-			$fs = get_defined_functions();
-			$hint = self::getSuggestion(array_merge($fs['internal'], $fs['user']), $m[1]);
+		} elseif (preg_match('#^Call to undefined function (\S+\\\\)?(\w+)\(#', $message, $m)) {
+			$funcs = get_defined_functions();
+			$funcs = array_merge($funcs['internal'], $funcs['user']);
+			$hint = self::getSuggestion($funcs, $m[1] . $m[2]) ?: self::getSuggestion($funcs, $m[2]);
 			$message .= ", did you mean $hint()?";
 
 		} elseif (preg_match('#^Call to undefined method (\S+)::(\w+)#', $message, $m)) {
@@ -206,10 +207,10 @@ class Helpers
 	public static function getSuggestion(array $items, $value)
 	{
 		$best = NULL;
-		$min = (int) (strlen($value) / 4) + 2;
-		foreach (array_unique($items) as $item) {
+		$min = (strlen($value) / 4 + 1) * 10 + .1;
+		foreach (array_unique($items, SORT_REGULAR) as $item) {
 			$item = is_object($item) ? $item->getName() : $item;
-			if (($len = levenshtein($item, $value)) > 0 && $len < $min) {
+			if (($len = levenshtein($item, $value, 10, 11, 10)) > 0 && $len < $min) {
 				$min = $len;
 				$best = $item;
 			}

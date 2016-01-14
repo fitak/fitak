@@ -29,6 +29,7 @@ class SqlProcessor
 		'dt' => [TRUE, TRUE, 'DateTime'],
 		'dts' => [TRUE, TRUE, 'DateTime'],
 		'di' => [TRUE, TRUE, 'DateInterval'],
+		'blob' => [TRUE, TRUE, 'blob string'],
 		'any' => [FALSE, FALSE, 'pretty much anything'],
 		'and' => [FALSE, FALSE, 'array'],
 		'or' => [FALSE, FALSE, 'array'],
@@ -130,6 +131,9 @@ class SqlProcessor
 						}
 						return $this->identifiers->$value;
 
+					case 'blob':
+						return $this->driver->convertToSql($value, IDriver::TYPE_BLOB);
+
 					case 'raw':
 						return $value;
 				}
@@ -174,6 +178,7 @@ class SqlProcessor
 					case '?dt':
 					case '?dts':
 					case '?di':
+					case '?blob':
 						return 'NULL';
 				}
 
@@ -216,9 +221,11 @@ class SqlProcessor
 						return $this->processArray("any[]", $value);
 
 					case 'i[]':
-						$i = count($value);
-						while ($i-- && is_int($value[$i]));
-						if ($i >= 0) break; // fallback to processArray
+						$nonInt = count($value);
+						foreach ($value as $v) {
+							if (is_int($v)) $nonInt--;
+						}
+						if ($nonInt > 0) break; // fallback to processArray 
 						return '(' . implode(', ', $value) . ')';
 
 					case 's[]':

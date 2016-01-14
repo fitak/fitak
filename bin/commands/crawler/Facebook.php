@@ -138,21 +138,31 @@ class Facebook extends Command
 	{
 		$code = $kvs->get($kvs::FACEBOOK_ACCESS_TOKEN);
 		$expires = $kvs->get($kvs::FACEBOOK_ACCESS_TOKEN_EXPIRES);
+
 		$accessToken = new AccessToken($code, $expires);
 
-		if (!$code || $accessToken->getExpiresAt()->getTimestamp() <= time())
+		$accessTokenExpire = false;
+		if ($accessToken->getExpiresAt()) {
+			$accessTokenExpire = true;
+		}
+
+		if ($accessTokenExpire) {
+			$accessTokenExpireDate = $accessToken->getExpiresAt()->getTimestamp();
+		}
+
+		if (!$code || ($accessTokenExpire && $accessTokenExpireDate <= time()))
 		{
 			throw new InvalidAccessTokenException("Authenticate by invoking 'auth:facebook'");
 		}
 
-		if (!$accessToken->isLongLived() || $accessToken->getExpiresAt()->getTimestamp() < strToTime('+1 week'))
+		if (!$accessToken->isLongLived() || ($accessTokenExpire && $accessToken->getExpiresAt()->getTimestamp() < strToTime('+1 week')))
 		{
 			$accessToken = $accessToken->extend();
 			$this->out->writeln("<info>Extended access token</info>");
 			$kvs->save($kvs::FACEBOOK_ACCESS_TOKEN, (string) $accessToken);
 		}
 
-		if ($this->out->isVerbose())
+		if ($this->out->isVerbose() && $accessTokenExpire)
 		{
 			$expires = $accessToken->getExpiresAt()->format('Y-m-d H:i');
 			$this->out->writeln("Token expires at $expires");
