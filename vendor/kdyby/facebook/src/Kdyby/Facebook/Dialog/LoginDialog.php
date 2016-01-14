@@ -25,6 +25,11 @@ class LoginDialog extends Facebook\Dialog\AbstractDialog
 	 */
 	private $scope;
 
+	/**
+	 * @var string
+	 */
+	private $authType;
+
 
 
 	/**
@@ -43,10 +48,14 @@ class LoginDialog extends Facebook\Dialog\AbstractDialog
 	 * Checks, if there is a user in storage and if not, it redirects to login dialog.
 	 * If the user is already in session storage, it will behave, as if were redirected from facebook right now,
 	 * this means, it will directly call onResponse event.
+	 *
+	 * @see https://developers.facebook.com/docs/facebook-login/login-flow-for-web/v2.1
+	 * @param string $authType
 	 */
-	public function handleOpen()
+	public function handleOpen($authType = NULL)
 	{
-		if (!$this->facebook->getUser()) { // no user
+		$this->authType = $authType;
+		if (!$this->facebook->getUser() || $this->authType) { // no user
 			$this->open();
 		}
 
@@ -57,6 +66,7 @@ class LoginDialog extends Facebook\Dialog\AbstractDialog
 
 
 	/**
+	 * @see https://developers.facebook.com/docs/facebook-login/permissions/v2.1
 	 * @param string|array $scope
 	 */
 	public function setScope($scope)
@@ -88,6 +98,12 @@ class LoginDialog extends Facebook\Dialog\AbstractDialog
 
 		} elseif ($scope = $this->facebook->config->permissions) {
 			$params['scope'] = implode(',', (array)$scope);
+		}
+
+		// authType
+		if ($this->authType) {
+			$params['auth_type'] = implode(',', (array) $this->authType);
+
 		}
 
 		return $params;

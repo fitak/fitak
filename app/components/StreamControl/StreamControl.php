@@ -3,6 +3,7 @@
 use Fitak\Orm;
 use Fitak\TemplateFactory;
 use Fitak\User;
+use Kdyby\Facebook\Facebook;
 use Nette\Application\UI;
 
 class StreamControl extends UI\Control
@@ -13,19 +14,18 @@ class StreamControl extends UI\Control
 
 	/** @var int maximum number of topics on a single page */
 	public $topicsPerPage = 20;
-
 	private $templateFactory;
-
 	public $orm;
-
 	public $user;
+	private $facebook;
 
-	public function __construct(TemplateFactory $templateFactory, Orm $orm, User $user)
+	public function __construct(TemplateFactory $templateFactory, Orm $orm, User $user, Facebook $facebook)
 	{
 		parent::__construct();
 		$this->templateFactory = $templateFactory;
 		$this->orm = $orm;
 		$this->user = $user;
+		$this->facebook = $facebook;
 	}
 
 
@@ -50,7 +50,7 @@ class StreamControl extends UI\Control
 	protected function createComponentCommentForm()
 	{
 
-		$form = new CommentForm($this->orm, $this->user);
+		$form = new CommentForm($this->orm, $this->user, $this->facebook);
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;

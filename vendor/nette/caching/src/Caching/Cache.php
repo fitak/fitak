@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching;
@@ -13,9 +13,6 @@ use Nette\Utils\Callback;
 
 /**
  * Implements the cache for a application.
- *
- * @property-read IStorage $storage
- * @property-read string $namespace
  */
 class Cache extends Nette\Object implements \ArrayAccess
 {
@@ -97,7 +94,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 		$data = $this->storage->read($this->generateKey($key));
 		if ($data === NULL && $fallback) {
 			return $this->save($key, function (& $dependencies) use ($fallback) {
-				return call_user_func_array($fallback, array(& $dependencies));
+				return call_user_func_array($fallback, [& $dependencies]);
 			});
 		}
 		return $data;
@@ -128,7 +125,15 @@ class Cache extends Nette\Object implements \ArrayAccess
 
 		if ($data instanceof Nette\Callback || $data instanceof \Closure) {
 			$this->storage->lock($key);
-			$data = call_user_func_array($data, array(& $dependencies));
+			try {
+				$data = call_user_func_array($data, [& $dependencies]);
+			} catch (\Throwable $e) {
+				$this->storage->remove($key);
+				throw $e;
+			} catch (\Exception $e) {
+				$this->storage->remove($key);
+				throw $e;
+			}
 		}
 
 		if ($data === NULL) {
@@ -150,26 +155,26 @@ class Cache extends Nette\Object implements \ArrayAccess
 		// convert FILES into CALLBACKS
 		if (isset($dp[self::FILES])) {
 			foreach (array_unique((array) $dp[self::FILES]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkFile'), $item, @filemtime($item)); // @ - stat may fail
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkFile'], $item, @filemtime($item)]; // @ - stat may fail
 			}
 			unset($dp[self::FILES]);
 		}
 
 		// add namespaces to items
 		if (isset($dp[self::ITEMS])) {
-			$dp[self::ITEMS] = array_unique(array_map(array($this, 'generateKey'), (array) $dp[self::ITEMS]));
+			$dp[self::ITEMS] = array_unique(array_map([$this, 'generateKey'], (array) $dp[self::ITEMS]));
 		}
 
 		// convert CONSTS into CALLBACKS
 		if (isset($dp[self::CONSTS])) {
 			foreach (array_unique((array) $dp[self::CONSTS]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkConst'), $item, constant($item));
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkConst'], $item, constant($item)];
 			}
 			unset($dp[self::CONSTS]);
 		}
 
 		if (!is_array($dp)) {
-			$dp = array();
+			$dp = [];
 		}
 		return $dp;
 	}
@@ -226,15 +231,14 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function wrap($function, array $dependencies = NULL)
 	{
-		$cache = $this;
-		return function () use ($cache, $function, $dependencies) {
-			$key = array($function, func_get_args());
+		return function () use ($function, $dependencies) {
+			$key = [$function, func_get_args()];
 			if (is_array($function) && is_object($function[0])) {
 				$key[0][0] = get_class($function[0]);
 			}
-			$data = $cache->load($key);
+			$data = $this->load($key);
 			if ($data === NULL) {
-				$data = $cache->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
+				$data = $this->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
 			}
 			return $data;
 		};
