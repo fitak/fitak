@@ -4,6 +4,7 @@ use Fitak\Orm;
 use Fitak\Post;
 use Fitak\User;
 use Kdyby\Facebook\Facebook;
+use Kdyby\Facebook\FacebookApiException;
 use \Nette\Application\UI\Form;
 
 class CommentForm extends Form
@@ -41,31 +42,39 @@ class CommentForm extends Form
 
 
 
-	public function commentToFacebook($message, $user, $parent_id)
+	public function commentToFacebook($message, $user, $parentId)
 	{
+		$parentPostFbId = $this->orm->posts->getById($parentId)->fbId;
 		$fb = $this->facebook;
-//		$this->facebook->setAccessToken($user->fbAccessToken);
-//		$dialog = $this->facebook->createDialog('login');
-		$fb->session->set('user', $user->fbId);
-		$fb->session->set('accessToken', $fb->getAccessToken());
-		$fb->setAccessToken($fb->getAccessToken());
-		$fb->api('/me');
-//		$this->createComponentFbLogin();
+		$fb->setAccessToken($user->fbAccessToken);
 
+		return $fb->api($parentPostFbId . '/comments', 'POST', ['message' => $message]);
 	}
 
-	public function saveComment($message, $user, $parent_id)
+	private function isFbPost($parentId)
 	{
-		$this->commentToFacebook($message, $user, $parent_id);
+		if ($this->orm->posts->getById($parentId)->fbId) {
+			return true;
+		}
+
+		return false;
+	}
+	public function saveComment($message, $user, $parentId)
+	{
+		$fbId = null;
+		if ($this->isFbPost($parentId)) {
+			$fbId = $this->commentToFacebook($message, $user, $parentId)['id'];
+		}
 
 		$comment = new Post();
+		$comment->fbId = $fbId;
 		$comment->message = $message;
 		$comment->user = $user;
 		$comment->createdTime = 'now';
 		$comment->updatedTime = 'now';
 		$comment->type = $comment::TYPE_STATUS;
 		$this->orm->posts->attach($comment);
-		$comment->parent = $this->orm->posts->getById($parent_id);
+		$comment->parent = $this->orm->posts->getById($parentId);
 
 		$this->orm->posts->persistAndFlush($comment);
 	}
