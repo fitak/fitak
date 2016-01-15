@@ -75,6 +75,13 @@ class CommentForm extends Form
 		$this->orm->posts->attach($comment);
 		$comment->parent = $this->orm->posts->getById($parentId);
 
+		$parent = $comment->parent;
+		$comment->group = $parent->group;
+		$parent->updatedTime = 'now';
+		if ($parent->parent) {
+			$parent->parent->updatedTime = 'now';
+		}
+
 		$this->orm->posts->persistAndFlush($comment);
 	}
 
