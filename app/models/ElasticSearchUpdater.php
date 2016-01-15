@@ -36,10 +36,15 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 			$post->description,
 			$post->caption,
 		]));
+		$group = $post->group ? $post->group->id : NULL;
 		return [
 			'tags' => $post->getParsedTags()[0],
 			'message' => $post->getMessageWithoutTags(),
 			'message_addons' => $addons,
+			'author' => $post->user->name,
+			'is_topic' => ($post->parent === NULL),
+			'updated_time' => $post->updatedTime->getTimestamp(),
+			'group' => $group,
 		];
 	}
 
@@ -47,13 +52,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 	{
 		if ($post instanceof Post)
 		{
-			$group = $post->group ? $post->group->id : NULL;
-			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
-				'author' => $post->user->name,
-				'is_topic' => ($post->parent === NULL),
-				'updated_time' => $post->updatedTime->getTimestamp(),
-				'group' => $group,
-			] + $this->getDefaultData($post));
+			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, $this->getDefaultData($post));
 		}
 	}
 
