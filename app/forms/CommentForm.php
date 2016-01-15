@@ -40,8 +40,6 @@ class CommentForm extends Form
 		$this->presenter->redirect('Search:', $parameters);
 	}
 
-
-
 	public function commentToFacebook($message, $user, $parentId)
 	{
 		$parentPostFbId = $this->orm->posts->getById($parentId)->fbId;
@@ -59,6 +57,7 @@ class CommentForm extends Form
 
 		return false;
 	}
+
 	public function saveComment($message, $user, $parentId)
 	{
 		$fbId = null;
