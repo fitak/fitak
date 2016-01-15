@@ -11,3 +11,4 @@ output
 pubring.gpg~
 secring.gpg
 app/config/production-dev.neon
+/node_modules/elasticdump
