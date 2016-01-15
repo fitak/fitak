@@ -76,7 +76,7 @@ class PostForm extends Form
 
 		$post = new Post();
 		$post->fbId = $fbId;
-		$post->group =  $this->orm->groups->getById($fbGroup);
+		$post->group = $this->orm->groups->getById($fbGroup);
 		$post->message = $values['message'];
 		$post->user = $user;
 		$post->createdTime = 'now';
