@@ -41,20 +41,21 @@ class StreamControl extends UI\Control
 		$this->template->render();
 	}
 
-	public function handleVote($postId)
+	public function handleVote($postId, $isDownvote)
 	{
 		$post = $this->orm->posts->getById($postId);
 
-		$vote = new Vote();
-		$vote->data = $post;
-		$vote->user = $this->user;
-		$vote->isDownvote = 0;
-		try {
-			$this->orm->votes->persistAndFlush($vote);
-		} catch (UniqueConstraintViolationException $e)
-		{
-			$this->flashMessage($e->getMessage());
+		$vote = $this->orm->votes->getbyIds($postId, $this->user->id);
+
+		if (!$vote) {
+			$vote = new Vote();
+			$vote->data = $post;
+			$vote->user = $this->user;
 		}
+
+		$vote->isDownvote = $isDownvote;
+		$this->orm->votes->persistAndFlush($vote);
+
 	}
 
 
