@@ -1,0 +1,1 @@
+CREATE TABLE `votes` (  `data_id`     INT(11) NOT NULL,  `is_downvote` BIT(1)  NOT NULL,  `user_id`     INT UNSIGNED NOT NULL,  PRIMARY KEY (`data_id`, `user_id`),  FOREIGN KEY `votes_ibfk_1` (`data_id`) REFERENCES `data` (`id`),  FOREIGN KEY `votes_ibfk_2` (`user_id`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
