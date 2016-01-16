@@ -10,6 +10,7 @@ use Nextras\Orm\Model\Model;
  * @property-read PostsRepository $posts
  * @property-read TagsRepository $tags
  * @property-read UsersRepository $users
+ * @property-read VotesRepository $votes
  */
 class Orm extends Model
 {

@@ -1,3 +1,7 @@
+{foreach $flashes as $flash}
+ 	<div class="flash {$flash->type}">{$flash->message}</div>
+{/foreach}
+
 {define #commentForm}
 {form commentForm, class => 'form-horizontal'}
 	<fieldset>
@@ -48,7 +52,8 @@
 				<span class="label label-info">{$tag}</span>
 			</a>
 			{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
-
+			<a n:href="vote!, $entry->id">Upvote!</a>
+			{*<a n:href="vote!, $entry->id">Downvote!</a>*}
 			<blockquote n:tag-if="$entry->name" style="margin-top:15px">
 				<strong n:if="$entry->name">{$entry->name}</strong>
 				<a n:tag-if="$entry->link" href="{$entry->link}">

@@ -23,6 +23,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  *
  * @property ManyHasMany|Tag[] $favoriteTags        {m:n TagsRepository $favoredBy primary}
  * @property OneHasMany|Post[] $posts  {1:m PostsRepository $user}
+ * @property OneHasMany|Vote[] $votes  {1:m VotesRepository $user}
  *
  * @property-read bool         $isActivated {virtual} only activated users can sign in
  */

@@ -1,10 +1,13 @@
 <?php
 
 use Fitak\Orm;
+use Fitak\Post;
 use Fitak\TemplateFactory;
 use Fitak\User;
+use Fitak\Vote;
 use Kdyby\Facebook\Facebook;
 use Nette\Application\UI;
+use Nextras\Dbal\UniqueConstraintViolationException;
 
 class StreamControl extends UI\Control
 {
@@ -37,6 +40,23 @@ class StreamControl extends UI\Control
 		$this->template->topics = $this->dataSource->getTopics($paginator->itemsPerPage, $paginator->offset);
 		$this->template->render();
 	}
+
+	public function handleVote($postId)
+	{
+		$post = $this->orm->posts->getById($postId);
+
+		$vote = new Vote();
+		$vote->data = $post;
+		$vote->user = $this->user;
+		$vote->isDownvote = 0;
+		try {
+			$this->orm->votes->persistAndFlush($vote);
+		} catch (UniqueConstraintViolationException $e)
+		{
+			$this->flashMessage($e->getMessage());
+		}
+	}
+
 
 	protected function createComponentPaginator()
 	{

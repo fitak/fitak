@@ -29,6 +29,7 @@ use Tags;
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}
+ * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
  */
 class Post extends Entity
 {
