@@ -7,6 +7,7 @@ use Nextras\Orm\Relationships\ManyHasOne;
 
 
 /**
+ * @property int|NULL               $dataId
  * @property bool              $isDownvote
  *
  * @property ManyHasOne|Post[] $data  {m:1 PostsRepository $votes} {primary}

@@ -54,6 +54,7 @@
 			{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
 			<a n:href="vote!, $entry->id, 0">Upvote!</a>
 			<a n:href="vote!, $entry->id, 1">Downvote!</a>
+			<span class="important">This entry has {$entry->votesCnt} votes.</span>
 			<blockquote n:tag-if="$entry->name" style="margin-top:15px">
 				<strong n:if="$entry->name">{$entry->name}</strong>
 				<a n:tag-if="$entry->link" href="{$entry->link}">

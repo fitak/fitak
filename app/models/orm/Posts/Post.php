@@ -30,6 +30,8 @@ use Tags;
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}
  * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
+ *
+ * @property-read int         $votesCnt {virtual}
  */
 class Post extends Entity
 {
@@ -45,6 +47,14 @@ class Post extends Entity
 	 * @inject
 	 */
 	public $tagParser;
+
+	public function votesCnt()
+	{
+		$votes = $this->votes->get();
+		$positiveVotes = $votes->findBy(['isDownvote' => 0])->count();
+		$negativeVotes = $votes->findBy(['isDownvote' => 1])->count();
+		return $positiveVotes - $negativeVotes;
+	}
 
 	/**
 	 * @return string[][] [string[] $cleanTags, string[] $originalTags]
