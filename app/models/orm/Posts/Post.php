@@ -12,7 +12,7 @@ use Tags;
 
 /**
  * @property string|NULL       $fbId
- * @property Post|NULL         $parent   {m:1 PostsRepository $comments}
+ * @property Post|NULL         $parent   {m:1 PostsRepository $children}
  * @property Group|NULL        $group    {m:1 GroupsRepository $posts}
  * @property string            $message
  * @property DateTime          $createdTime
@@ -28,7 +28,7 @@ use Tags;
  * @property User              $user {m:1 UsersRepository $posts}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
- * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}
+ * @property OneHasMany|Post[] $children {1:m PostsRepository $parent}
  * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
  *
  * @property-read int         $votesCnt {virtual}
@@ -48,7 +48,7 @@ class Post extends Entity
 	 */
 	public $tagParser;
 
-	public function votesCnt()
+	public function getterVotesCnt()
 	{
 		$votes = $this->votes->get();
 		$positiveVotes = $votes->findBy(['isDownvote' => 0])->count();

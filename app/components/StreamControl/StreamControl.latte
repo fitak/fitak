@@ -1,3 +1,4 @@
+
 {foreach $flashes as $flash}
  	<div class="flash {$flash->type}">{$flash->message}</div>
 {/foreach}
@@ -14,7 +15,7 @@
 {/define}
 
 {define #entry}
-	{default $marked = $entry->marked}
+	{default $marked = false}
 	<div n:class="entry, $type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply'">
 	{*<div n:tag-if="$type != 'post'" n:class="$marked ? 'comment-marked' : 'comment'">*}
 		<div class="row header">
@@ -28,28 +29,33 @@
 			</div>
 			<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}" class="user-name">{$entry->user->name}</a>
 			<br>
-			{if $type == "post"}
-				{var top_parent_id = $entry->fb_id}
-			{elseif $type == "comment"}
-				{var top_parent_id = $entry->parent->fb_id}
-			{elseif $type == "reply"}
-				{var top_parent_id = $entry->parent->parent->fb_id}
+			{if $entry->group}
+				{if $type == "post"}
+					{var top_parent_id = $entry->fbId}
+				{elseif $type == "comment"}
+					{var top_parent_id = $entry->parent->fbId}
+				{elseif $type == "reply"}
+					{var top_parent_id = $entry->parent->parent->fbId}
+				{/if}
+				{var $fb_url = "https://www.facebook.com/groups/{$entry->group->id}/permalink/{$top_parent_id}"}
+				{if $type != "post"}
+					{var fb_url = $fb_url . "/?comment_id={$entry->fbId}"}
+				{/if}
+				<a target="_blank" href="{$fb_url}">{$entry->createdTime|date: "j.n.Y G:i:s"}</a>
+			{else}
+			<span>{$entry->createdTime|date: "j.n.Y G:i:s"}</span>
 			{/if}
-
-			{var $fb_url = "https://www.facebook.com/groups/{$entry->group_id}/permalink/{$top_parent_id}"}
-			{if $type != "post"}
-				{var fb_url = $fb_url . "/?comment_id={$entry->fb_id}"}
+			</div>
+			{if $entry->group}
+				<div n:if="$type == 'post'" class="col-xs-6">
+						<a target="_blank" href="http://www.facebook.com/groups/{$entry->group->id}" title="{$entry->group->name}">{$entry->group->name|truncate:45}</a>
+				</div>
 			{/if}
-			<a target="_blank" href="{$fb_url}">{$entry->created_time|date: "j.n.Y G:i:s"}</a>
-			</div>
-			<div n:if="$type == 'post'" class="col-xs-6">
-				<a target="_blank" href="http://www.facebook.com/groups/{$entry->group_id}" title="{$entry->group_name}">{$entry->group_name|truncate:45}</a>
-			</div>
 		</div>
 
 		<div class="row message">
-			<a n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
-				<span class="label label-info">{$tag}</span>
+			<a n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag->name">
+				<span class="label label-info">{$tag->name}</span>
 			</a>
 			{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
 			<a n:href="vote!, $entry->id, 0">Upvote!</a>
@@ -125,9 +131,9 @@
 {control paginator}
 
 {*<div n:foreach="$topics as $topic" class="entry topic">*}
-{foreach $topics as $topic}
+{foreach $topics->topics as $topic}
 	{include #entry, entry => $topic, type => "post"}
 {/foreach}
 {*</div>*}
-
+{dump}
 {control paginator}
