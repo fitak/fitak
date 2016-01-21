@@ -29,6 +29,7 @@ class PostForm extends Form
 		$this->addText('message', 'zprava');
 		$this->addCheckbox('sendToFb', 'poslat do FB skupiny');
 		$this->addSelect('fbGroup', 'Výběr FB skupiny', $groups);
+		$this->addCheckbox('typeQA', 'Typ Q&A');
 		$this->addSubmit('send', 'Vyhledat');
 	}
 
@@ -81,6 +82,10 @@ class PostForm extends Form
 		$post->user = $user;
 		$post->createdTime = 'now';
 		$post->updatedTime = 'now';
+
+		if ($values['typeQA']) {
+			$post->isTypeQa = true;
+		}
 
 		$tags = array();
 		foreach ($post->getParsedTags()[0] as $tag)

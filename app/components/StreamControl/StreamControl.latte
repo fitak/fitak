@@ -83,12 +83,21 @@
 				{/if}
 			{/foreach}
 		{elseif $type == "post"}
-			{foreach $entry->children as $comment}
-				{include #entry, entry => $comment, type => "comment"}
-				{if $marked}
-					{var $anyMarked = true}
-				{/if}
-			{/foreach}
+			{if $entry->isTypeQa}
+                {foreach $entry->sortedAnswers as $reply}
+                    {include #entry, entry => $reply, type => "comment"}
+                    {if $marked}
+                        {var $anyMarked = true}
+                    {/if}
+                {/foreach}
+            {else}
+				{foreach $entry->children as $comment}
+					{include #entry, entry => $comment, type => "comment"}
+					{if $marked}
+						{var $anyMarked = true}
+					{/if}
+				{/foreach}
+			{/if}
 		{/if}
 
 		{if $type != "reply"}

@@ -25,13 +25,15 @@ use Tags;
  * @property string|NULL       $description
  * @property string|NULL       $picture
  * @property string|NULL       $source
+ * @property bool              $isTypeQa {default false}
  * @property User              $user {m:1 UsersRepository $posts}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $children {1:m PostsRepository $parent}
  * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
  *
- * @property-read int         $votesCnt {virtual}
+ * @property-read int          $votesCnt {virtual}
+ * @property Post[]|NULL       $sortedAnswers {virtual}
  */
 class Post extends Entity
 {
@@ -47,6 +49,7 @@ class Post extends Entity
 	 * @inject
 	 */
 	public $tagParser;
+
 
 	public function getterVotesCnt()
 	{
