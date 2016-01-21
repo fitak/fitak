@@ -33,7 +33,7 @@ use Tags;
  * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
  *
  * @property-read int          $votesCnt {virtual}
- * @property Post[]|NULL       $sortedAnswers {virtual}
+ * @property-read Post[]|NULL  $sortedAnswers {virtual}
  */
 class Post extends Entity
 {
@@ -50,6 +50,30 @@ class Post extends Entity
 	 */
 	public $tagParser;
 
+	/**
+	 * @return array
+	 */
+	public function getterSortedAnswers()
+	{
+		$answers = $this->children->get()->fetchAll();
+
+		$answerVotes = [];
+		foreach ($answers as $answer) {
+			$answerVotes[$answer->id] = $answer->votesCnt;
+		}
+
+		arsort($answerVotes);
+
+		$sortedAnswersIds = array_keys($answerVotes);
+
+		$sortedAnswers = [];
+		foreach ($sortedAnswersIds as $answerId) {
+			$childEntity = $this->children->get()->getBy(['id' => $answerId]);
+			array_push($sortedAnswers, $childEntity);
+		}
+
+		return $sortedAnswers;
+	}
 
 	public function getterVotesCnt()
 	{
