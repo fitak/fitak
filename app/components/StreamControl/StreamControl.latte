@@ -16,14 +16,17 @@
                     </div>
                     <div class="right-part">
                         <div class="fb-group">
-                    {if $entry->group}
+                    {if $type == 'post'}
+                        {if $entry->group}
                             <a href="#"><i class="fa fa-facebook-official"></i>{$entry->group->name|truncate:45}
                             </a>
-                    {else}
+                        {else}
                            <i class="fa fa-rocket"></i>Pouze na Fiťák.cz
+	                    {/if}
                     {/if}
                         </div>
                         <div class="post-menu">
+
                         <a href="#"><i class="fa fa-chevron-down"></i></a>
                         </div>
                     </div>
@@ -32,11 +35,11 @@
                     <div class="votes-part">
                         <ul>
                             <li>
-                                <a n:href="vote!, $entry->id, 0"><i class="fa fa-thumbs-o-up"></i></a>
+                                <a n:href="vote!, $entry->id, 0"><i n:class="fa, $entry->isTypeQa ? fa-chevron-up : fa-thumbs-o-up"></i></a>
                             </li>
                             <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
                             <li>
-                                <a n:href="vote!, $entry->id, 1"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+                                <a n:href="vote!, $entry->id, 1"><i n:class="fa, $entry->isTypeQa ? fa-chevron-down : fa-thumbs-o-down, fa-flip-horizontal"></i></a>
                             </li>
                         </ul>
                     </div>
