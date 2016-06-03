@@ -38,6 +38,7 @@ class StreamControl extends UI\Control
 		$paginator = $this['paginator']->paginator;
 
 		$this->template->topics = $this->dataSource->getTopics($paginator->itemsPerPage, $paginator->offset);
+        $this->template->user = $this->user;
 		$this->template->render();
 	}
 

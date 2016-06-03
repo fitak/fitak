@@ -1,3 +1,61 @@
+{define #comment}
+<div n:class="$type == 'reply' ? reply : comment">
+                    <div class="profile-picture">
+                        {if $entry->user->profilePicture}
+                                                    <img src="{$entry->user->profilePicture}">
+                                                {else}
+                                                    <img src="{$basePath}/img/anonymous_user.gif">
+                                                {/if}
+                    </div>
+                    <div class="comment-body">
+                        <p><span class="author">{$entry->user->name}</span>{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+                        </p>
+                        <ul class="extra-line">
+                            <li>
+                                <a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+                            </li>
+                            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
+                            <li>
+                                <a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+                            </li>
+                            <li><span class="divider">•</span></li>
+                            <li><span class="date">{$entry->createdTime|date: "j.n.Y G:i"}</span></li>
+                        </ul>
+                        {if $type != 'reply'}
+                        <div class="replies-container">
+                            <button class="show-replies"><i class="fa fa-chevron-down"></i>
+                                Zobrazit odpovědi [{count($entry->children)}] <i class="fa fa-chevron-down"></i>
+                            </button>
+                            <button class="hide-replies" style="display: none;"><i class="fa fa-chevron-up"></i>
+                                Skrýt odpovědi [{count($entry->children)}] <i class="fa fa-chevron-up"></i></button>
+
+                            <div class="replies" style="display: none;">
+								{default $anyMarked = false}
+                                                        {foreach $entry->children as $reply}
+                                                            {include #comment, entry => $reply, type => "reply"}
+                                                            {if $marked}
+                                                                {var $anyMarked = true}
+                                                            {/if}
+                                                        {/foreach}
+
+
+                            <div class="reply">
+                                <div class="profile-picture">
+                                    <img src="{$user->profilePicture}">
+
+                                </div>
+                                <div class="reply-body">
+                                    <input placeholder="Napište odpověď...">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        {/if}
+
+                    </div>
+                </div>
+{/define}
+
 {define #entry}
 <div n:class="$type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply', $type == 'answer' ? 'answer'">
                 <div class="header-row">
@@ -87,7 +145,7 @@
                                {/foreach}
                            {else}
                             {foreach $entry->children as $comment}
-                                {include #entry, entry => $comment, type => "comment"}
+                                {include #comment, entry => $comment, type => "comment"}
                                 {if $marked}
                                     {var $anyMarked = true}
                                 {/if}
@@ -97,7 +155,7 @@
 
                 <div n:class="$entry->isTypeQa ? answer : comment, $entry->isTypeQa ? write-answer">
                     <div class="profile-picture">
-                        <img src="{$basePath}/img/profile_matej_herman.jpg">
+                        <img src="{$user->profilePicture}">
                     </div>
                     <div class="comment-body">
                         <input placeholder="Napište komentář">
