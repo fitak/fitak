@@ -678,7 +678,7 @@ a.label:hover{
 
             .profile-picture {
                 display: table-cell;
-                width: auto;
+                width: $reply-left-column;
                 min-width: $reply-left-column;
                 padding-right: $post-left-column-padding;
             }

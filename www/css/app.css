@@ -4791,7 +4791,7 @@ a.label:hover {
       width: 100%; }
       .post-container .replies-container .reply .profile-picture, .post-container .qa-comments-container .reply .profile-picture {
         display: table-cell;
-        width: auto;
+        width: 2rem;
         min-width: 2rem;
         padding-right: 0.5rem; }
       .post-container .replies-container .reply .reply-body, .post-container .qa-comments-container .reply .reply-body {

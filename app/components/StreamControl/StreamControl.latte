@@ -152,7 +152,13 @@
                         {/if}
                     {/if}
 
-                <div n:class="$entry->isTypeQa ? answer : comment, $entry->isTypeQa ? write-answer">
+				{if $entry->isTypeQa}
+					<div class="answer write-answer">
+                        <textarea placeholder="Napište odpověď..."></textarea>
+                        <button class="button">Odeslat odpověď</button>
+                    </div>
+				{else}
+                <div class="comment">
                     <div class="profile-picture">
                         <img src="{$user->profilePicture}">
                     </div>
@@ -160,6 +166,7 @@
                         <input placeholder="Napište komentář">
                     </div>
                 </div>
+                {/if}
             </div>
             {/if}
 {/define}
