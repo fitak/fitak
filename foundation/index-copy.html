@@ -1,64 +1,5 @@
-<!doctype html>
-<html lang="cs">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Test</title>
-	<link rel="stylesheet" href="{$basePath}/css/font-awesome.min.css">
-	<link rel="stylesheet" href="{$basePath}/css/app.css">
-</head>
 
-<body>
 
-<div id="top-bar">
-	<div id="top-bar-content">
-
-		<div id="logo">
-			<a href="#"><img src="{$basePath}/img/logo-new.png"></a>
-		</div>
-
-		<div id="search">
-			<div class="input-group">
-				<input>
-				<div class="input-group-button">
-					<button class="button" type="submit"><i class="fa fa-search"></i>
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<div id="user-profile">
-			<a href="#">
-				<ul>
-					<li class="profile-picture">
-						<img src="{$basePath}/img/profile_matej_herman.jpg">
-					</li>
-					<li class="username">Matěj Heřman</li>
-				</ul>
-			</a>
-		</div>
-
-		<nav>
-			<ul id="dropdown-menu" class="dropdown menu">
-				<li>
-					<a href="#"><i class="fa fa-caret-down"></i></a>
-					<ul id="dropdown-submenu" class="vertical menu">
-						<li><a href="#">Nápověda</a></li>
-						<li><a href="#">O webu</a></li>
-						<li><a href="#">Nahlásit problém</a></li>
-						<hr>
-						<li><a href="#">Zpět na hlavní stránku</a></li>
-						<li><a href="#">Uživatelské nastavení</a></li>
-						<li><a href="#">Odhlásit se</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
-
-	</div>
-</div>
-
-<div id="page-wrapper">
 	<div id="main-container">
 
 		<div class="post-container">
@@ -101,7 +42,7 @@
 				<div class="header-row">
 					<div class="left-part">
 						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_ifor_zmajlo.jpg"></a>
+							<a href="#"><img src="../img/profile_ifor_zmajlo.jpg"></a>
 						</div>
 						<div class="name-date">
 							<a class="username">Igor Žmaljo</a>
@@ -115,7 +56,7 @@
 							</a>
 						</div>
 						<div class="post-menu">
-						<a href="#"><i class="fa fa-chevron-down"></i></a>
+							<a href="#"><i class="fa fa-chevron-down"></i></a>
 						</div>
 					</div>
 				</div>
@@ -151,14 +92,17 @@
 				</div>
 			</div>
 			<div class="hiding-comments">
-				<button class="hide-comments"><i class="fa fa-caret-up"></i>skrýt komentáře [2]<i class="fa fa-caret-up"></i></button>
-				<button class="show-comments"><i class="fa fa-caret-down"></i>zobrazit komentáře [2]<i class="fa fa-caret-down"></i></button>
+				<button class="hide-comments"><i class="fa fa-caret-up"></i>skrýt komentáře
+					[2]<i class="fa fa-caret-up"></i>
+				</button>
+				<button class="show-comments"><i class="fa fa-caret-down"></i>zobrazit komentáře
+					[2]<i class="fa fa-caret-down"></i></button>
 			</div>
 			<div class="comments">
 
 				<div class="comment">
 					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
+						<img src="../img/profile_terorka_sudikova.jpg">
 					</div>
 					<div class="comment-body">
 						<p><span class="author">Terorka Sudíková</span>Teď tě asi
@@ -194,7 +138,7 @@
 							<div class="replies">
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_ifor_zmajlo.jpg">
+										<img src="../img/profile_ifor_zmajlo.jpg">
 									</div>
 									<div class="reply-body">
 										<p><span class="author">Igor Žmaljo</span>Ano,
@@ -216,7 +160,7 @@
 
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
+										<img src="../img/profile_terorka_sudikova.jpg">
 									</div>
 									<div class="reply-body">
 										<p><span class="author">Terorka Sudíková</span>Pokud jdeš
@@ -248,7 +192,7 @@
 
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
+										<img src="../img/profile_matej_herman.jpg">
 									</div>
 									<div class="reply-body">
 										<input placeholder="Napište odpověď...">
@@ -262,11 +206,15 @@
 
 				<div class="comment">
 					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_michal_cvach.jpg">
+						<img src="../img/profile_michal_cvach.jpg">
 					</div>
 					<div class="comment-body">
-						<p><span class="author">Michal Cvach</span>Řekl bych, že podmínkou moc neni, ale v dalších matematických předmětech se asi můžou věci ze ZMA zase vyskytovat grin emoticon ...<br>
-							Jinak čistě z toho co jsem slyšel, tak se ten extra pokus na ZMA docela vyplatí, protože těch předmětů, který maj tak nízkou průchodnost za celý studium zas tolik neni...
+						<p><span class="author">Michal Cvach</span>Řekl bych, že podmínkou moc neni, ale v dalších
+							matematických
+							předmětech se asi můžou věci ze ZMA zase vyskytovat grin emoticon ...<br>
+							Jinak čistě z toho co jsem slyšel, tak se ten extra pokus na ZMA docela vyplatí, protože
+							těch předmětů,
+							který maj tak nízkou průchodnost za celý studium zas tolik neni...
 						</p>
 						<ul class="extra-line">
 							<li>
@@ -289,14 +237,14 @@
 							<div class="replies">
 
 
-							<div class="reply">
-								<div class="profile-picture">
-									<img src="{$basePath}/img/profile_matej_herman.jpg">
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="../img/profile_matej_herman.jpg">
+									</div>
+									<div class="reply-body">
+										<input placeholder="Napište odpověď...">
+									</div>
 								</div>
-								<div class="reply-body">
-									<input placeholder="Napište odpověď...">
-								</div>
-							</div>
 							</div>
 						</div>
 
@@ -305,7 +253,7 @@
 
 				<div class="comment">
 					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_matej_herman.jpg">
+						<img src="../img/profile_matej_herman.jpg">
 					</div>
 					<div class="comment-body">
 						<input placeholder="Napište komentář">
@@ -320,7 +268,7 @@
 				<div class="header-row">
 					<div class="left-part">
 						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_matej_herman.jpg"></a>
+							<a href="#"><img src="../img/profile_matej_herman.jpg"></a>
 						</div>
 						<div class="name-date">
 							<a class="username">Matěj Heřman</a>
@@ -332,7 +280,7 @@
 							<i class="fa fa-rocket"></i>Pouze na Fiťák.cz
 						</div>
 						<div class="post-menu">
-						<a href="#"><i class="fa fa-chevron-down"></i></a>
+							<a href="#"><i class="fa fa-chevron-down"></i></a>
 						</div>
 					</div>
 				</div>
@@ -350,11 +298,16 @@
 					</div>
 					<div class="post-message">
 						<p>
-							<a href="#" class="label">FI-FIL</a>Věděl by někdo jaké jsou podmínky absolvování předmětu FI-FIL pro nás fiťáky?<br>
+							<a href="#" class="label">FI-FIL</a>Věděl by někdo jaké jsou podmínky absolvování předmětu
+							FI-FIL pro nás
+							fiťáky?<br>
 
-							Na Eduxu je, že se vše řídí podle stránek katedry, nicméně tam se evidentně počítá s variantou předmětu za 4 kredity a s cvičeními (my to máme za 2 kredity a bez cvičení).<br>
+							Na Eduxu je, že se vše řídí podle stránek katedry, nicméně tam se evidentně počítá s
+							variantou předmětu za
+							4 kredity a s cvičeními (my to máme za 2 kredity a bez cvičení).<br>
 
-							A případně doplňující otázka - mám ještě šanci ten předmět dát, když jsem tam dosud nebyl?<br>
+							A případně doplňující otázka - mám ještě šanci ten předmět dát, když jsem tam dosud
+							nebyl?<br>
 
 							Díky.</p>
 
@@ -369,7 +322,7 @@
 
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
+										<img src="../img/profile_matej_herman.jpg">
 									</div>
 									<div class="reply-body">
 										<input placeholder="Napište komentář...">
@@ -381,14 +334,17 @@
 				</div>
 			</div>
 			<div class="hiding-answers">
-				<button class="hide-answers"><i class="fa fa-caret-up"></i>skrýt odpovědi [2]<i class="fa fa-caret-up"></i></button>
-				<button class="show-answers"><i class="fa fa-caret-down"></i>zobrazit odpovědi [2]<i class="fa fa-caret-down"></i></button>
+				<button class="hide-answers"><i class="fa fa-caret-up"></i>skrýt odpovědi
+					[2]<i class="fa fa-caret-up"></i>
+				</button>
+				<button class="show-answers"><i class="fa fa-caret-down"></i>zobrazit odpovědi
+					[2]<i class="fa fa-caret-down"></i></button>
 			</div>
 			<div class="answer best">
 				<div class="header-row">
 					<div class="left-part">
 						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_ifor_zmajlo.jpg"></a>
+							<a href="#"><img src="../img/profile_ifor_zmajlo.jpg"></a>
 						</div>
 						<div class="name-date">
 							<a class="username">Igor Žmajlo</a>
@@ -418,7 +374,8 @@
 							Tak dle e-mailu od Zamarovského:<br>
 
 							zkouškové termíny budou v KOSu<br>
-							učit se na zkoušku z: Zamarovský, "Příběh antické filosofie", hlavně část po Aristotela včetně.<br>
+							učit se na zkoušku z: Zamarovský, "Příběh antické filosofie", hlavně část po Aristotela
+							včetně.<br>
 							žádné podmínky na vypracování čehokoliv během semestru nejsou</p>
 
 						<div class="qa-comments-container">
@@ -431,7 +388,7 @@
 							<div class="replies">
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
+										<img src="../img/profile_matej_herman.jpg">
 									</div>
 									<div class="reply-body">
 										<input placeholder="Napište komentář...">
@@ -447,7 +404,7 @@
 				<div class="header-row">
 					<div class="left-part">
 						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_terorka_sudikova.jpg"></a>
+							<a href="#"><img src="../img/profile_terorka_sudikova.jpg"></a>
 						</div>
 						<div class="name-date">
 							<a class="username">Terorka Sudíková</a>
@@ -474,9 +431,17 @@
 					</div>
 					<div class="post-message">
 						<p>
-							Jestli ti můžu dát radu, neber tenhle předmět moc vážně. Já jsem přednášejícího viděl u zkoušky po prvé v životě, na prvním pokusu měl špatnou náladu, tak mě vyrazil. Po druhé už měl náladu dobrou, tak mi dal B za prakticky stejné znalosti. Na FELu bohužel takoví lidé pořád učí, i když podle mého názoru nemají na ČVUT co dělat. Na FITu jsem se naštěstí s ničím podobným nesetkal.<br>
+							Jestli ti můžu dát radu, neber tenhle předmět moc vážně. Já jsem přednášejícího viděl u
+							zkoušky po prvé v
+							životě, na prvním pokusu měl špatnou náladu, tak mě vyrazil. Po druhé už měl náladu dobrou,
+							tak mi dal B
+							za prakticky stejné znalosti. Na FELu bohužel takoví lidé pořád učí, i když podle mého
+							názoru nemají na
+							ČVUT co dělat. Na FITu jsem se naštěstí s ničím podobným nesetkal.<br>
 
-							Pokud nebude mít Zamarovsky vyloženě špatnou náladu, tak by mělo stačit naučit se jedno libovolné téma. U zkoušky se totiž většinou ptá, co umíš nejlíp a to chce pak slyšet.</p>
+							Pokud nebude mít Zamarovsky vyloženě špatnou náladu, tak by mělo stačit naučit se jedno
+							libovolné téma. U
+							zkoušky se totiž většinou ptá, co umíš nejlíp a to chce pak slyšet.</p>
 
 						<div class="qa-comments-container">
 							<button class="show-replies"><i class="fa fa-chevron-down"></i>
@@ -488,10 +453,13 @@
 							<div class="replies">
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_ifor_zmajlo.jpg">
+										<img src="../img/profile_ifor_zmajlo.jpg">
 									</div>
 									<div class="reply-body">
-										<p><span class="author">Igor Žmaljo</span>Díky, takže tomu rozumím správně, že během semestru žádná práce (semestrálka) vyžadována není a termín zkoušky bude normálně v KOSu?</p>
+										<p><span class="author">Igor Žmaljo</span>Díky, takže tomu rozumím správně, že
+											během semestru žádná
+											práce (semestrálka) vyžadována není a termín zkoušky bude normálně v KOSu?
+										</p>
 										<ul class="extra-line">
 											<li>
 												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
@@ -508,10 +476,14 @@
 
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
+										<img src="../img/profile_terorka_sudikova.jpg">
 									</div>
 									<div class="reply-body">
-										<p><span class="author">Terorka Sudíková</span>Spíš mu napiš, že vypíše zkoušku v KOSu není úplně stoprocentní, pokud si dobře pamatuju. Nebo jak píše kolega, můžeš vychytat ten test na přednášce, pokud tam budeš chodit :)</p>
+										<p><span class="author">Terorka Sudíková</span>Spíš mu napiš, že vypíše zkoušku
+											v KOSu není úplně
+											stoprocentní, pokud si dobře pamatuju. Nebo jak píše kolega, můžeš vychytat
+											ten test na přednášce,
+											pokud tam budeš chodit :)</p>
 										<ul class="extra-line">
 											<li>
 												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
@@ -529,7 +501,7 @@
 
 								<div class="reply">
 									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
+										<img src="../img/profile_matej_herman.jpg">
 									</div>
 									<div class="reply-body">
 										<input placeholder="Napište komentář...">
@@ -550,7 +522,9 @@
 	</div>
 	<div id="sidebar">
 		<h1>Oblíbená hledání</h1>
-		<a class="label">Moje předměty <i class="fa fa-remove"></i></a><a class="label">Web a multimédia <i class="fa fa-remove"></i></a><a class="label">B121 <i class="fa fa-remove"></i></a><a class="label">Vtipy | Hlášky <i class="fa fa-remove"></i></a><a class="label">Spam | OT <i class="fa fa-remove"></i></a>
+		<a class="label">Moje předměty <i class="fa fa-remove"></i></a><a class="label">Web a multimédia
+		<i class="fa fa-remove"></i></a><a class="label">B121 <i class="fa fa-remove"></i></a><a class="label">Vtipy |
+		Hlášky <i class="fa fa-remove"></i></a><a class="label">Spam | OT <i class="fa fa-remove"></i></a>
 		<h1>Aktuální témata</h1>
 		<div class="cloud">
 			<a class="small">3DT</a>
@@ -579,11 +553,3 @@
 			<a class="smaller">zma</a>
 		</div>
 	</div>
-</div>
-
-<script src="{$basePath}/js/libs/jquery-2.1.4.min.js"></script>
-<script src="{$basePath}/js/libs/foundation.min.js"></script>
-<script src="{$basePath}/js/app.js"></script>
-
-</body>
-</html>

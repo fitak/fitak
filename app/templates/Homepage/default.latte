@@ -1,82 +1,74 @@
  {block content}
-	<div class="well" style="padding-left:35px;padding-right:35px">
+	<div id="main-container">
 
-		{form searchForm, class => 'form-horizontal'}
-			<fieldset>
-			<div class="row">
-				<span class="input-group">
-					{input s, class => 'form-control'}
-					<span class="input-group-btn">
-					<button n:name="send" class="btn btn-primary">
-						<i class="icon-search icon-white"></i>
-						Vyhledat
-					</button>
-					</span>
-				</span>
+		<div class="post-container">
+			<div class="post post-form">
+				<div class="post-type">
+					<ul data-toggle="buttons-radio">
+						<li>
+							<input type="radio" id="r1" name="r-group" data-toggle="button" checked>
+							<label class="radio-button" for="r1" title="FB-like příspěvky"><i class="fa fa-comments fa-2x"></i></label>
+						</li>
+						<li>
+							<input type="radio" id="r2" name="r-group" data-toggle="button">
+							<label class="radio-button" for="r2" title="Q&A příspěvek"><i class="fa fa-question-circle fa-2x"></i></label>
+						</li>
+					</ul>
+				</div>
+				<div class="post-message">
+					<textarea placeholder="Začněte psát příspěvek..." name="message"></textarea>
+				</div>
 			</div>
-
-			<div class="row">
-				<span class="input-group">
-				<small>
-					<a href="#" class="toggle-search-advanced">
-						Podrobné vyhledávání
-						{if $advancedSearch}&#x25bc;{else}&#x25ba;{/if}
-					</a>
-				</small>
-				</span>
+			<div class="post-bottom">
+				<div>
+					<select dir="rtl">
+						<option value="husker">Pouze na Fiťák.cz</option>
+						<option value="starbuck">FIT ČVUT - skupina pro nové studenty z
+							roku 2011/2012
+						</option>
+						<option value="hotdog">FIT ČVUT - skupina pro nové studenty z
+							roku 2012/2013
+						</option>
+						<option value="apollo">FIT ČVUT 2013/2014</option>
+					</select>
+				</div>
+				<button class="button">Odeslat</button>
 			</div>
+		</div>
 
-			<div class="search-advanced" {if $advancedSearch}style="display: block"{/if}>
-				<div class="form-group">
-				{label limit/}
-				{input limit, class => "form-control"}
-				</div>
-
-				<div class="form-group">
-				{label from/}
-				{input from, class => "form-control"}
-				</div>
-
-				<div class="form-group">
-				{foreach $form['groups']->items as $key => $label}
-				<div class="checkbox">
-					{label groups:$key} {input groups:$key} {$label}{/label}
-				</div>
-				{/foreach}
-				</div>
-
-			</div>
-			</fieldset>
-		{/form}
+        {control stream}
 	</div>
-
-		{form postForm, class => 'form-horizontal'}
-						<fieldset>
-							<div>
-								<span class="input-group">
-									{input message, class => 'form-control'}
-									<span class="input-group-btn">
-									<button n:name="send" class="btn btn-primary">
-										Odeslat
-									</button>
-									</span>
-								</span>
-							</div>
-
-							<div class="row">
-								<span class="input-group">
-									{input sendToFb, class => 'form-control'}
-									{input fbGroup, class => 'form-control'}
-									{input typeQA, class => 'form-control'}
-
-								</span>
-							</div>
-						</fieldset>
-					{/form}
-
-
-
-
-
-	{control stream}
+	<div id="sidebar">
+		<h1>Oblíbená hledání</h1>
+		<a class="label">Moje předměty <i class="fa fa-remove"></i></a><a class="label">Web a multimédia
+		<i class="fa fa-remove"></i></a><a class="label">B121 <i class="fa fa-remove"></i></a><a class="label">Vtipy |
+		Hlášky <i class="fa fa-remove"></i></a><a class="label">Spam | OT <i class="fa fa-remove"></i></a>
+		<h1>Aktuální témata</h1>
+		<div class="cloud">
+			<a class="small">3DT</a>
+			<a class="large">AAG</a>
+			<a class="small">cvika</a>
+			<a class="small">DBS</a>
+			<a class="smaller">EFA</a>
+			<a class="small">GIT</a>
+			<a class="small">GRA</a>
+			<a class="medium">KOS</a>
+			<a class="medium">MLO</a>
+			<a class="small">OT</a>
+			<a class="large">PA1</a>
+			<a class="smaller">PA2</a>
+			<a class="small">predmety</a>
+			<a class="small">PS1</a>
+			<a class="small">rozstrel</a>
+			<a class="larger">rozvrh</a>
+			<a class="small">SAP</a>
+			<a class="small">SP1</a>
+			<a class="small">teoreticka</a>
+			<a class="small">teorie</a>
+			<a class="smaller">ustni</a>
+			<a class="larger">ZDM</a>
+			<a class="medium">zkouska</a>
+			<a class="smaller">zma</a>
+		</div>
+	</div>
 {/block}

@@ -4284,7 +4284,8 @@ table.hover tr:nth-of-type(even):hover {
           animation-delay: 700ms !important; }
 
 @font-face {
-  font-family: FontAwesome; }
+  font-family: FontAwesome;
+  src: url(../fonts/FontAwesome.otf); }
 
 input, button {
   outline: none; }
