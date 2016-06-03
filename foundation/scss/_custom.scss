@@ -663,39 +663,46 @@ a.label:hover{
       font-size: 80%;
     }
   }
+    .replies-container {
+        font-size: small;
 
-  .replies-container {
+        border-left: $reply-border-width solid $border-lighter-color;
+        padding-left: $post-left-column-padding;
+        margin-left: -$post-left-column-padding - $reply-border-width;
+        margin-top: $reply-top-margin;
 
-    border-left: $reply-border-width solid $border-lighter-color;
-    padding-left: $post-left-column-padding;
-    margin-left: -$post-left-column-padding - $reply-border-width;
-    margin-top: $reply-top-margin;
+        .reply {
+            margin-top: $reply-top-margin;
+            display: table;
+            width: 100%;
 
-    .reply {
-      margin-top: $reply-top-margin;
-      display: table;
-      width: 100%;
+            .profile-picture {
+                display: table-cell;
+                width: auto;
+                min-width: $reply-left-column;
+                padding-right: $post-left-column-padding;
+            }
 
-      .profile-picture {
-        display: table-cell;
-        width: auto;
-        min-width: $reply-left-column;
-        padding-right: $post-left-column-padding;
-      }
+            .reply-body {
+                display: table-cell;
+                width: 100%;
+                vertical-align: top;
+            }
 
-      .reply-body {
-        display: table-cell;
-        width: 100%;
-        vertical-align: top;
-      }
+            input {
+                width: 100%;
+                height: $reply-left-column - $post-left-column-padding;
+                padding: $global-padding-quarter;
+            }
 
-      input {
-        width: 100%;
-        height: $reply-left-column - $post-left-column-padding;
-        padding: $global-padding-quarter;
-      }
+            .comment-body {
+                vertical-align: top;
+                display: table-cell;
+                position: relative;
+                top: -3px;
+            }
+        }
     }
-  }
 
   .hiding-comments {
     @extend .comments;
