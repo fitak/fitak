@@ -1,0 +1,765 @@
+//----------------------------------------------------------------------------
+// TABLE OF CONTENTS:
+// Mixins
+// Fonts
+// Global styles
+// Global classes
+
+// Top bar
+// - Top bar content
+// - Logo
+// - Search
+// - User profile
+// - Dropdown menu
+// Page Wrapper
+// Main Container
+// Sidebar
+
+// ============================ Mixins =======================================
+@mixin horizontal-list($padding) {
+  display: table;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: $padding;
+
+    &:first-of-type {
+      padding-left: 0;
+    }
+  }
+}
+
+@mixin vertical-list($padding) {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding-top: $padding;
+
+    &:first-of-type {
+      padding-top: 0;
+    }
+  }
+}
+
+@mixin radio-buttons($btn-color, $btn-hover-color, $btn-active-color) {
+  .radio-button {
+    color: $btn-color;
+
+    &:hover {
+      color: $btn-hover-color;
+    }
+  }
+
+  input[data-toggle] {
+    display: none;
+  }
+
+  input[data-toggle]:checked + label,
+  input[data-toggle]:checked + label:active {
+    color: $btn-active-color;
+  }
+
+}
+
+@mixin right-float-properly {
+  text-align: right;
+
+  * {
+    display: inline-block;
+  }
+}
+
+@mixin faded-link {
+  color: $faded-link-color;
+
+  &:hover, &:active {
+    color: $faded-link-hover-color;
+  }
+}
+
+@mixin vote-button-colors {
+  a {
+    color: $faded-link-color;
+
+    &:hover {
+      color: $active-link-color;
+    }
+
+    &.active {
+      color: $active-link-color;
+
+      &:hover {
+        color: $faded-link-hover-color;
+      }
+    }
+  }
+}
+
+// ============================== Fonts ======================================
+@font-face {
+  font-family: FontAwesome;
+//  src: url(../fonts/FontAwesome.otf);
+}
+
+// ============================= Global styles ===============================
+input, button {
+  outline: none;
+}
+
+input {
+  width: 100%;
+}
+
+
+p {
+  text-align: justify;
+}
+
+img {
+  max-width: none;
+}
+
+a.label:hover{
+  color: $fb-white;
+  background-color: $primary-color-hover;
+}
+
+// ============================= Global classes ==============================
+
+// ============================ Top bar ======================================
+#top-bar {
+  @include top-bar-container;
+  box-shadow: 0 1px 2px $top-bar-shadow;
+  position: relative;
+}
+
+// ---------------------- Top Bar Content ------------------------------------
+#top-bar-content {
+  @include grid-column-row(0);
+  padding: $global-padding-half $global-padding-half $global-padding-half $global-padding;
+  display: table;
+
+  > * {
+    display: table-cell;
+    vertical-align: middle;
+    padding-right: $global-padding;
+    width: auto;
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+}
+
+// ----------------------------- Logo ----------------------------------------
+#logo {
+  @include show-for(large);
+  margin-right: 1rem;
+
+  img {
+    height: 1.75rem;
+  }
+}
+
+// --------------------------- Search ----------------------------------------
+#search {
+  width: 100%;
+  display: table-cell;
+  $border-radius: 4px;
+
+  .input-group {
+    background-color: $white;
+    border-radius: $border-radius;
+    display: table;
+    margin: 0;
+  }
+
+  input {
+    border: none;
+    display: table-cell;
+    border-radius: $border-radius;
+    padding: $global-padding-half;
+  }
+
+  .input-group-button {
+    border-radius: 0 ($border-radius - 1px) ($border-radius - 1px) 0;
+    background-color: $primary-color;
+  }
+
+  button {
+    border-radius: 0 $border-radius $border-radius 0;
+    font-size: $global-font-size * 1.25;
+    padding: $global-padding-half * 0.8 $global-padding * 1.5;
+    margin: 0;
+  }
+
+}
+
+// --------------------------- User profile ----------------------------------
+#user-profile {
+  white-space: nowrap;
+  @include show-for(medium);
+
+  img {
+    border: 1px solid $dark-gray;
+    height: 2.2rem;
+  }
+
+  a {
+    display: block;
+    padding: 4px;
+
+    &:hover {
+      background-color: $top-bar-hover;
+    }
+  }
+
+  ul {
+    @include horizontal-list($global-padding-half);
+    background-color: transparent;
+  }
+
+  .username {
+    @include show-for(xlarge);
+  }
+
+}
+
+// ---------------------- Dropdown menu --------------------------------------
+#dropdown-menu {
+  white-space: nowrap;
+
+  > li > a {
+    &:focus, &:hover {
+      outline: none;
+      color: $primary-color;
+    }
+  }
+
+  i.fa {
+    font-size: 1.15rem;
+  }
+
+  #dropdown-submenu {
+    // .align-right from Foundation
+    // menu shows on right place
+    top: 100%;
+    left: auto;
+    right: 0;
+    padding-bottom: 0.7rem;
+  }
+
+  .is-dropdown-submenu-item {
+    float: right;
+    text-align: right;
+
+    &:hover {
+      background-color: $primary-color;
+
+      a {
+        color: $white;
+      }
+    }
+
+    a {
+      margin: $global-margin-half $global-margin;
+    }
+  }
+
+  .is-dropdown-submenu {
+    margin: 0.7rem (-0.49rem) 0 0;
+    border: 1px solid $medium-gray;
+    box-shadow: -1px 1px 10px $light-gray;
+    background-color: $menu-background;
+    border-radius: 3px;
+
+    hr {
+      margin: 0 $global-margin $global-margin-half $global-margin;
+      padding: $global-padding-half 0 0 0;
+      border-bottom: 1px solid $border-color;
+    }
+
+    &::before {
+      @include css-triangle(0.45rem, $menu-background, 'up');
+      position: relative;
+      right: 0.66rem;
+      bottom: 0.8rem;
+      float: right;
+    }
+  }
+}
+
+//=============================== Page wrapper ===============================
+#page-wrapper {
+  @include grid-row;
+}
+
+//============================ Main Container ================================
+#main-container {
+  @include grid-column(12);
+  float: none;
+
+  @media #{$xlarge-up} {
+    @include grid-column(9);
+    float: left;
+  }
+}
+
+// =========================== Sidebar =======================================
+#sidebar {
+  @media #{$xlarge-up} {
+    @include grid-column(3);
+    background-color: $white;
+    border: 1px solid $border-color;
+    margin-top: 0;
+  }
+
+  margin-top: 1.5rem;
+  padding: $global-padding;
+  text-align: center;
+
+  h1 {
+    font-size: 100%;
+    color: $dark-gray;
+    margin-top: $global-margin*2;
+    margin-bottom: $global-margin-half;
+    text-align: left;
+    border-top: 1px solid $border-lighter-color;
+
+  }
+
+  a {
+    margin: .2rem .2rem;
+  }
+
+  .cloud {
+    line-height: 1.5;
+
+    a {
+      &.large {
+        font-size: 1.7rem;
+      }
+
+      &.larger {
+        font-size: 1.5rem;
+      }
+
+      &.medium {
+        font-size: 1.3rem;
+      }
+
+      &.smaller {
+        font-size: 1rem;
+      }
+
+      &.small {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  *:first-child {
+    margin-top: 0;
+  }
+}
+
+// ============================ Post container ===============================
+.post-container {
+  width: 100%;
+  min-height: 3rem;
+  margin-top: $global-margin;
+  border: 1px solid $border-color;
+  background-color: $white;
+
+  //-------------------------- Post ------------------------------------------
+  .post {
+    padding: $post-padding;
+    width: 100%;
+  }
+
+  //============================ Post Form ===================================
+  .post-form {
+    display: table;
+  }
+
+  .post-type {
+    display: table-cell;
+    width: auto;
+    min-width: $post-left-column;
+    padding-right: $post-left-column-padding;
+
+    ul {
+      @include vertical-list(0);
+      @include radio-buttons($inactive-button-color, $inactive-button-hover-color, $active-button-color);
+
+      label {
+        padding: 0;
+        margin: 0;
+      }
+    }
+  }
+
+  .post-message {
+    display: table-cell;
+    width: 100%;
+    vertical-align: top;
+
+    textarea {
+      padding: 0;
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      resize: vertical;
+      height: 6rem;
+    }
+  }
+
+  .post-bottom {
+    background-color: $post-secondary;
+    border-top: 1px solid $border-lighter-color;
+    @include right-float-properly;
+    padding: $post-padding;
+
+    select {
+      height: 2.5rem;
+      margin: 0;
+      padding: 0;
+      border: none;
+      text-align: right;
+      padding-right: $global-margin*1.5;
+      overflow: hidden;
+      background-color: inherit;
+      color: $faded-link-color;
+      font-size: 90%;
+
+      @include background-triangle($faded-link-color);
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        color: $faded-link-hover-color;
+      }
+    }
+
+    button {
+      margin: 0;
+      //      height: 2rem;
+      padding: .5rem 1rem;
+    }
+  }
+
+  //---------------------------- FB-post -------------------------------------
+  //----------------------------- header -------------------------------------
+  .header-row {
+    @include grid-row();
+
+  }
+
+  .left-part, .right-part {
+    @include grid-column(6, 0);
+    display: table;
+  }
+
+  .left-part {
+    padding-right: $global-padding-half;
+  }
+
+  .right-part {
+    padding-left: $global-padding-half;
+  }
+
+  .profile-picture {
+    display: table-cell;
+    min-width: $post-left-column;
+    padding-right: $post-left-column-padding;
+
+    img {
+      width: 100%;
+    }
+
+    a:hover img {
+      opacity: 0.8;
+    }
+  }
+
+  .name-date {
+    display: table-cell;
+    vertical-align: top;
+    width: 100%;
+
+    .username {
+      font-weight: bold;
+      display: block;
+    }
+
+    .date {
+      font-size: $small-font-size;
+      @include faded-link;
+    }
+  }
+
+  .fb-group {
+    display: table-cell;
+    width: 100%;
+    text-align: right;
+    font-size: $small-font-size;
+    color: $faded-link-color;
+
+    i {
+      font-size: 160%;
+      vertical-align: -15%;
+      padding-right: .5rem;
+    }
+
+    a {
+      @include faded-link;
+    }
+  }
+
+  .post-menu {
+    display: table-cell;
+    width: auto;
+    padding-left: $global-padding;
+    font-size: 75%;
+
+    a {
+      @include faded-link;
+    }
+  }
+
+  //----------------------------- post-body ----------------------------------
+  .post-body {
+    display: table;
+    margin-top: $post-padding;
+  }
+
+  .votes-part {
+    display: table-cell;
+    width: auto;
+    min-width: $post-left-column;
+    padding-right: $post-left-column-padding;
+    text-align: center;
+
+    ul {
+      @include vertical-list($global-padding * 0.75);
+      @include vote-button-colors;
+      i {
+        font-size: 1.5rem;
+      }
+    }
+
+    .votes-cnt {
+      color: $primary-color;
+      font-weight: bold;
+      font-size: large;
+    }
+  }
+
+  .post-message {
+    display: table-cell;
+    width: 100%;
+    padding-right: $post-right-extra-padding;
+
+    .label {
+      margin-right: .35rem;
+      padding: .25rem .5rem;
+    }
+
+    p:last-of-type {
+      margin: 0;
+    }
+  }
+  //---------------------- comments -------------------------------------------
+  .comments {
+    background-color: $post-secondary;
+    padding: $post-padding;
+    border-top: 1px solid $border-lighter-color;
+  }
+
+  .comment {
+    display: table;
+    margin-bottom: $post-margin;
+    font-size: small;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .profile-picture {
+      display: table-cell;
+      width: auto;
+      min-width: $comment-left-column;
+      padding-right: $post-left-column-padding;
+    }
+
+    .comment-body {
+      display: table-cell;
+      width: 100%;
+      padding-right: $post-right-extra-padding;
+      vertical-align: top;
+
+
+
+
+
+      input {
+        height: $comment-left-column - $post-left-column-padding;
+        padding: $global-padding-quarter;
+      }
+    }
+
+  }
+
+  .author {
+    font-weight: bold;
+    color: $primary-color;
+    padding-right: .35rem;
+  }
+
+  .extra-line {
+    @include horizontal-list(.3rem);
+    @include vote-button-colors;
+
+    .votes-cnt {
+      color: $primary-color;
+      font-weight: bold;
+    }
+
+    .divider {
+      color: $faded-link-color;
+      font-size: 50%;
+      position: relative;
+      bottom: .1rem;
+      padding: 0 .3rem;
+    }
+
+    .date {
+      color: $faded-link-color;
+      font-size: 90%;
+    }
+  }
+
+  .show-replies, .hide-replies {
+    font-weight: bold;
+    color: $faded-link-color;
+    width: auto;
+
+    &:hover {
+      color: $faded-link-hover-color;
+    }
+
+    i {
+      font-size: 80%;
+    }
+  }
+
+  .replies-container {
+
+    border-left: $reply-border-width solid $border-lighter-color;
+    padding-left: $post-left-column-padding;
+    margin-left: -$post-left-column-padding - $reply-border-width;
+    margin-top: $reply-top-margin;
+
+    .reply {
+      margin-top: $reply-top-margin;
+      display: table;
+      width: 100%;
+
+      .profile-picture {
+        display: table-cell;
+        width: auto;
+        min-width: $reply-left-column;
+        padding-right: $post-left-column-padding;
+      }
+
+      .reply-body {
+        display: table-cell;
+        width: 100%;
+        vertical-align: top;
+      }
+
+      input {
+        width: 100%;
+        height: $reply-left-column - $post-left-column-padding;
+        padding: $global-padding-quarter;
+      }
+    }
+  }
+
+  .hiding-comments {
+    @extend .comments;
+
+    display: block;
+    text-align: center;
+
+    button {
+      color: $faded-link-color;
+
+      &:hover {
+        color: $faded-link-hover-color;
+      }
+      i {
+        padding: 0 $global-padding;
+      }
+    }
+
+  }
+}
+
+
+// =========================== QA types ======================================
+.answer {
+  @extend .post;
+  background-color: $post-secondary;
+
+  border-top: 1px solid $border-lighter-color;
+
+  &.best {
+    background-color: $qa-best-answer;
+  }
+}
+
+.qa-comments-container {
+  @extend .replies-container;
+  font-size: small;
+}
+
+.write-answer {
+  text-align: right;
+
+  textarea {
+    height: 6rem;
+    margin-down: $post-padding;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid $border-lighter-color;
+  }
+
+  button {
+    margin: 0;
+    padding: .5rem 1rem;
+  }
+}
+
+.hiding-answers {
+  @extend .hiding-comments;
+}
+
+.hide-answers {
+  @extend .hide-comments;
+}
+
+.show-anwers {
+  @extend .show-comments;
+}

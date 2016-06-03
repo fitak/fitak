@@ -1,0 +1,114 @@
+.primary-bg {
+  background-color: $primary-color;
+  color: $white;
+}
+
+.medium-gray-bg {
+  background-color: $medium-gray;
+}
+
+.secondary-bg {
+  background-color: $secondary-color;
+}
+
+.white-bg {
+  background-color: $white;
+}
+
+.top-padding {
+  padding-top: $global-padding;
+}
+
+.padding-right {
+  padding-right: $global-padding;
+}
+
+.padding-right-half {
+  padding-right: $global-padding/2;
+}
+
+.margin-top-half {
+  margin-top: $global-margin/2;
+}
+
+.table-cell {
+  display: table-cell;
+}
+
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.fa-0-75x {
+  font-size: 0.75rem;
+}
+
+.fa-1-5x {
+  font-size: 1.5rem;
+}
+
+.width-auto {
+  width: auto;
+}
+
+.width-full {
+  width: 100%;
+}
+
+.vertical-align-top {
+  vertical-align: top;
+}
+
+.block {
+  display: block;
+}
+
+.table {
+  width: 100%;
+  display: table;
+}
+
+.table-row {
+  display: table-row;
+}
+
+.padding-left-none {
+  padding-left: 0;
+}
+
+.padding-bottom {
+  padding-bottom: $global-padding;
+}
+
+
+.padding-none {
+  padding: 0;
+}
+
+.padding-top {
+  padding-top: $global-padding;
+}
+
+.padding-top-half {
+  padding-top: $global-padding/2;
+}
+
+.margin-top {
+  margin-top: $global-margin;
+}
+
+.size-2x {
+  font-size: 2*$global-font-size;
+}
+
+.right-float-properly {
+  text-align: right;
+
+  * {
+    display: inline-block;
+  }
+}

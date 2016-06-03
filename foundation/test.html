@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Test</title>
+	<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.1.1/foundation.min.css">-->
+	<link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+	<div class="top-bar">
+		<div class="top-bar-title">
+    <span data-responsive-toggle="responsive-menu" data-hide-for="medium">
+      <span class="menu-icon dark" data-toggle></span>
+    </span>
+			<strong>Site Title</strong>
+		</div>
+		<div class="top-bar-left">
+			<ul class="dropdown menu" data-dropdown-menu>
+				<li>
+					<a href="#">One</a>
+					<ul class="menu vertical">
+						<li><a href="#">One</a></li>
+						<li><a href="#">Two</a></li>
+						<li><a href="#">Three</a></li>
+					</ul>
+				</li>
+				<li><a href="#">Two</a></li>
+				<li><a href="#">Three</a></li>
+			</ul>
+		</div>
+		<div class="top-bar-right">
+			<ul class="menu">
+				<li><input type="search" placeholder="Search"></li>
+				<li>
+					<button type="button" class="button">Search</button>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.js"></script>
+	<script>
+		$(document).foundation();
+	</script>
+</body>
+</html>
