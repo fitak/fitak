@@ -1,450 +1,114 @@
-		<div class="post-container fb-post">
-			<div class="post">
-				<div class="header-row">
-					<div class="left-part">
-						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_ifor_zmajlo.jpg"></a>
-						</div>
-						<div class="name-date">
-							<a class="username">Igor Žmaljo</a>
-							<a class="date">25. 1. 2015 11:06</a>
-						</div>
-					</div>
-					<div class="right-part">
-						<div class="fb-group">
-							<a href="#"><i class="fa fa-facebook-official"></i>Nechceme
-								vypadnout z BI-ZMA (FIT ČVUT)
-							</a>
-						</div>
-						<div class="post-menu">
-						<a href="#"><i class="fa fa-chevron-down"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="post-body">
-					<div class="votes-part">
-						<ul>
-							<li>
-								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">4</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-							</li>
-						</ul>
-					</div>
-					<div class="post-message">
-						<p>
-							<a href="#" class="label">zma</a><a href="#" class="label">F</a>Zdravím,
-							touhle dobou vím, že
-							se
-							nestíhám doučit vše co je potřeba na řádný termín. Když se teď
-							zaměřím na MLO, měl bych na to více času a pravděpodobně ho
-							mohl
-							i udělat. Tím bych měl asi všechny předměty kromě ZMA, a svůj
-							skutečný pokus o ZMA nechám až na opravný termín.<br>
-							Chci se zeptat, co by to znamenalo teď neudělat ZMA? Nebudu
-							pak
-							moct dělat jiný předmět který ze zma vychází? Opakuje se až
-							zase
-							v zimě? Stojí mi za to použít 1 z 6 extra pokusů?<br>
-							díky</p>
-					</div>
-				</div>
-			</div>
-			<div class="hiding-comments">
-				<button class="hide-comments"><i class="fa fa-caret-up"></i>skrýt komentáře [2]<i class="fa fa-caret-up"></i></button>
-				<button class="show-comments"><i class="fa fa-caret-down"></i>zobrazit komentáře [2]<i class="fa fa-caret-down"></i></button>
-			</div>
-			<div class="comments">
+{define #entry}
+<div n:class="$type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply', $type == 'answer' ? 'answer'">
+                <div class="header-row">
+                    <div class="left-part">
+                        <div class="profile-picture">
+                        {if $entry->user->profilePicture}
+                            <img src="{$entry->user->profilePicture}">
+                        {else}
+                            <img src="{$basePath}/img/anonymous_user.gif">
+                        {/if}
+                        </div>
+                        <div class="name-date">
+                            <a class="username">{$entry->user->name}</a>
+                            <a class="date">{$entry->createdTime|date: "j.n.Y G:i"}</a>
+                        </div>
+                    </div>
+                    <div class="right-part">
+                        <div class="fb-group">
+                    {if $entry->group}
+                            <a href="#"><i class="fa fa-facebook-official"></i>{$entry->group->name|truncate:45}
+                            </a>
+                    {else}
+                           <i class="fa fa-rocket"></i>Pouze na Fiťák.cz
+                    {/if}
+                        </div>
+                        <div class="post-menu">
+                        <a href="#"><i class="fa fa-chevron-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-body">
+                    <div class="votes-part">
+                        <ul>
+                            <li>
+                                <a n:href="vote!, $entry->id, 0"><i class="fa fa-thumbs-o-up"></i></a>
+                            </li>
+                            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
+                            <li>
+                                <a n:href="vote!, $entry->id, 1"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="post-message">
+                        <p>
+                        <a class="label" n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag->name">{$tag->name}</a>
+                        {$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+                            </p>
+                            <blockquote n:tag-if="$entry->name" style="margin-top:15px">
+                                            <strong n:if="$entry->name">{$entry->name}</strong>
+                                            <a n:tag-if="$entry->link" href="{$entry->link}">
+                                                {if $entry->description}
+                                                    <br><small>{$entry->description}</small>
+                                                {/if}
+                                                {if $entry->picture}
+                                                    <br><img src="{$entry->picture}" title="{$entry->name}">
+                                                {/if}
+                                            </a>
+                                        </blockquote>
+                    </div>
+                </div>
+            </div>
+            {if $type == "post"}
+            <div n:class="$entry->isTypeQa ? hiding-answers : hiding-comments">
+                <button n:class="$entry->isTypeQa ? hide-answers : hide-comments"><i class="fa fa-caret-up"></i>skrýt {$entry->isTypeQa ? odpovědi : komentáře} [{count($entry->children)}]<i class="fa fa-caret-up"></i></button>
+                <button n:class="$entry->isTypeQa ? show-answers : show-comments"><i class="fa fa-caret-down"></i>zobrazit {$entry->isTypeQa ? odpovědi : komentáře} [{count($entry->children)}]<i class="fa fa-caret-down"></i></button>
+            </div>
 
-				<div class="comment">
-					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
-					</div>
-					<div class="comment-body">
-						<p><span class="author">Terorka Sudíková</span>Teď tě asi
-							úplně nechápu. Máš na mysli opravný termín zkoušky nebo
-							vyloženě
-							opakovat předmět? Po řádném termínu máš nárok na jeden
-							opravný,
-							jestli ti stojí za to použít jeden ze šesti druhých opravných
-							pokusů je čistě na tvém uvážení.<br>
-							ZMA se vyučuje jen v zimním semestru, jestli je podmínkou pro
-							nějaký předmět pochybuji, ale pan Tomáš Kalvoda určitě bude
-							vědět lépe.
-						</p>
-						<ul class="extra-line">
-							<li>
-								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">0</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-							</li>
-							<li><span class="divider">&#8226;</span></li>
-							<li><span class="date">25.1.2015 11:14</span></li>
-						</ul>
+            <div class="comments" n:tag-if="!$entry->isTypeQa">
+               {default $anyMarked = false}
+                    {if $type == "comment"}
+                        {foreach $entry->children as $reply}
+                            {include #entry, entry => $reply, type => "reply"}
+                            {if $marked}
+                                {var $anyMarked = true}
+                            {/if}
+                        {/foreach}
+                    {elseif $type == "post"}
+                        {if $entry->isTypeQa}
+                               {foreach $entry->sortedAnswers as $reply}
+                                   {include #entry, entry => $reply, type => "answer"}
+                                   {if $marked}
+                                       {var $anyMarked = true}
+                                   {/if}
+                               {/foreach}
+                           {else}
+                            {foreach $entry->children as $comment}
+                                {include #entry, entry => $comment, type => "comment"}
+                                {if $marked}
+                                    {var $anyMarked = true}
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    {/if}
 
-						<div class="replies-container">
-							<button class="show-replies"><i class="fa fa-chevron-down"></i>
-								Zobrazit odpovědi [2] <i class="fa fa-chevron-down"></i>
-							</button>
-							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
-								Skrýt odpovědi [2] <i class="fa fa-chevron-up"></i></button>
-
-							<div class="replies">
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_ifor_zmajlo.jpg">
-									</div>
-									<div class="reply-body">
-										<p><span class="author">Igor Žmaljo</span>Ano,
-											opravný termín zkoušky. Řádný je teď ve čtvrtek a to
-											určitě nestíhám.</p>
-										<ul class="extra-line">
-											<li>
-												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-											</li>
-											<li><span class="votes-cnt">0</span></li>
-											<li>
-												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-											</li>
-											<li><span class="divider">&#8226;</span></li>
-											<li><span class="date">25.1.2015 11:16</span></li>
-										</ul>
-									</div>
-								</div>
-
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
-									</div>
-									<div class="reply-body">
-										<p><span class="author">Terorka Sudíková</span>Pokud jdeš
-											teprve na řádný termín, tak bych asi doporučovala tam
-											dojít a
-											zkusit to. Ať vidíš, kde máš největší mezery. Opravné
-											termíny
-											vidím vypsané na 3. 2., 10. 2. a 18. 2. takže pokud
-											neuděláš řádný
-											termín, máš dost času se to doučit na jeden z opravných.
-											Pokud
-											neuděláš ani ten opravný, pak se teprve budeš muset
-											rozhodovat,
-											jestli použít druhý opravný pokus.</p>
-										<ul class="extra-line">
-											<li>
-												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-											</li>
-											<li><span class="votes-cnt">0</span></li>
-											<li>
-												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-											</li>
-											<li><span class="divider">&#8226;</span></li>
-											<li><span class="date">25.1.2015 11:14</span></li>
-										</ul>
-									</div>
-								</div>
-
-
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
-									</div>
-									<div class="reply-body">
-										<input placeholder="Napište odpověď...">
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="comment">
-					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_michal_cvach.jpg">
-					</div>
-					<div class="comment-body">
-						<p><span class="author">Michal Cvach</span>Řekl bych, že podmínkou moc neni, ale v dalších matematických předmětech se asi můžou věci ze ZMA zase vyskytovat grin emoticon ...<br>
-							Jinak čistě z toho co jsem slyšel, tak se ten extra pokus na ZMA docela vyplatí, protože těch předmětů, který maj tak nízkou průchodnost za celý studium zas tolik neni...
-						</p>
-						<ul class="extra-line">
-							<li>
-								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">1</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-							</li>
-							<li><span class="divider">&#8226;</span></li>
-							<li><span class="date">25.1.2015 11:16</span></li>
-						</ul>
-						<div class="replies-container">
-							<button class="show-replies"><i class="fa fa-chevron-down"></i>
-								Zobrazit odpovědi [0] <i class="fa fa-chevron-down"></i>
-							</button>
-							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
-								Skrýt odpovědi [0] <i class="fa fa-chevron-up"></i></button>
-
-							<div class="replies">
-
-
-							<div class="reply">
-								<div class="profile-picture">
-									<img src="{$basePath}/img/profile_matej_herman.jpg">
-								</div>
-								<div class="reply-body">
-									<input placeholder="Napište odpověď...">
-								</div>
-							</div>
-							</div>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="comment">
-					<div class="profile-picture">
-						<img src="{$basePath}/img/profile_matej_herman.jpg">
-					</div>
-					<div class="comment-body">
-						<input placeholder="Napište komentář">
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-		<div class="post-container qa-post">
-			<div class="post">
-				<div class="header-row">
-					<div class="left-part">
-						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_matej_herman.jpg"></a>
-						</div>
-						<div class="name-date">
-							<a class="username">Matěj Heřman</a>
-							<a class="date">22. 1. 2015 13:02</a>
-						</div>
-					</div>
-					<div class="right-part">
-						<div class="fb-group">
-							<i class="fa fa-rocket"></i>Pouze na Fiťák.cz
-						</div>
-						<div class="post-menu">
-						<a href="#"><i class="fa fa-chevron-down"></i></a>
-						</div>
-					</div>
-				</div>
-				<div class="post-body">
-					<div class="votes-part">
-						<ul>
-							<li>
-								<a href="#"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">0</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
-							</li>
-						</ul>
-					</div>
-					<div class="post-message">
-						<p>
-							<a href="#" class="label">FI-FIL</a>Věděl by někdo jaké jsou podmínky absolvování předmětu FI-FIL pro nás fiťáky?<br>
-
-							Na Eduxu je, že se vše řídí podle stránek katedry, nicméně tam se evidentně počítá s variantou předmětu za 4 kredity a s cvičeními (my to máme za 2 kredity a bez cvičení).<br>
-
-							A případně doplňující otázka - mám ještě šanci ten předmět dát, když jsem tam dosud nebyl?<br>
-
-							Díky.</p>
-
-						<div class="qa-comments-container">
-							<button class="show-replies"><i class="fa fa-chevron-down"></i>
-								Zobrazit komentáře [0] <i class="fa fa-chevron-down"></i>
-							</button>
-							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
-								Skrýt komentáře [0] <i class="fa fa-chevron-up"></i></button>
-
-							<div class="replies">
-
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
-									</div>
-									<div class="reply-body">
-										<input placeholder="Napište komentář...">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="hiding-answers">
-				<button class="hide-answers"><i class="fa fa-caret-up"></i>skrýt odpovědi [2]<i class="fa fa-caret-up"></i></button>
-				<button class="show-answers"><i class="fa fa-caret-down"></i>zobrazit odpovědi [2]<i class="fa fa-caret-down"></i></button>
-			</div>
-			<div class="answer best">
-				<div class="header-row">
-					<div class="left-part">
-						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_ifor_zmajlo.jpg"></a>
-						</div>
-						<div class="name-date">
-							<a class="username">Igor Žmajlo</a>
-							<a class="date">23. 1. 2015 8:51</a>
-						</div>
-					</div>
-					<div class="right-part">
-					</div>
-				</div>
-				<div class="post-body">
-					<div class="votes-part">
-						<ul>
-							<li>
-								<a href="#"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">5</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
-							</li>
-							<li>
-								<a class="green" href="#"><i class="fa fa-check"></i></a>
-							</li>
-						</ul>
-					</div>
-					<div class="post-message">
-						<p>
-							Tak dle e-mailu od Zamarovského:<br>
-
-							zkouškové termíny budou v KOSu<br>
-							učit se na zkoušku z: Zamarovský, "Příběh antické filosofie", hlavně část po Aristotela včetně.<br>
-							žádné podmínky na vypracování čehokoliv během semestru nejsou</p>
-
-						<div class="qa-comments-container">
-							<button class="show-replies"><i class="fa fa-chevron-down"></i>
-								Zobrazit komentáře [0] <i class="fa fa-chevron-down"></i>
-							</button>
-							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
-								Skrýt komentáře [0] <i class="fa fa-chevron-up"></i></button>
-
-							<div class="replies">
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
-									</div>
-									<div class="reply-body">
-										<input placeholder="Napište komentář...">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="answer">
-				<div class="header-row">
-					<div class="left-part">
-						<div class="profile-picture">
-							<a href="#"><img src="{$basePath}/img/profile_terorka_sudikova.jpg"></a>
-						</div>
-						<div class="name-date">
-							<a class="username">Terorka Sudíková</a>
-							<a class="date">22. 1. 2015 19:34</a>
-						</div>
-					</div>
-					<div class="right-part">
-						<!--<div class="post-menu">-->
-						<!--<a href="#"><i class="fa fa-chevron-down"></i></a>-->
-						<!--</div>-->
-					</div>
-				</div>
-				<div class="post-body">
-					<div class="votes-part">
-						<ul>
-							<li>
-								<a href="#"><i class="fa fa-chevron-up"></i></a>
-							</li>
-							<li><span class="votes-cnt">&minus;2</span></li>
-							<li>
-								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
-							</li>
-						</ul>
-					</div>
-					<div class="post-message">
-						<p>
-							Jestli ti můžu dát radu, neber tenhle předmět moc vážně. Já jsem přednášejícího viděl u zkoušky po prvé v životě, na prvním pokusu měl špatnou náladu, tak mě vyrazil. Po druhé už měl náladu dobrou, tak mi dal B za prakticky stejné znalosti. Na FELu bohužel takoví lidé pořád učí, i když podle mého názoru nemají na ČVUT co dělat. Na FITu jsem se naštěstí s ničím podobným nesetkal.<br>
-
-							Pokud nebude mít Zamarovsky vyloženě špatnou náladu, tak by mělo stačit naučit se jedno libovolné téma. U zkoušky se totiž většinou ptá, co umíš nejlíp a to chce pak slyšet.</p>
-
-						<div class="qa-comments-container">
-							<button class="show-replies"><i class="fa fa-chevron-down"></i>
-								Zobrazit komentáře [2] <i class="fa fa-chevron-down"></i>
-							</button>
-							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
-								Skrýt komentáře [2] <i class="fa fa-chevron-up"></i></button>
-
-							<div class="replies">
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_ifor_zmajlo.jpg">
-									</div>
-									<div class="reply-body">
-										<p><span class="author">Igor Žmaljo</span>Díky, takže tomu rozumím správně, že během semestru žádná práce (semestrálka) vyžadována není a termín zkoušky bude normálně v KOSu?</p>
-										<ul class="extra-line">
-											<li>
-												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-											</li>
-											<li><span class="votes-cnt">0</span></li>
-											<li>
-												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-											</li>
-											<li><span class="divider">&#8226;</span></li>
-											<li><span class="date">22.1.2015 19:56</span></li>
-										</ul>
-									</div>
-								</div>
-
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_terorka_sudikova.jpg">
-									</div>
-									<div class="reply-body">
-										<p><span class="author">Terorka Sudíková</span>Spíš mu napiš, že vypíše zkoušku v KOSu není úplně stoprocentní, pokud si dobře pamatuju. Nebo jak píše kolega, můžeš vychytat ten test na přednášce, pokud tam budeš chodit :)</p>
-										<ul class="extra-line">
-											<li>
-												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-											</li>
-											<li><span class="votes-cnt">1</span></li>
-											<li>
-												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-											</li>
-											<li><span class="divider">&#8226;</span></li>
-											<li><span class="date">22.1.2015 22:04</span></li>
-										</ul>
-									</div>
-								</div>
-
-
-								<div class="reply">
-									<div class="profile-picture">
-										<img src="{$basePath}/img/profile_matej_herman.jpg">
-									</div>
-									<div class="reply-body">
-										<input placeholder="Napište komentář...">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="answer write-answer">
-				<textarea placeholder="Napište odpověď..."></textarea>
-				<button class="button">Odeslat odpověď</button>
-			</div>
-
-		</div>
+                <div n:class="$entry->isTypeQa ? answer : comment, $entry->isTypeQa ? write-answer">
+                    <div class="profile-picture">
+                        <img src="{$basePath}/img/profile_matej_herman.jpg">
+                    </div>
+                    <div class="comment-body">
+                        <input placeholder="Napište komentář">
+                    </div>
+                </div>
+            </div>
+            {/if}
+{/define}
+{define #post}
+        <div n:class="post-container, $entry->isTypeQa ? qa-post : fb-post">
+            {include #entry, entry => $topic, type => "post"}
+        </div>
+{/define}
+{dump}
+{foreach $topics->topics as $topic}
+    {include #post, entry => $topic}
+{/foreach}
