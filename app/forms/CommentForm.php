@@ -37,7 +37,7 @@ class CommentForm extends Form
 		$parameters = $this->getPresenter()->getParameters();
 		unset($parameters['do']);
 
-		$this->presenter->redirect('Search:', $parameters);
+		$this->presenter->redirect('Homepage:', $parameters);
 	}
 
 	public function commentToFacebook($message, $user, $parentId)

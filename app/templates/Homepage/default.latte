@@ -1,40 +1,33 @@
 {block content}
 	<div id="main-container">
-
+		{form postForm}
 		<div class="post-container">
 			<div class="post post-form">
 				<div class="post-type">
 					<ul data-toggle="buttons-radio">
 						<li>
-							<input type="radio" id="r1" name="r-group" data-toggle="button" checked>
+							<input type="radio" id="r1" n:name="typeQA" data-toggle="button" value="0" checked>
+
 							<label class="radio-button" for="r1" title="FB-like příspěvky"><i class="fa fa-comments fa-2x"></i></label>
 						</li>
 						<li>
-							<input type="radio" id="r2" name="r-group" data-toggle="button">
+							<input type="radio" id="r2" n:name="typeQA" data-toggle="button" value="1">
 							<label class="radio-button" for="r2" title="Q&A příspěvek"><i class="fa fa-question-circle fa-2x"></i></label>
 						</li>
 					</ul>
 				</div>
 				<div class="post-message">
-					<textarea placeholder="Začněte psát příspěvek..." name="message"></textarea>
+					{input message}
 				</div>
 			</div>
 			<div class="post-bottom">
 				<div>
-					<select dir="rtl">
-						<option value="husker">Pouze na Fiťák.cz</option>
-						<option value="starbuck">FIT ČVUT - skupina pro nové studenty z
-							roku 2011/2012
-						</option>
-						<option value="hotdog">FIT ČVUT - skupina pro nové studenty z
-							roku 2012/2013
-						</option>
-						<option value="apollo">FIT ČVUT 2013/2014</option>
-					</select>
+				{input fbGroup}
 				</div>
-				<button class="button">Odeslat</button>
+				<button n:name="send" class="button">Odeslat</button>
 			</div>
 		</div>
+		{/form}
 
 {control stream}
 

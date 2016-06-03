@@ -23,13 +23,15 @@ class PostForm extends Form
 		$this->orm = $orm;
 		$this->user = $user;
 		$this->facebook = $facebook;
-
+        $type_qa = [false => 'no', true => 'yes'];
 		$groups = $this->orm->groups->findList();
+        $groups[0] = "Pouze na Fiťákovi";
 
-		$this->addText('message', 'zprava');
-		$this->addCheckbox('sendToFb', 'poslat do FB skupiny');
-		$this->addSelect('fbGroup', 'Výběr FB skupiny', $groups);
-		$this->addCheckbox('typeQA', 'Typ Q&A');
+		$this->addTextArea('message', 'zprava')
+            ->setAttribute('placeholder', 'Začněte psát příspěvek...');
+		$this->addSelect('fbGroup', 'Výběr FB skupiny', $groups)
+            ->setAttribute('dir', 'rtl');
+		$this->addRadioList('typeQA', 'Typ Q&A', $type_qa);
 		$this->addSubmit('send', 'Vyhledat');
 	}
 
@@ -42,7 +44,7 @@ class PostForm extends Form
 		$parameters = $this->getPresenter()->getParameters();
 		unset($parameters['do']);
 
-		$this->presenter->redirect('Search:', $parameters);
+		$this->presenter->redirect('Homepage:', $parameters);
 	}
 
 	private function parseId($longId)
@@ -63,7 +65,8 @@ class PostForm extends Form
 		$fbId = null;
 		$fbGroup = null;
 
-		if ($values['sendToFb']) {
+
+		if (!$values['typeQA'] and $values['fbGroup']) {
 			$fbId = $this->postToFacebook($values['message'], $user, $values['fbGroup'])['id'];
 
 			if (!$fbId) {
