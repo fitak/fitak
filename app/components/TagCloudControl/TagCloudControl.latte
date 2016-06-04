@@ -1,7 +1,7 @@
 <div class="text-center cloud">
 	{if $tagCloud}
 		{foreach $tagCloud as $item}
-			<a href="{plink Search:default "tag:$item[name]"}" style="font-size: {$item["size"]|noescape}em;">{$item['name']}</a>
+			<a href="{plink Homepage:default "tag:$item[name]"}" style="font-size: {$item["size"]|noescape}em;">{$item['name']}</a>
 		{/foreach}
 	{else}
 	    Žádné trendy v poslední době.

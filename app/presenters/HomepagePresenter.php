@@ -2,7 +2,7 @@
 
 use Fitak\PostManager;
 use Kdyby\Facebook\Dialog\LoginDialog;
-
+use Fitak\TagCloudControl;
 
 /**
  * @author Vojtech Miksu <vojtech@miksu.cz>
@@ -115,5 +115,11 @@ class HomepagePresenter extends BasePresenter
 
 		return $dialog;
 	}
+
+    protected function createComponentTagCloud()
+    {
+        $trending = $this->orm->tags->findTrending();
+        return new TagCloudControl($trending);
+    }
 
 }
