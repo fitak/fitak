@@ -12,7 +12,7 @@ use Tags;
 
 /**
  * @property string|NULL       $fbId
- * @property Post|NULL         $parent   {m:1 PostsRepository $children}
+ * @property Post|NULL         $parent   {m:1 PostsRepository $allChildren}
  * @property Group|NULL        $group    {m:1 GroupsRepository $posts}
  * @property string            $message
  * @property DateTime          $createdTime
@@ -30,12 +30,15 @@ use Tags;
  * @property bool              $deleted {default false}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
- * @property OneHasMany|Post[] $children {1:m PostsRepository $parent}
+ * @property OneHasMany|Post[] $allChildren {1:m PostsRepository $parent}
  * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
  *
  * @property-read int          $votesCnt {virtual}
+ * @property-read Post[]       $children {virtual}
  * @property-read Post[]|NULL  $sortedAnswers {virtual}
  */
+
+
 class Post extends Entity
 {
 
@@ -51,12 +54,16 @@ class Post extends Entity
 	 */
 	public $tagParser;
 
+    public function getterChildren() {
+        return $this->allChildren->get()->findBy(['deleted' => 0]);
+    }
+
 	/**
 	 * @return array
 	 */
 	public function getterSortedAnswers()
 	{
-		$answers = $this->children->get()->fetchAll();
+		$answers = $this->children;
 
 		$answerVotes = [];
 		foreach ($answers as $answer) {
@@ -69,7 +76,7 @@ class Post extends Entity
 
 		$sortedAnswers = [];
 		foreach ($sortedAnswersIds as $answerId) {
-			$childEntity = $this->children->get()->getBy(['id' => $answerId]);
+			$childEntity = $this->children->getBy(['id' => $answerId]);
 			array_push($sortedAnswers, $childEntity);
 		}
 
