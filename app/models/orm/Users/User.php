@@ -23,6 +23,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  * @property bool              $admin
  *
  * @property ManyHasMany|Tag[] $favoriteTags        {m:n TagsRepository $favoredBy primary}
+ * @property ManyHasMany|SavedSearch[] $savedSearches        {m:n SavedSearchesRepository $userSaved primary}
  * @property OneHasMany|Post[] $posts  {1:m PostsRepository $user}
  * @property OneHasMany|Vote[] $votes  {1:m VotesRepository $user}
  *

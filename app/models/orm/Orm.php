@@ -11,6 +11,7 @@ use Nextras\Orm\Model\Model;
  * @property-read TagsRepository $tags
  * @property-read UsersRepository $users
  * @property-read VotesRepository $votes
+ * @property-read SavedSearchesRepository $savedSearches
  */
 class Orm extends Model
 {
