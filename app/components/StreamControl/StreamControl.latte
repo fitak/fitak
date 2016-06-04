@@ -1,3 +1,14 @@
+{define #post-menu}
+    <ul class="dropdown menu" data-dropdown-menu data-disable-hover='true' data-click-open = 'true' data-close-on-click='true'>
+        <li>
+            <a href="#"><i class="fa fa-chevron-down"></i></a>
+            <ul class="vertical menu">
+                <li><a n:href="delete!, $entry->id">Smazat</a></li>
+            </ul>
+        </li>
+    </ul>
+{/define}
+
 {define #replies-container}
                         <div n:class="replies-container">
                             <button class="show-replies"><i class="fa fa-chevron-down"></i>
@@ -86,8 +97,7 @@
                     {/if}
                         </div>
                         <div class="post-menu">
-
-                        <a href="#"><i class="fa fa-chevron-down"></i></a>
+							{include #post-menu}
                         </div>
                     </div>
                 </div>
