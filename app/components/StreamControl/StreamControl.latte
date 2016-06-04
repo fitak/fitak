@@ -169,17 +169,25 @@
 
 				{if $entry->isTypeQa}
 					<div class="answer write-answer">
-                        <textarea placeholder="Napište odpověď..."></textarea>
-                        <button class="button">Odeslat odpověď</button>
+						{form commentForm}
+							{input message}
+							{input parent_id, value => $entry->id}
+	                        <button n:name="send" class="button">Odeslat odpověď</button>
+                        {/form}
                     </div>
 				{else}
                 <div class="comment">
+
                     <div class="profile-picture">
                         <img src="{$user->profilePicture}">
                     </div>
                     <div class="comment-body">
-                        <input placeholder="Napište komentář">
+                    {form commentForm}
+                        {input message}
+                        {input parent_id, value => $entry->id}
+                    {/form}
                     </div>
+
                 </div>
                 {/if}
             </div>

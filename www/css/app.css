@@ -4292,6 +4292,8 @@ input, button {
 
 input {
   width: 100%; }
+  input[type=text] {
+    margin: 0; }
 
 p {
   text-align: justify; }

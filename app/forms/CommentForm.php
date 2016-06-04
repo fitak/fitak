@@ -23,7 +23,7 @@ class CommentForm extends Form
 		$this->facebook = $facebook;
 		$this->addText('message', 'zprava');
 		$this->addHidden('parent_id');
-		$this->addSubmit('send', 'Vyhledat');
+		$this->addSubmit('send', 'Odeslat');
 	}
 
 	public function submitted(self $form)
