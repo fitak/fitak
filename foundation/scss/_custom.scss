@@ -547,6 +547,15 @@ a.label:hover {
         i {
             font-size: .8rem !important;
         }
+
+        &.comment-menu {
+            padding: 0;
+            vertical-align: top;
+
+            a {
+                padding: 0;
+            }
+        }
     }
 
     //----------------------------- post-body ----------------------------------

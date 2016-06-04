@@ -20,6 +20,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  * @property string|NULL       $passwordResetTokenHash
  * @property string|NULL       $profilePicture
  * @property bool              $registered
+ * @property bool              $admin
  *
  * @property ManyHasMany|Tag[] $favoriteTags        {m:n TagsRepository $favoredBy primary}
  * @property OneHasMany|Post[] $posts  {1:m PostsRepository $user}

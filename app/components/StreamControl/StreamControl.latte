@@ -2,9 +2,11 @@
     <ul class="dropdown menu" data-dropdown-menu data-disable-hover='true' data-click-open = 'true' data-close-on-click='true'>
         <li>
             <a href="#"><i class="fa fa-chevron-down"></i></a>
+            {if $user->admin}
             <ul class="vertical menu">
                 <li><a n:href="delete!, $entry->id">Smazat</a></li>
             </ul>
+            {/if}
         </li>
     </ul>
 {/define}
@@ -40,33 +42,36 @@
 
 {define #comment}
 <div n:class="$type == 'reply' ? reply : comment">
-                    <div class="profile-picture">
-                        {if $entry->user->profilePicture}
-                                                    <img src="{$entry->user->profilePicture}">
-                                                {else}
-                                                    <img src="{$basePath}/img/anonymous_user.gif">
-                                                {/if}
-                    </div>
-                    <div class="comment-body">
-                        <p><span class="author">{$entry->user->name}</span>{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
-                        </p>
-                        <ul class="extra-line">
-                            <li>
-                                <a href="#"><i class="fa fa-thumbs-o-up"></i></a>
-                            </li>
-                            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
-                            <li>
-                                <a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
-                            </li>
-                            <li><span class="divider">•</span></li>
-                            <li><span class="date">{$entry->createdTime|date: "j.n.Y G:i"}</span></li>
-                        </ul>
-                        {if $type != 'reply'}
-                            {include #replies-container}
-                        {/if}
+    <div class="profile-picture">
+        {if $entry->user->profilePicture}
+                                    <img src="{$entry->user->profilePicture}">
+                                {else}
+                                    <img src="{$basePath}/img/anonymous_user.gif">
+                                {/if}
+    </div>
+    <div class="comment-body">
+        <p><span class="author">{$entry->user->name}</span>{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+        </p>
+        <ul class="extra-line">
+            <li>
+                <a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+            </li>
+            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
+            <li>
+                <a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+            </li>
+            <li><span class="divider">•</span></li>
+            <li><span class="date">{$entry->createdTime|date: "j.n.Y G:i"}</span></li>
+        </ul>
+        {if $type != 'reply'}
+            {include #replies-container}
+        {/if}
 
-                    </div>
-                </div>
+    </div>
+    <div class="post-menu comment-menu">
+        {include #post-menu}
+    </div>
+</div>
 {/define}
 
 {define #entry}

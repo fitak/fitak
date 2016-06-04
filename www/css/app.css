@@ -4682,6 +4682,11 @@ a.label:hover {
         color: #696f7d; }
     .post-container .post-menu i {
       font-size: .8rem !important; }
+    .post-container .post-menu.comment-menu {
+      padding: 0;
+      vertical-align: top; }
+      .post-container .post-menu.comment-menu a {
+        padding: 0; }
   .post-container .post-body {
     display: table;
     margin-top: 0.75rem; }
