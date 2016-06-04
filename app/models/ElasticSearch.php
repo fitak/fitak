@@ -130,7 +130,8 @@ class ElasticSearch extends Client
 					'function_score' => [
 						'query' => [
 							'bool' => [
-								'should' => [
+                                // There should be 'should'!! Now it's not searching in comments...
+								'must' => [
 									// Prefer matches in topics (as opposed to matches in comments)
 									['match' => ['is_topic' => TRUE]],
 								]
@@ -160,6 +161,8 @@ class ElasticSearch extends Client
 		];
 
 		$boolQuery = &$args['body']['query']['function_score']['query']['bool'];
+
+        $boolQuery['must'][] = ['match' => ['deleted' => 0],];
 
 		if ($request->query)
 		{

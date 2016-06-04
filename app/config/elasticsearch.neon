@@ -50,6 +50,9 @@ mappings:
 			is_topic:
 				type: boolean
 				store: 'false'
+			deleted:
+				type: boolean
+				store: 'false'
 			likes:
 				type: integer
 				store: 'false'

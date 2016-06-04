@@ -43,6 +43,7 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 			'message_addons' => $addons,
 			'author' => $post->user->name,
 			'is_topic' => ($post->parent === NULL),
+            'deleted' => ($post->deleted),
 			'updated_time' => $post->updatedTime->getTimestamp(),
 			'group' => $group,
 		];

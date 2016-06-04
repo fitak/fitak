@@ -40,7 +40,7 @@ class Data extends BaseModel
 
 		$result = [];
 		foreach (array_keys($map) as $id) {
-			array_push($result, $this->orm->posts->getById($id));
+			array_push($result, $this->orm->posts->getPost($id));
 		}
 
 		return new SearchResponse($result, $map, $response['hits']['total'], $this->tagParser);

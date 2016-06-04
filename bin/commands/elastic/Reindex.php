@@ -31,7 +31,7 @@ class Reindex extends Command
 		$rows = $db->query('
 			SELECT
 				`id`, `message`, `group_id`, `description`, `caption`,
-				If(`parent_id` IS NULL, 1, 0) `is_topic`, `user`,
+				If(`parent_id` IS NULL, 1, 0) `is_topic`, `user`, `deleted`,
 				Unix_Timestamp(`updated_time`) `timestamp`
 			FROM `data`
 		');
@@ -62,6 +62,7 @@ class Reindex extends Command
 				'message_addons' => $addons,
 				'author' => $user['name'],
 				'is_topic' => $row['is_topic'],
+                'deleted' => $row['deleted'],
 				'updated_time' => $row['timestamp'],
 				'group' => $row['group_id'],
 				'profile_picture' => $user['profile_picture'],
