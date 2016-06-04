@@ -33,7 +33,10 @@
 
                                 </div>
                                 <div class="reply-body">
-                                    <input placeholder="Napište odpověď...">
+									{form commentForm}
+                                        {input message}
+                                        {input parent_id, value => $entry->id}
+                                    {/form}
                                 </div>
                             </div>
                             </div>

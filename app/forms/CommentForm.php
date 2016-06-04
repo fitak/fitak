@@ -21,7 +21,8 @@ class CommentForm extends Form
 		$this->orm = $orm;
 		$this->user = $user;
 		$this->facebook = $facebook;
-		$this->addText('message', 'zprava');
+		$this->addText('message', 'zprava')
+            ->setAttribute('placeholder', 'Napište komentář...');
 		$this->addHidden('parent_id');
 		$this->addSubmit('send', 'Odeslat');
 	}
