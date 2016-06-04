@@ -78,12 +78,27 @@ class StreamControl extends UI\Control
 
 	protected function createComponentCommentForm()
 	{
-
-		$form = new CommentForm($this->orm, $this->user, $this->facebook);
+		$form = new CommentForm($this->orm, $this->user, $this->facebook, 'comment');
 		$form->onSuccess[] = callback($form, 'submitted');
 
 		return $form;
 	}
+
+    protected function createComponentReplyForm()
+    {
+        $form = new CommentForm($this->orm, $this->user, $this->facebook, 'reply');
+        $form->onSuccess[] = callback($form, 'submitted');
+
+        return $form;
+    }
+
+    protected function createComponentAnswerForm()
+    {
+        $form = new CommentForm($this->orm, $this->user, $this->facebook, 'answer');
+        $form->onSuccess[] = callback($form, 'submitted');
+
+        return $form;
+    }
 
 	protected function createTemplate($class = NULL)
 	{

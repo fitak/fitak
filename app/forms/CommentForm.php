@@ -14,15 +14,24 @@ class CommentForm extends Form
 	private $facebook;
 	const SEMESTER = 'semester';
 
-	public function __construct(Orm $orm, User $user, Facebook $facebook)
+	public function __construct(Orm $orm, User $user, Facebook $facebook, $type = 'comment')
 	{
 		parent::__construct();
 
 		$this->orm = $orm;
 		$this->user = $user;
 		$this->facebook = $facebook;
-		$this->addText('message', 'zprava')
-            ->setAttribute('placeholder', 'Napište komentář...');
+        if ($type == 'comment') {
+            $this->addText('message', 'zprava')
+                ->setAttribute('placeholder', 'Napište komentář...');
+        } elseif ($type == 'answer') {
+            $this->addTextArea('message', 'zprava')
+                ->setAttribute('placeholder', 'Napište odpověď...');
+        } else {
+        $this->addText('message', 'zprava')
+            ->setAttribute('placeholder', 'Napište odpověď na komentář...');
+    }
+
 		$this->addHidden('parent_id');
 		$this->addSubmit('send', 'Odeslat');
 	}
@@ -66,6 +75,8 @@ class CommentForm extends Form
 			$fbId = $this->commentToFacebook($message, $user, $parentId)['id'];
 		}
 
+
+
 		$comment = new Post();
 		$comment->fbId = $fbId;
 		$comment->message = $message;
@@ -78,6 +89,8 @@ class CommentForm extends Form
 
 		$parent = $comment->parent;
 		$comment->group = $parent->group;
+        $comment->isTypeQa = $parent->isTypeQa;
+
 		$parent->updatedTime = 'now';
 		if ($parent->parent) {
 			$parent->parent->updatedTime = 'now';

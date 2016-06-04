@@ -4291,9 +4291,11 @@ input, button {
   outline: none; }
 
 input {
-  width: 100%; }
+  width: 100%;
+  font-size: inherit; }
   input[type=text] {
-    margin: 0; }
+    margin: 0;
+    font-size: inherit; }
 
 p {
   text-align: justify; }
@@ -4472,6 +4474,7 @@ a.label:hover {
     clear: both; }
 
 #main-container {
+  margin-bottom: 5rem;
   padding-left: 1rem;
   padding-right: 1rem;
   width: 100%;

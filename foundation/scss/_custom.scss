@@ -113,9 +113,11 @@ input, button {
 
 input {
     width: 100%;
+    font-size: inherit;
 
     &[type=text] {
         margin: 0;
+        font-size: inherit;
     }
 }
 
@@ -316,6 +318,8 @@ a.label:hover {
 
 //============================ Main Container ================================
 #main-container {
+    margin-bottom: 5rem;
+
     @include grid-column(12);
     float: none;
 

@@ -18,7 +18,7 @@ $(document).ready(function() {
     $('#main-container').attr('data-equalizer-watch', '');
     $('#sidebar').attr('data-equalizer-watch', '');
     var options = {equalizeOn: 'xlarge'};
-    var equalizer = new Foundation.Equalizer($('#page-wrapper'), options);
+    //var equalizer = new Foundation.Equalizer($('#page-wrapper'), options);
 
     //hiding replies
     $('.show-replies, .hide-replies').on('click', function () {
