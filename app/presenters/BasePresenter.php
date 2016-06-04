@@ -24,6 +24,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 	/** @var Fitak\Orm @inject */
 	public $orm;
 
+    /** @var SearchRequest */
+    private $searchRequest;
+
 	/**
 	 * Redirects not logged user to sign in page.
 	 *
@@ -65,6 +68,26 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
 		return NULL;
 	}
+
+    protected function createComponentSearchForm()
+    {
+        if ($this->searchRequest->groups) {
+            $groups = $this->searchRequest->groups;
+        } else {
+            $groups = $this->orm->groups->findAll()->fetchPairs(NULL, 'id');
+        }
+
+        $form = new SearchForm($this->orm);
+        $form->setDefaults([
+            's' => $this->getParameter('s'),
+            'since' => $this->getParameter('since', 0),
+            'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
+            'groups' => $groups,
+        ]);
+        $form->onSuccess[] = callback($form, 'submitted');
+
+        return $form;
+    }
 
 	/**
 	 * Add global variables to template (FB groups list and user data)

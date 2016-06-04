@@ -19,7 +19,7 @@
 
 
 		<div id="search">
-		{form searchForm, 'supeer'}
+		{form searchForm}
 			<div class="input-group">
 				{input s}
 				<span class="save-search"><a n:href="saveSearch!"><i class="fa fa-star"></i></a></span>
@@ -39,7 +39,7 @@
 
 
 		<div id="user-profile">
-			<a href="#">
+			<a n:href="User:profile">
 				<ul>
 					<li class="profile-picture">
 						<img src="{$user->profilePicture}">

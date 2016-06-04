@@ -51,25 +51,6 @@ class HomepagePresenter extends BasePresenter
         $this['stream']->dataSource = new CompleteStreamDataSource($this->context->data);
     }
 
-    protected function createComponentSearchForm()
-    {
-        if ($this->searchRequest->groups) {
-            $groups = $this->searchRequest->groups;
-        } else {
-            $groups = $this->orm->groups->findAll()->fetchPairs(NULL, 'id');
-        }
-
-        $form = new SearchForm($this->orm);
-        $form->setDefaults([
-            's' => $this->getParameter('s'),
-            'since' => $this->getParameter('since', 0),
-            'from' => $this->searchRequest ? $this->searchRequest->from : NULL,
-            'groups' => $groups,
-        ]);
-        $form->onSuccess[] = callback($form, 'submitted');
-
-        return $form;
-    }
 
     protected function createComponentPostForm()
     {
