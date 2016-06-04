@@ -183,6 +183,8 @@ a.label:hover {
         display: table-cell;
         border-radius: $border-radius;
         padding: $global-padding-half;
+        margin: 0;
+        height: auto;
     }
 
     .input-group-button {

@@ -59,6 +59,13 @@ class StreamControl extends UI\Control
 
 	}
 
+    public function handleDelete($postId)
+    {
+        $post = $this->orm->posts->getById($postId);
+        $post->deleted = 1;
+        $this->orm->posts->persistAndFlush($post);
+
+    }
 
 	protected function createComponentPaginator()
 	{

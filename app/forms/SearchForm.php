@@ -57,7 +57,7 @@ class SearchForm extends Form
 			}
 		}
 
-		$this->presenter->redirect('Search:', $params);
+		$this->presenter->redirect('Homepage:', $params);
 	}
 
 }

@@ -27,6 +27,7 @@ use Tags;
  * @property string|NULL       $source
  * @property bool              $isTypeQa {default false}
  * @property User              $user {m:1 UsersRepository $posts}
+ * @property bool              $deleted {default false}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $children {1:m PostsRepository $parent}

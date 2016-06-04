@@ -17,15 +17,24 @@
 			<a n:href="Homepage:"><img src="{$basePath}/img/logo-new.png"></a>
 		</div>
 
+
 		<div id="search">
+		{form searchForm}
 			<div class="input-group">
-				<input>
+				{input s}
 				<div class="input-group-button">
-					<button class="button" type="submit"><i class="fa fa-search"></i>
+					<button n:name="send" class="button" type="submit"><i class="fa fa-search"></i>
 					</button>
+					<div class="advanced-search" style="display:none">
+						{input limit}
+						{input from}
+						{input groups}
+					</div>
 				</div>
 			</div>
+		{/form}
 		</div>
+
 
 		<div id="user-profile">
 			<a href="#">
