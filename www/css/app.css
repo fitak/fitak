@@ -4376,7 +4376,8 @@ a.label:hover {
     border-radius: 4px;
     padding: 0.5rem;
     margin: 0;
-    height: auto; }
+    height: auto;
+    box-shadow: none; }
   #search .input-group-button {
     border-radius: 0 3px 3px 0;
     background-color: #3b5997; }
@@ -4385,6 +4386,15 @@ a.label:hover {
     font-size: 118.75%;
     padding: 0.4rem 1.5rem;
     margin: 0; }
+  #search .save-search {
+    display: table-cell;
+    vertical-align: middle;
+    padding-right: 0.4rem;
+    text-align: right; }
+    #search .save-search a {
+      color: #bcc0c8; }
+      #search .save-search a:hover {
+        color: #7e7e7f; }
 
 #user-profile {
   white-space: nowrap; }

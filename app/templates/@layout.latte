@@ -22,6 +22,8 @@
 		{form searchForm, 'supeer'}
 			<div class="input-group">
 				{input s}
+				<span class="save-search"><a n:href="saveSearch!"><i class="fa fa-star"></i></a></span>
+
 				<div class="input-group-button">
 					<button n:name="send" class="button" type="submit"><i class="fa fa-search"></i>
 					</button>
@@ -40,9 +42,9 @@
 			<a href="#">
 				<ul>
 					<li class="profile-picture">
-						<img src="{$basePath}/img/profile_matej_herman.jpg">
+						<img src="{$user->profilePicture}">
 					</li>
-					<li class="username">Matěj Heřman</li>
+					<li class="username">{$user->name}</li>
 				</ul>
 			</a>
 		</div>

@@ -191,6 +191,7 @@ a.label:hover {
         padding: $global-padding-half;
         margin: 0;
         height: auto;
+        box-shadow: none;
     }
 
     .input-group-button {
@@ -203,6 +204,21 @@ a.label:hover {
         font-size: $global-font-size * 1.25;
         padding: $global-padding-half * 0.8 $global-padding * 1.5;
         margin: 0;
+    }
+
+    .save-search {
+        display: table-cell;
+        vertical-align: middle;
+        padding-right: 0.4rem;
+        text-align: right;
+
+        a {
+            color: $light-gray;
+
+            &:hover {
+                color: $dark-gray;
+            }
+        }
     }
 
 }
