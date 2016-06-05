@@ -1,5 +1,6 @@
 <?php
-
+use Fitak\SavedSearch;
+use Nette\Application\UI;
 /**
  * Parent class for all other presenters with common properties.
  *
@@ -87,6 +88,29 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $form->onSuccess[] = callback($form, 'submitted');
 
         return $form;
+    }
+
+    protected function createComponentSaveSearchForm() {
+        $form = new UI\Form;
+        $form->addText('name', 'Popis');
+        $form->addHidden('query', 'SearchQuery');
+        $form->addSubmit('submit', 'Uložit');
+        $form->onSuccess[] = [$this, 'saveSearch'];
+        return $form;
+    }
+
+    public function saveSearch(UI\Form $form, $values) {
+        $values = $form->getValues(TRUE);
+        $savedSearch = new SavedSearch();
+        $savedSearch->name = $values['name'];
+        $savedSearch->query = $values['query'];
+        $savedSearch->users->add($this->getLoggedInUser());
+
+        $this->orm->savedSearches->persistAndFlush($savedSearch);
+
+        $this->flashMessage('Hledání uloženo', 'success');
+        $this->redirect('Homepage:', $values['query']);
+
     }
 
 	/**

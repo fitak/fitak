@@ -210,6 +210,10 @@ a.label:hover {
         border-radius: $border-radius;
         display: table;
         margin: 0;
+
+        form {
+            display: table;
+        }
     }
 
     input {
@@ -237,14 +241,37 @@ a.label:hover {
     .save-search {
         display: table-cell;
         vertical-align: middle;
-        padding-right: 0.4rem;
         text-align: right;
 
-        a {
+        i {
             color: $light-gray;
+            padding-left: .4rem;
 
             &:hover {
                 color: $dark-gray;
+            }
+        }
+
+        ul {
+            background-color: $fb-white;
+            width: 1.5rem;
+        }
+
+
+        li:hover {
+            background-color: $fb-white;
+        }
+
+        table {
+            width: 250px;
+            margin: 0;
+
+            input {
+                border: 1px solid $border-color;
+            }
+
+            tr {
+                background-color: $fb-white;
             }
         }
     }

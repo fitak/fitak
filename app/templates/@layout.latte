@@ -1,3 +1,19 @@
+{define #save-search}
+<span class="save-search">
+	<ul class="dropdown menu" data-dropdown-menu data-disable-hover='true' data-click-open = 'true' data-close-on-click='true'>
+        <li>
+            <i id="save-search" class="fa fa-star"></i>
+            <ul class="vertical menu">
+                <li>
+                {control saveSearchForm}
+                </li>
+            </ul>
+        </li>
+    </ul>
+</span>
+{/define}
+
+
 {define #top-bar}
 <div id="top-bar">
 	<div id="top-bar-content">
@@ -8,10 +24,11 @@
 
 
 		<div id="search">
-		{form searchForm}
+
 			<div class="input-group">
+			{include #save-search}
+			{form searchForm}
 				{input s}
-				<span class="save-search"><a n:href="saveSearch!"><i class="fa fa-star"></i></a></span>
 
 				<div class="input-group-button">
 					<button n:name="send" class="button" type="submit"><i class="fa fa-search"></i>
@@ -22,9 +39,10 @@
 						{input groups}
 					</div>
 				</div>
+			{/form}
 			</div>
-		{/form}
 		</div>
+
 
 
 		<div id="user-profile">
@@ -43,7 +61,7 @@
 				<li>
 					<a href="#"><i class="fa fa-caret-down"></i></a>
 					<ul id="dropdown-submenu" class="vertical menu">
-						<li><a n:href="Help:">Nápověda</a></li>
+						{*<li><a n:href="Help:">Nápověda</a></li>*}
 						<li><a n:href="About:">O webu</a></li>
 						{*<li><a href="#">Nahlásit problém</a></li>*}
 						<hr>

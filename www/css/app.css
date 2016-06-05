@@ -4389,6 +4389,8 @@ a.label:hover {
     border-radius: 4px;
     display: table;
     margin: 0; }
+    #search .input-group form {
+      display: table; }
   #search input {
     border: none;
     display: table-cell;
@@ -4408,12 +4410,24 @@ a.label:hover {
   #search .save-search {
     display: table-cell;
     vertical-align: middle;
-    padding-right: 0.4rem;
     text-align: right; }
-    #search .save-search a {
-      color: #bcc0c8; }
-      #search .save-search a:hover {
+    #search .save-search i {
+      color: #bcc0c8;
+      padding-left: .4rem; }
+      #search .save-search i:hover {
         color: #7e7e7f; }
+    #search .save-search ul {
+      background-color: #fdfdfe;
+      width: 1.5rem; }
+    #search .save-search li:hover {
+      background-color: #fdfdfe; }
+    #search .save-search table {
+      width: 250px;
+      margin: 0; }
+      #search .save-search table input {
+        border: 1px solid #bcc0c8; }
+      #search .save-search table tr {
+        background-color: #fdfdfe; }
 
 #user-profile {
   white-space: nowrap; }

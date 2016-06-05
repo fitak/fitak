@@ -45,4 +45,9 @@ $(document).ready(function() {
         $(this).hide();
     });
 
+    $('#save-search').on('click', function () {
+        var input = $('#frm-searchForm-s').val();
+        $("#frm-saveSearchForm [name='query']").val(input);
+    });
+
 });

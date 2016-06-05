@@ -1,5 +1,9 @@
 {block content}
 	<div id="main-container">
+		<div n:foreach="$flashes as $flash" class="callout {$flash->type}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {$flash->message}
+        </div>
 		{form postForm}
 		<div class="post-container">
 			<div class="post post-form">
