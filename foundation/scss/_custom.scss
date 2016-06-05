@@ -136,6 +136,34 @@ a.label:hover {
 
 // ============================= Global classes ==============================
 
+.main-full-container {
+    background-color: $fb-white;
+    border: 1px solid $border-color;
+    border-top: 0;
+    padding: $global-padding * 2;
+}
+
+.centered-simple-container {
+    background-color: $fb-white;
+    border: 1px solid $border-color;
+    padding: $global-padding * 2;
+    margin: 3rem auto;
+    text-align: center;
+
+    table {
+        margin: $global-padding auto;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    img {
+        margin-bottom: $global-padding * 2;
+    }
+
+}
+
 // ============================ Top bar ======================================
 #top-bar {
     @include top-bar-container;

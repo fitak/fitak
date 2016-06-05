@@ -1,15 +1,4 @@
-<!doctype html>
-<html lang="cs">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Test</title>
-	<link rel="stylesheet" href="{$basePath}/css/font-awesome.min.css">
-	<link rel="stylesheet" href="{$basePath}/css/app.css">
-</head>
-
-<body>
-
+{define #top-bar}
 <div id="top-bar">
 	<div id="top-bar-content">
 
@@ -39,7 +28,7 @@
 
 
 		<div id="user-profile">
-			<a n:href="User:profile">
+			<a n:href="User:">
 				<ul>
 					<li class="profile-picture">
 						<img src="{$user->profilePicture}">
@@ -60,7 +49,7 @@
 						<hr>
 						<li><a href="#">Zpět na hlavní stránku</a></li>
 						<li><a href="#">Uživatelské nastavení</a></li>
-						<li><a href="#">Odhlásit se</a></li>
+						<li><a n:href="Auth:SignOut">Odhlásit se</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -68,6 +57,24 @@
 
 	</div>
 </div>
+{/define}
+
+<!doctype html>
+<html lang="cs">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Test</title>
+	<link rel="stylesheet" href="{$basePath}/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{$basePath}/css/app.css">
+	<link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+{if $user}
+	{include #top-bar}
+{/if}
 
 <div id="page-wrapper">
     {include #content}

@@ -4307,6 +4307,25 @@ a.label:hover {
   color: #fdfdfe;
   background-color: #2f4779; }
 
+.main-full-container {
+  background-color: #fdfdfe;
+  border: 1px solid #bcc0c8;
+  border-top: 0;
+  padding: 2rem; }
+
+.centered-simple-container {
+  background-color: #fdfdfe;
+  border: 1px solid #bcc0c8;
+  padding: 2rem;
+  margin: 3rem auto;
+  text-align: center; }
+  .centered-simple-container table {
+    margin: 1rem auto; }
+  .centered-simple-container p {
+    text-align: center; }
+  .centered-simple-container img {
+    margin-bottom: 2rem; }
+
 #top-bar {
   padding: 0;
   box-shadow: 0 1px 2px #575e6b;
