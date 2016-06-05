@@ -3,6 +3,7 @@
 use Fitak\PostManager;
 use Kdyby\Facebook\Dialog\LoginDialog;
 use Fitak\TagCloudControl;
+use Fitak\SavedSearchesControl;
 
 /**
  * @author Vojtech Miksu <vojtech@miksu.cz>
@@ -105,6 +106,14 @@ class HomepagePresenter extends BasePresenter
         $trending = $this->orm->tags->findTrending();
 
         return new TagCloudControl($trending);
+    }
+
+    protected function createComponentSavedSearches()
+    {
+        $user = $this->getLoggedInUser();
+        $savedSearches = $user->savedSearches;
+
+        return new SavedSearchesControl($savedSearches);
     }
 
 }

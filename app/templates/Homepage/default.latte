@@ -1,7 +1,6 @@
 {block content}
 	<div id="main-container">
 		<div n:foreach="$flashes as $flash" class="callout {$flash->type}">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
             {$flash->message}
         </div>
 		{form postForm}
@@ -38,7 +37,8 @@
 	</div>
 	<div id="sidebar">
 		<h1>Oblíbená hledání</h1>
-		<a class="label">Moje předměty <i class="fa fa-remove"></i></a><a class="label">Web a multimédia <i class="fa fa-remove"></i></a><a class="label">B121 <i class="fa fa-remove"></i></a><a class="label">Vtipy | Hlášky <i class="fa fa-remove"></i></a><a class="label">Spam | OT <i class="fa fa-remove"></i></a>
+		{control savedSearches}
+
 		<h1>Aktuální témata</h1>
 
 		<div class="cloud">

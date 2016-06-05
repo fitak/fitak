@@ -1,0 +1,9 @@
+<div class="text-center cloud">
+	{if $savedSearches}
+		{foreach $savedSearches as $item}
+			<a href="{plink Homepage:default "$item->query"}" class="label">{$item->name} <i class="fa fa-remove"></i></a>
+		{/foreach}
+	{else}
+	    Žádné trendy v poslední době.
+	{/if}
+</div>
