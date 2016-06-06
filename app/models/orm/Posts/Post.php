@@ -28,6 +28,7 @@ use Tags;
  * @property bool              $isTypeQa {default false}
  * @property User              $user {m:1 UsersRepository $posts}
  * @property bool              $deleted {default false}
+ * @property int               $currentUserVote {virtual}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
  * @property OneHasMany|Post[] $allChildren {1:m PostsRepository $parent}
@@ -56,6 +57,15 @@ class Post extends Entity
 
     public function getterChildren() {
         return $this->allChildren->get()->findBy(['deleted' => 0]);
+    }
+
+    public function getterCurrentUserVote() {
+        return 0;
+    }
+
+    public function setterCurrentUserVote($value) {
+        return $this->currentUserVote = $value;
+
     }
 
 	/**

@@ -120,11 +120,17 @@
                     <div class="votes-part">
                         <ul>
                             <li>
-                                <a n:href="vote!, $entry->id, 0"><i n:class="fa, $entry->isTypeQa ? fa-chevron-up : fa-thumbs-o-up"></i></a>
+                                <a n:href="vote!, $entry->id, 0" n:class="$entry->currentUserVote == 1 ? active">
+                                    <i n:class="fa, $entry->isTypeQa ? fa-chevron-up : fa-thumbs-o-up"></i>
+                                </a>
                             </li>
                             <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
                             <li>
-                                <a n:href="vote!, $entry->id, 1"><i n:class="fa, $entry->isTypeQa ? fa-chevron-down : fa-thumbs-o-down, fa-flip-horizontal"></i></a>
+                            </li>
+                            <li>
+                                <a n:href="vote!, $entry->id, 1" n:class="$entry->currentUserVote == -1 ? active">
+                                    <i n:class="fa, $entry->isTypeQa ? fa-chevron-down : fa-thumbs-o-down, fa-flip-horizontal"></i>
+                                </a>
                             </li>
                         </ul>
                     </div>

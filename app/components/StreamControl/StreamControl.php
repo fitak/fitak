@@ -37,9 +37,26 @@ class StreamControl extends UI\Control
 		/** @var $paginator Nette\Utils\Paginator */
 		$paginator = $this['paginator']->paginator;
 
-		$this->template->topics = $this->dataSource->getTopics($paginator->itemsPerPage, $paginator->offset);
+		$topics = $this->dataSource->getTopics($paginator->itemsPerPage, $paginator->offset);
         $this->template->user = $this->user;
-		$this->template->render();
+
+        if ($topics) {
+            if ($topics->topics) {
+                foreach ($topics->topics as $topic) {
+                    $vote = $topic->votes->get()->getBy(['user' => $this->user]);
+                    if (!$vote) {
+                        $topic->setterCurrentUserVote(0);
+                    } elseif ($vote->isDownvote == 1) {
+                        $topic->setterCurrentUserVote(-1);
+                    } else {
+                        $topic->setterCurrentUserVote(1);
+                    }
+                }
+            }
+        }
+
+        $this->template->topics = $topics;
+        $this->template->render();
 	}
 
 	public function handleVote($postId, $isDownvote)
