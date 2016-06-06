@@ -113,7 +113,7 @@ class HomepagePresenter extends BasePresenter
         $user = $this->getLoggedInUser();
         $savedSearches = $user->savedSearches;
 
-        return new SavedSearchesControl($savedSearches);
+        return new SavedSearchesControl($this->orm, $savedSearches);
     }
 
 }

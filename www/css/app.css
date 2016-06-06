@@ -4303,9 +4303,12 @@ p {
 img {
   max-width: none; }
 
-a.label:hover {
+.label:hover {
   color: #fdfdfe;
   background-color: #2f4779; }
+
+.label a {
+  color: #fdfdfe; }
 
 .main-full-container {
   background-color: #fdfdfe;

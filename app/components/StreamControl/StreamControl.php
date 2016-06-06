@@ -64,7 +64,6 @@ class StreamControl extends UI\Control
         $post = $this->orm->posts->getById($postId);
         $post->deleted = 1;
         $this->orm->posts->persistAndFlush($post);
-
     }
 
 	protected function createComponentPaginator()

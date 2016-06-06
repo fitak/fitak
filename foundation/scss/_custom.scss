@@ -129,10 +129,18 @@ img {
     max-width: none;
 }
 
-a.label:hover {
-    color: $fb-white;
-    background-color: $primary-color-hover;
+.label {
+    &:hover {
+        color: $fb-white;
+        background-color: $primary-color-hover;
+    }
+
+    a {
+        color: $fb-white;
+    }
 }
+
+
 
 // ============================= Global classes ==============================
 
