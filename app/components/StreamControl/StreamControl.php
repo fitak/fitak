@@ -33,7 +33,11 @@ class StreamControl extends UI\Control
 
 
     public function setCurrentVote($topic) {
-        $vote = $topic->votes->get()->getBy(['user' => $this->user]);
+        $vote = NULL;
+        if ($topic->votes) {
+            $vote = $topic->votes->get()->getBy(['user' => $this->user]);
+        }
+
         if (!$vote) {
             $topic->setterCurrentUserVote(0);
         } elseif ($vote->isDownvote == 1) {
@@ -47,7 +51,9 @@ class StreamControl extends UI\Control
         if ($topics) {
             if ($topics->topics) {
                 foreach ($topics->topics as $topic) {
-                    $this->setCurrentVote($topic);
+                    if ($topic) {
+                        $this->setCurrentVote($topic);
+                    }
 
                     if ($topic->children) {
                         foreach ($topic->children as $topic) {

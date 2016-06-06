@@ -4310,6 +4310,10 @@ img {
 .label a {
   color: #fdfdfe; }
 
+.alert {
+  font-weight: bold;
+  color: #be0000; }
+
 .main-full-container {
   background-color: #fdfdfe;
   border: 1px solid #bcc0c8;

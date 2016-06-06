@@ -97,7 +97,6 @@ class HomepagePresenter extends BasePresenter
 
     public function handleSaveSearch($query)
     {
-
         return TRUE;
     }
 

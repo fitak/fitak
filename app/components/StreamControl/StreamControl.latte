@@ -167,6 +167,7 @@
 			{if $type == "post"}
             <div class="comments" n:tag-if="!$entry->isTypeQa">
                {default $anyMarked = false}
+               {if $entry}
                     {if $type == "post"}
                         {if $entry->isTypeQa}
                            {foreach $entry->sortedAnswers as $reply}
@@ -207,6 +208,7 @@
                     </div>
 
                 </div>
+                {/if}
                 {/if}
             </div>
             {/if}
