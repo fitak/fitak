@@ -1,6 +1,8 @@
 /app/config/local.neon
 /log/
 /tests/temp/
+/tests/php.ini
+/tests/coverage.html
 /tmp/
 /www/build
 fitak.sublime-project
