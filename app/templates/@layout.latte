@@ -67,6 +67,9 @@
 						<hr>
 						<li><a n:href="Homepage:">Zpět na hlavní stránku</a></li>
 						<li><a n:href="User:">Uživatelské nastavení</a></li>
+						{if $user->admin}
+						<li><a n:href="Admin:">Administrace</a></li>
+						{/if}
 						<li><a n:href="Auth:SignOut">Odhlásit se</a></li>
 					</ul>
 				</li>

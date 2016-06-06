@@ -1,4 +1,13 @@
 {block content}
 <div class="main-full-container">
+	<div n:foreach="$flashes as $flash" class="callout {$flash->type}">
+        {$flash->message}
+    </div>
+
+	<h1>Administrace</h1>
+	<h2>Přidat uživatele</h2>
+	{control addUserForm}
+	<h2>Přidat administrátora</h2>
+	{control addAdminForm}
 </div>
 {/block}

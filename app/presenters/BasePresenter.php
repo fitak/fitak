@@ -48,6 +48,16 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 		}
 	}
 
+    public function requireAdmin($message = 'Do této sekce nemáte přístup.')
+    {
+        $this->requireLogin();
+
+        if (!$this->getLoggedInUser()->admin) {
+            $this->flashMessage($message);
+            $this->redirect('Homepage:');
+        }
+    }
+
 	/**
 	 * Check if user is authenticated.
 	 *
