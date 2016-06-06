@@ -64,11 +64,15 @@
         </p>
         <ul class="extra-line">
             <li>
-                <a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+                <a n:href="vote!, $entry->id, 0" n:class="$entry->currentUserVote == 1 ? active">
+                    <i class="fa fa-thumbs-o-up"></i>
+                </a>
             </li>
             <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
             <li>
-                <a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+                <a n:href="vote!, $entry->id, 1" n:class="$entry->currentUserVote == -1 ? active">
+                    <i class="fa fa-thumbs-o-down fa-flip-horizontal"></i>
+                </a>
             </li>
             <li><span class="divider">•</span></li>
             <li><span class="date">{$entry->createdTime|date: "j.n.Y G:i"}</span></li>
@@ -125,8 +129,6 @@
                                 </a>
                             </li>
                             <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
-                            <li>
-                            </li>
                             <li>
                                 <a n:href="vote!, $entry->id, 1" n:class="$entry->currentUserVote == -1 ? active">
                                     <i n:class="fa, $entry->isTypeQa ? fa-chevron-down : fa-thumbs-o-down, fa-flip-horizontal"></i>
