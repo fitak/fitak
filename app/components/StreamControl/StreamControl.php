@@ -48,14 +48,22 @@ class StreamControl extends UI\Control
 
 		$vote = $this->orm->votes->getbyIds($postId, $this->user->id);
 
-		if (!$vote) {
-			$vote = new Vote();
-			$vote->data = $post;
-			$vote->user = $this->user;
-		}
+		if ($vote) {
+			if (($isDownvote and $vote->isDownvote) or (!$isDownvote and !$vote->isDownvote)) {
+                $this->orm->votes->removeAndFlush($vote);
+            } else {
+                $vote->isDownvote = $isDownvote;
+                $this->orm->votes->persistAndFlush($vote);
+            }
+		} else {
+            $vote = new Vote();
+            $vote->data = $post;
+            $vote->user = $this->user;
+            $vote->isDownvote = $isDownvote;
+            $this->orm->votes->persistAndFlush($vote);
+        }
 
-		$vote->isDownvote = $isDownvote;
-		$this->orm->votes->persistAndFlush($vote);
+
 
 	}
 
