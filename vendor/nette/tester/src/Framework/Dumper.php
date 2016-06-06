@@ -47,10 +47,10 @@ class Dumper
 
 		} elseif (is_float($var)) {
 			if (!is_finite($var)) {
-				return var_export($var, TRUE);
+				return str_replace('.0', '', var_export($var, TRUE)); // workaround for PHP 7.0.2
 			}
 			$var = str_replace(',', '.', "$var");
-			return strpos($var, '.') === FALSE ? $var . '.0' : $var;
+			return strpos($var, '.') === FALSE ? $var . '.0' : $var; // workaround for PHP < 7.0.2
 
 		} elseif (is_string($var)) {
 			if (preg_match('#^(.{' . self::$maxLength . '}).#su', $var, $m)) {
@@ -70,7 +70,7 @@ class Dumper
 					break;
 				}
 				$out .= ($k === $counter ? '' : self::toLine($k) . ' => ')
-					. (is_array($v) ? 'array(...)' : self::toLine($v));
+					. (is_array($v) && $v ? 'array(...)' : self::toLine($v));
 				$counter = is_int($k) ? max($k + 1, $counter) : $counter;
 			}
 			return "array($out)";
@@ -102,7 +102,7 @@ class Dumper
 			$line .= '(' . $object->format('Y-m-d H:i:s O') . ')';
 		}
 
-		return $line . '(#' . substr(md5(spl_object_hash($object)), 0, 4) . ')';
+		return $line . '(' . self::hash($object) . ')';
 	}
 
 
@@ -114,6 +114,17 @@ class Dumper
 	public static function toPhp($var)
 	{
 		return self::_toPhp($var);
+	}
+
+
+	/**
+	 * Returns object's stripped hash.
+	 * @param  object
+	 * @return string
+	 */
+	private static function hash($object)
+	{
+		return '#' . substr(md5(spl_object_hash($object)), 0, 4);
 	}
 
 
@@ -216,9 +227,10 @@ class Dumper
 				}
 				$out .= $space;
 			}
+			$hash = self::hash($var);
 			return $class === 'stdClass'
-				? "(object) array($out)"
-				: "$class::__set_state(array($out))";
+				? "(object) /* $hash */ array($out)"
+				: "$class::__set_state(/* $hash */ array($out))";
 
 		} elseif (is_resource($var)) {
 			return '/* resource ' . get_resource_type($var) . ' */';
@@ -264,7 +276,7 @@ class Dumper
 
 			if ((is_string($actual) && is_string($expected))) {
 				for ($i = 0; $i < strlen($actual) && isset($expected[$i]) && $actual[$i] === $expected[$i]; $i++);
-				$i = max(0, min($i, max(strlen($actual), strlen($expected)) - self::$maxLength + 3));
+				$i = max(0, min($i, max(strlen($actual), strlen($expected)) - self::$maxLength));
 				for (; $i && $i < count($actual) && $actual[$i - 1] >= "\x80" && $actual[$i] >= "\x80" && $actual[$i] < "\xC0"; $i--);
 				if ($i) {
 					$expected = substr_replace($expected, '...', 0, $i);
@@ -299,6 +311,8 @@ class Dumper
 			if ($e instanceof AssertException && $item['file'] === __DIR__ . DIRECTORY_SEPARATOR . 'Assert.php') {
 				continue;
 			}
+			$line = $item['class'] === 'Tester\Assert' && method_exists($item['class'], $item['function'])
+				&& ($tmp = file($item['file'])) && strpos($tmp = $tmp[$item['line'] - 1], "::$item[function](") ? $tmp : NULL;
 
 			$s .= 'in '
 				. ($item['file']
@@ -309,8 +323,10 @@ class Dumper
 					)
 					: '[internal function]'
 				)
-				. $item['class'] . $item['type']
-				. (isset($item['function']) ? $item['function'] . '()' : '')
+				. ($line
+					? trim($line)
+					: $item['class'] . $item['type'] . $item['function'] . ($item['function'] ? '()' : '')
+				)
 				. self::color() . "\n";
 		}
 
@@ -352,7 +368,8 @@ class Dumper
 			NULL => '0',
 		);
 		$c = explode('/', $color);
-		return "\033[" . $colors[$c[0]] . (empty($c[1]) ? '' : ';4' . substr($colors[$c[1]], -1))
+		return "\033["
+			. str_replace(';', "m\033[", $colors[$c[0]] . (empty($c[1]) ? '' : ';4' . substr($colors[$c[1]], -1)))
 			. 'm' . $s . ($s === NULL ? '' : "\033[0m");
 	}
 

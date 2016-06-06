@@ -1,5 +1,0 @@
-<?php
-
-/**
- * @dataProvider? missing.ini
- */

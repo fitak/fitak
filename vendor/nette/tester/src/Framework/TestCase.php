@@ -18,6 +18,13 @@ class TestCase
 		METHOD_PATTERN = '#^test[A-Z0-9_]#';
 
 
+	/** @var bool */
+	private $handleErrors = FALSE;
+
+	/** @var callable|NULL|FALSE */
+	private $prevErrorHandler = FALSE;
+
+
 	/**
 	 * Runs the test case.
 	 * @return void
@@ -87,8 +94,8 @@ class TestCase
 
 			foreach ((array) $info['dataprovider'] as $provider) {
 				$res = $this->getData($provider);
-				if (!is_array($res)) {
-					throw new TestCaseException("Data provider $provider() doesn't return array.");
+				if (!is_array($res) && !$res instanceof \Traversable) {
+					throw new TestCaseException("Data provider $provider() doesn't return array or Traversable.");
 				}
 				foreach ($res as $set) {
 					$data[] = is_string(key($set)) ? array_merge($defaultParams, $set) : $set;
@@ -105,26 +112,33 @@ class TestCase
 			$data[] = $args;
 		}
 
-		$me = $this;
-		$errorHandler = function ($severity, $message) use ($me, & $prev) {
-			if (($severity & error_reporting()) === $severity) {
-				restore_error_handler();
-				$rm = new \ReflectionMethod($me, 'tearDown');
-				$rm->setAccessible(TRUE);
 
-				set_error_handler(function () {}); // mute all errors
-				$rm->invoke($me);
-				restore_error_handler();
-			}
+		if ($this->prevErrorHandler === FALSE) {
+			$me = $this;
+			$handleErrors = & $this->handleErrors;
+			$prev = & $this->prevErrorHandler;
 
-			return $prev ? call_user_func_array($prev, func_get_args()) : FALSE;
-		};
+			$prev = set_error_handler(function ($severity) use ($me, & $prev, & $handleErrors) {
+				if ($handleErrors && ($severity & error_reporting()) === $severity) {
+					$handleErrors = FALSE;
+					$rm = new \ReflectionMethod($me, 'tearDown');
+					$rm->setAccessible(TRUE);
+
+					set_error_handler(function() {});  // mute all errors
+					$rm->invoke($me);
+					restore_error_handler();
+				}
+
+				return $prev ? call_user_func_array($prev, func_get_args()) : FALSE;
+			});
+		}
+
 
 		foreach ($data as $params) {
 			try {
 				$this->setUp();
 
-				$prev = set_error_handler($errorHandler);
+				$this->handleErrors = TRUE;
 				try {
 					if ($info['throws']) {
 						$tmp = $this;
@@ -139,7 +153,7 @@ class TestCase
 					}
 				} catch (\Exception $testException) {
 				}
-				restore_error_handler();
+				$this->handleErrors = FALSE;
 
 				try {
 					$this->tearDown();
@@ -164,12 +178,12 @@ class TestCase
 	 */
 	protected function getData($provider)
 	{
-		if (strpos($provider, '.')) {
+		if (strpos($provider, '.') === FALSE) {
+			return $this->$provider();
+		} else {
 			$rc = new \ReflectionClass($this);
 			list($file, $query) = DataProvider::parseAnnotation($provider, $rc->getFileName());
 			return DataProvider::load($file, $query);
-		} else {
-			return $this->$provider();
 		}
 	}
 

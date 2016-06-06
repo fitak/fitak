@@ -1,8 +1,0 @@
-<?php
-
-/**
- * @outputMatchFile ../../Framework/Assert.matchFile.txt
- */
-
-?>
-! Hello !

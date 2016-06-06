@@ -1178,64 +1178,6 @@
         ]
     },
     {
-        "name": "nette/tester",
-        "version": "v1.6.1",
-        "version_normalized": "1.6.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/nette/tester.git",
-            "reference": "b0f312e7ab9a70bbd5c92568e2a20dd46be9a529"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/nette/tester/zipball/b0f312e7ab9a70bbd5c92568e2a20dd46be9a529",
-            "reference": "b0f312e7ab9a70bbd5c92568e2a20dd46be9a529",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2015-10-26 05:38:30",
-        "bin": [
-            "src/tester"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.6-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "src/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause",
-            "GPL-2.0",
-            "GPL-3.0"
-        ],
-        "authors": [
-            {
-                "name": "David Grudl",
-                "homepage": "https://davidgrudl.com"
-            },
-            {
-                "name": "Nette Community",
-                "homepage": "https://nette.org/contributors"
-            }
-        ],
-        "description": "An easy-to-use PHP unit testing framework.",
-        "homepage": "https://tester.nette.org",
-        "keywords": [
-            "nette",
-            "testing",
-            "unit"
-        ]
-    },
-    {
         "name": "hamcrest/hamcrest-php",
         "version": "v1.2.2",
         "version_normalized": "1.2.2.0",
@@ -2125,7 +2067,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nette/database/zipball/1e12005c73411cade4691ca8e1c3b96c1d09a05e",
+            "url": "https://api.github.com/repos/nette/database/zipball/a4c7ea17470a7d888df5738f5e63b2605899f289",
             "reference": "1e12005c73411cade4691ca8e1c3b96c1d09a05e",
             "shasum": ""
         },
@@ -2249,7 +2191,7 @@
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/nette/nette/zipball/4fdb5bff44ae1b45ee2247c70430142b9677d7a6",
+            "url": "https://api.github.com/repos/nette/nette/zipball/25381e4ec7902734e49924c1ffd07017830c5f31",
             "reference": "4fdb5bff44ae1b45ee2247c70430142b9677d7a6",
             "shasum": ""
         },
@@ -2798,5 +2740,63 @@
         ],
         "description": "Symfony EventDispatcher Component",
         "homepage": "https://symfony.com"
+    },
+    {
+        "name": "nette/tester",
+        "version": "v1.7.1",
+        "version_normalized": "1.7.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nette/tester.git",
+            "reference": "d97534578e8cf66eabe081e7d5eaa4dd527ab0c8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nette/tester/zipball/d97534578e8cf66eabe081e7d5eaa4dd527ab0c8",
+            "reference": "d97534578e8cf66eabe081e7d5eaa4dd527ab0c8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-03-19 14:34:02",
+        "bin": [
+            "src/tester"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.7-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause",
+            "GPL-2.0",
+            "GPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "David Grudl",
+                "homepage": "https://davidgrudl.com"
+            },
+            {
+                "name": "Nette Community",
+                "homepage": "https://nette.org/contributors"
+            }
+        ],
+        "description": "An easy-to-use PHP unit testing framework.",
+        "homepage": "https://tester.nette.org",
+        "keywords": [
+            "nette",
+            "testing",
+            "unit"
+        ]
     }
 ]

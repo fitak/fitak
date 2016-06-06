@@ -1,3 +1,0 @@
-/vendor
-tests/**/output/
-tools/create-phar/tester.phar

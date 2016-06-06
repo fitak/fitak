@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2ca6a517d43c141da65f96e4bbdbfbbf",
-    "content-hash": "841029dff8a3ca906ac03fb5948987c6",
+    "hash": "ee8e1bb45e1018ba057c435d70fae556",
+    "content-hash": "80ffa51dc469501b2f7ec8b8e3c19fbd",
     "packages": [
         {
             "name": "dibi/dibi",
@@ -997,7 +997,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/database/zipball/1e12005c73411cade4691ca8e1c3b96c1d09a05e",
+                "url": "https://api.github.com/repos/nette/database/zipball/a4c7ea17470a7d888df5738f5e63b2605899f289",
                 "reference": "1e12005c73411cade4691ca8e1c3b96c1d09a05e",
                 "shasum": ""
             },
@@ -1420,7 +1420,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/nette/zipball/4fdb5bff44ae1b45ee2247c70430142b9677d7a6",
+                "url": "https://api.github.com/repos/nette/nette/zipball/25381e4ec7902734e49924c1ffd07017830c5f31",
                 "reference": "4fdb5bff44ae1b45ee2247c70430142b9677d7a6",
                 "shasum": ""
             },
@@ -2661,16 +2661,16 @@
         },
         {
             "name": "nette/tester",
-            "version": "v1.6.1",
+            "version": "v1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tester.git",
-                "reference": "b0f312e7ab9a70bbd5c92568e2a20dd46be9a529"
+                "reference": "d97534578e8cf66eabe081e7d5eaa4dd527ab0c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tester/zipball/b0f312e7ab9a70bbd5c92568e2a20dd46be9a529",
-                "reference": "b0f312e7ab9a70bbd5c92568e2a20dd46be9a529",
+                "url": "https://api.github.com/repos/nette/tester/zipball/d97534578e8cf66eabe081e7d5eaa4dd527ab0c8",
+                "reference": "d97534578e8cf66eabe081e7d5eaa4dd527ab0c8",
                 "shasum": ""
             },
             "require": {
@@ -2682,7 +2682,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.7-dev"
                 }
             },
             "autoload": {
@@ -2713,7 +2713,7 @@
                 "testing",
                 "unit"
             ],
-            "time": "2015-10-26 05:38:30"
+            "time": "2016-03-19 14:34:02"
         }
     ],
     "aliases": [],
