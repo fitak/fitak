@@ -23,7 +23,7 @@ class PostForm extends Form
 		$this->orm = $orm;
 		$this->user = $user;
 		$this->facebook = $facebook;
-        $type_qa = [false => 'no', true => 'yes'];
+        $type_qa = [0 => 'no', 1 => 'yes'];
 		$groups = $this->orm->groups->findList();
         $groups[0] = "Pouze na Fiťákovi";
 

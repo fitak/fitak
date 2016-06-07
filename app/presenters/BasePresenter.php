@@ -82,11 +82,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function createComponentSearchForm()
     {
-        if ($this->searchRequest->groups) {
-            $groups = $this->searchRequest->groups;
-        } else {
-            $groups = $this->orm->groups->findAll()->fetchPairs(NULL, 'id');
-        }
+            if ($this->searchRequest and $this->searchRequest->groups) {
+                $groups = $this->searchRequest->groups;
+            } else {
+                $groups = $this->orm->groups->findAll()->fetchPairs(NULL, 'id');
+            }
 
         $form = new SearchForm($this->orm);
         $form->setDefaults([

@@ -10,6 +10,7 @@ use Nextras\Orm\Relationships\OneHasMany;
  * @property string            $id
  * @property string            $name
  * @property bool              $closed {default 0}
+ * @property bool              $enabled {default 1}
  *
  * @property OneHasMany|Post[] $posts  {1:m PostsRepository $group}
  */
