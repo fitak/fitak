@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Drivers;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Supplemental PostgreSQL database driver.
- *
- * @author     David Grudl
  */
 class PgSqlDriver extends Nette\Object implements Nette\Database\ISupplementalDriver
 {
@@ -24,6 +22,30 @@ class PgSqlDriver extends Nette\Object implements Nette\Database\ISupplementalDr
 	public function __construct(Nette\Database\Connection $connection, array $options)
 	{
 		$this->connection = $connection;
+	}
+
+
+	public function convertException(\PDOException $e)
+	{
+		$code = isset($e->errorInfo[0]) ? $e->errorInfo[0] : NULL;
+		if ($code === '0A000' && strpos($e->getMessage(), 'truncate') !== FALSE) {
+			return Nette\Database\ForeignKeyConstraintViolationException::from($e);
+
+		} elseif ($code === '23502') {
+			return Nette\Database\NotNullConstraintViolationException::from($e);
+
+		} elseif ($code === '23503') {
+			return Nette\Database\ForeignKeyConstraintViolationException::from($e);
+
+		} elseif ($code === '23505') {
+			return Nette\Database\UniqueConstraintViolationException::from($e);
+
+		} elseif ($code === '08006') {
+			return Nette\Database\ConnectionException::from($e);
+
+		} else {
+			return Nette\Database\DriverException::from($e);
+		}
 	}
 
 
@@ -59,11 +81,22 @@ class PgSqlDriver extends Nette\Object implements Nette\Database\ISupplementalDr
 
 
 	/**
+	 * Formats date-time interval for use in a SQL statement.
+	 */
+	public function formatDateInterval(\DateInterval $value)
+	{
+		throw new Nette\NotSupportedException;
+	}
+
+
+	/**
 	 * Encodes string for use in a LIKE statement.
 	 */
 	public function formatLike($value, $pos)
 	{
-		$value = strtr($value, array("'" => "''", '\\' => '\\\\', '%' => '\\\\%', '_' => '\\\\_'));
+		$bs = substr($this->connection->quote('\\', \PDO::PARAM_STR), 1, -1); // standard_conforming_strings = on/off
+		$value = substr($this->connection->quote($value, \PDO::PARAM_STR), 1, -1);
+		$value = strtr($value, array('%' => $bs . '%', '_' => $bs . '_', '\\' => '\\\\'));
 		return ($pos <= 0 ? "'%" : "'") . $value . ($pos >= 0 ? "%'" : "'");
 	}
 
@@ -73,10 +106,13 @@ class PgSqlDriver extends Nette\Object implements Nette\Database\ISupplementalDr
 	 */
 	public function applyLimit(& $sql, $limit, $offset)
 	{
-		if ($limit >= 0) {
+		if ($limit < 0 || $offset < 0) {
+			throw new Nette\InvalidArgumentException('Negative offset or limit.');
+		}
+		if ($limit !== NULL) {
 			$sql .= ' LIMIT ' . (int) $limit;
 		}
-		if ($offset > 0) {
+		if ($offset) {
 			$sql .= ' OFFSET ' . (int) $offset;
 		}
 	}

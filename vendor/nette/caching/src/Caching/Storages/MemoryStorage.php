@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching\Storages;
@@ -12,13 +12,11 @@ use Nette;
 
 /**
  * Memory cache storage.
- *
- * @author     David Grudl
  */
 class MemoryStorage extends Nette\Object implements Nette\Caching\IStorage
 {
 	/** @var array */
-	private $data = array();
+	private $data = [];
 
 
 	/**
@@ -74,7 +72,7 @@ class MemoryStorage extends Nette\Object implements Nette\Caching\IStorage
 	public function clean(array $conditions)
 	{
 		if (!empty($conditions[Nette\Caching\Cache::ALL])) {
-			$this->data = array();
+			$this->data = [];
 		}
 	}
 

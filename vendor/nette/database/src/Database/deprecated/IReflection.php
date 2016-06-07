@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database;
@@ -11,7 +11,7 @@ use Nette;
 
 
 /** @deprecated */
-interface IReflection extends Nette\Database\IConventions
+interface IReflection extends IConventions
 {
 	/** @deprecated */
 	const

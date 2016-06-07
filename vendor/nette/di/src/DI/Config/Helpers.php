@@ -1,19 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\DI\Config;
 
-use Nette;
-
 
 /**
  * Configuration helpers.
- *
- * @author     David Grudl
  */
 class Helpers
 {
@@ -23,7 +19,7 @@ class Helpers
 
 	/**
 	 * Merges configurations. Left has higher priority than right one.
-	 * @return array
+	 * @return array|string
 	 */
 	public static function merge($left, $right)
 	{

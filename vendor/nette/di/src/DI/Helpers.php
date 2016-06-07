@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\DI;
@@ -12,8 +12,7 @@ use Nette;
 
 /**
  * The DI helpers.
- *
- * @author     David Grudl
+ * @internal
  */
 class Helpers
 {
@@ -22,7 +21,7 @@ class Helpers
 	 * Expands %placeholders%.
 	 * @param  mixed
 	 * @param  array
-	 * @param  bool
+	 * @param  bool|array
 	 * @return mixed
 	 * @throws Nette\InvalidArgumentException
 	 */
@@ -35,12 +34,8 @@ class Helpers
 			}
 			return $res;
 
-		} elseif ($var instanceof \stdClass || $var instanceof Statement) {
-			$res = clone $var;
-			foreach ($var as $key => $val) {
-				$res->$key = self::expand($val, $params, $recursive);
-			}
-			return $res;
+		} elseif ($var instanceof Statement) {
+			return new Statement(self::expand($var->getEntity(), $params, $recursive), self::expand($var->arguments, $params, $recursive));
 
 		} elseif (!is_string($var)) {
 			return $var;
@@ -82,7 +77,6 @@ class Helpers
 
 	/**
 	 * Generates list of arguments using autowiring.
-	 * @param  Nette\Reflection\GlobalFunction|Nette\Reflection\Method
 	 * @return array
 	 */
 	public static function autowireArguments(\ReflectionFunctionAbstract $method, array $arguments, $container)
@@ -90,6 +84,8 @@ class Helpers
 		$optCount = 0;
 		$num = -1;
 		$res = array();
+		$methodName = ($method instanceof \ReflectionMethod ? $method->getDeclaringClass()->getName() . '::' : '')
+			. $method->getName() . '()';
 
 		foreach ($method->getParameters() as $num => $parameter) {
 			if (array_key_exists($num, $arguments)) {
@@ -102,15 +98,15 @@ class Helpers
 				unset($arguments[$parameter->getName()]);
 				$optCount = 0;
 
-			} elseif ($class = $parameter->getClassName()) { // has object type hint
+			} elseif (($class = PhpReflection::getParameterType($parameter)) && !PhpReflection::isBuiltinType($class)) {
 				$res[$num] = $container->getByType($class, FALSE);
 				if ($res[$num] === NULL) {
 					if ($parameter->allowsNull()) {
 						$optCount++;
 					} elseif (class_exists($class) || interface_exists($class)) {
-						throw new ServiceCreationException("Service of type {$class} needed by $method not found. Did you register it in configuration file?");
+						throw new ServiceCreationException("Service of type {$class} needed by $methodName not found. Did you register it in configuration file?");
 					} else {
-						throw new ServiceCreationException("Class {$class} needed by $method not found. Check type hint and 'use' statements.");
+						throw new ServiceCreationException("Class {$class} needed by $methodName not found. Check type hint and 'use' statements.");
 					}
 				} else {
 					if ($container instanceof ContainerBuilder) {
@@ -119,13 +115,14 @@ class Helpers
 					$optCount = 0;
 				}
 
-			} elseif ($parameter->isOptional()) {
-				// PDO::__construct has optional parameter without default value (and isArray() and allowsNull() returns FALSE)
+			} elseif ($parameter->isOptional() || $parameter->isDefaultValueAvailable()) {
+				// !optional + defaultAvailable = func($a = NULL, $b) since 5.3.17 & 5.4.7
+				// optional + !defaultAvailable = i.e. Exception::__construct, mysqli::mysqli, ...
 				$res[$num] = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : NULL;
 				$optCount++;
 
 			} else {
-				throw new ServiceCreationException("Parameter $parameter has no type hint, so its value must be specified.");
+				throw new ServiceCreationException("Parameter \${$parameter->getName()} in $methodName has no class type hint or default value, so its value must be specified.");
 			}
 		}
 
@@ -136,39 +133,10 @@ class Helpers
 			$optCount = 0;
 		}
 		if ($arguments) {
-			throw new ServiceCreationException("Unable to pass specified arguments to $method.");
+			throw new ServiceCreationException("Unable to pass specified arguments to $methodName.");
 		}
 
 		return $optCount ? array_slice($res, 0, -$optCount) : $res;
 	}
-
-
-	/**
-	 * Generates list of properties with annotation @inject.
-	 * @return array
-	 */
-	public static function getInjectProperties(Nette\Reflection\ClassType $class, $container = NULL)
-	{
-		$res = array();
-		foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-			$type = $property->getAnnotation('var');
-			if (!$property->getAnnotation('inject')) {
-				continue;
-
-			} elseif (!$type) {
-				throw new Nette\InvalidStateException("Property $property has no @var annotation.");
-			}
-
-			$type = Nette\Reflection\AnnotationsParser::expandClassName($type, $property->getDeclaringClass());
-			if (!class_exists($type) && !interface_exists($type)) {
-				throw new Nette\InvalidStateException("Class or interface '$type' used in @var annotation at $property not found. Check annotation and 'use' statements.");
-			} elseif ($container && !$container->getByType($type, FALSE)) {
-				throw new ServiceCreationException("Service of type {$type} used in @var annotation at $property not found. Did you register it in configuration file?");
-			}
-			$res[$property->getName()] = $type;
-		}
-		return $res;
-	}
-
 
 }

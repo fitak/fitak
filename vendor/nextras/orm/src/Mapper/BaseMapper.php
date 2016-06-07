@@ -1,32 +1,27 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Mapper;
 
-use Nextras\Orm\Repository\IRepository;
-use Nextras\Orm\StorageReflection\DbStorageReflection;
-use Nextras\Orm\StorageReflection\IDbStorageReflection;
-use Nextras\Orm\InvalidStateException;
 use Nette\Object;
+use Nextras\Orm\InvalidStateException;
+use Nextras\Orm\Repository\IRepository;
+use Nextras\Orm\StorageReflection\IStorageReflection;
+use Nextras\Orm\StorageReflection\StringHelper;
 use stdClass;
 
 
-/**
- * Base Mapper.
- */
 abstract class BaseMapper extends Object implements IMapper
 {
 	/** @var string */
 	protected $tableName;
 
-	/** @var IDbStorageReflection */
+	/** @var IStorageReflection */
 	protected $storageReflection;
 
 	/** @var stdClass */
@@ -62,7 +57,8 @@ abstract class BaseMapper extends Object implements IMapper
 	public function getTableName()
 	{
 		if (!$this->tableName) {
-			$this->tableName = DbStorageReflection::underscore(substr($this->getReflection()->getShortName(), 0, -6));
+			$tableName = str_replace('Mapper', '', $this->getReflection()->getShortName());
+			$this->tableName = StringHelper::underscore($tableName);
 		}
 
 		return $this->tableName;
@@ -82,6 +78,18 @@ abstract class BaseMapper extends Object implements IMapper
 	public function getCollectionCache()
 	{
 		return $this->collectionCache;
+	}
+
+
+	public function clearCollectionCache()
+	{
+		$this->collectionCache = (object) NULL;
+	}
+
+
+	public function flush()
+	{
+		$this->collectionCache = (object) NULL;
 	}
 
 

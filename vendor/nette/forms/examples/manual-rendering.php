@@ -6,12 +6,12 @@
 
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {
-	die('Install packages using `composer update --dev`');
+	die('Install packages using `composer install`');
 }
 
-use Nette\Forms\Form,
-	Tracy\Debugger,
-	Tracy\Dumper;
+use Nette\Forms\Form;
+use Tracy\Debugger;
+use Tracy\Dumper;
 
 Debugger::enable();
 
@@ -48,7 +48,7 @@ if ($form->isSuccess()) {
 	<meta charset="utf-8">
 	<title>Nette Forms manual form rendering</title>
 	<link rel="stylesheet" media="screen" href="assets/style.css" />
-	<script src="http://nette.github.io/resources/js/netteForms.js"></script>
+	<script src="https://nette.github.io/resources/js/netteForms.js"></script>
 </head>
 
 <body>

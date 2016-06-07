@@ -1,0 +1,148 @@
+
+{foreach $flashes as $flash}
+ 	<div class="flash {$flash->type}">{$flash->message}</div>
+{/foreach}
+
+{define #commentForm}
+{form commentForm, class => 'form-horizontal'}
+	<fieldset>
+			<span class="input-group comment-field">
+				{input message, class => 'form-control'}
+				{input parent_id, value => $parent_id}
+			</span>
+	</fieldset>
+{/form}
+{/define}
+
+{define #entry}
+	{default $marked = false}
+	<div n:class="entry, $type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply'">
+	{*<div n:tag-if="$type != 'post'" n:class="$marked ? 'comment-marked' : 'comment'">*}
+		<div class="row header">
+			<div class="col-xs-6">
+			<div n:class="$type == 'post' ? post-user-image, $type == 'comment' ? comment-user-image, $type == 'reply' ? reply-user-image, user-image">
+				{if $entry->user->profilePicture}
+				<img src="{$entry->user->profilePicture}">
+				{else}
+				<img src="{$basePath}/img/anonymous_user.gif">
+				{/if}
+			</div>
+			<a target="_blank" href="https://www.facebook.com/{$entry->user->fbId}" class="user-name">{$entry->user->name}</a>
+			<br>
+			{if $entry->group}
+				{if $type == "post"}
+					{var top_parent_id = $entry->fbId}
+				{elseif $type == "comment"}
+					{var top_parent_id = $entry->parent->fbId}
+				{elseif $type == "reply"}
+					{var top_parent_id = $entry->parent->parent->fbId}
+				{/if}
+				{var $fb_url = "https://www.facebook.com/groups/{$entry->group->id}/permalink/{$top_parent_id}"}
+				{if $type != "post"}
+					{var fb_url = $fb_url . "/?comment_id={$entry->fbId}"}
+				{/if}
+				<a target="_blank" href="{$fb_url}">{$entry->createdTime|date: "j.n.Y G:i:s"}</a>
+			{else}
+			<span>{$entry->createdTime|date: "j.n.Y G:i:s"}</span>
+			{/if}
+			</div>
+			{if $entry->group}
+				<div n:if="$type == 'post'" class="col-xs-6">
+						<a target="_blank" href="http://www.facebook.com/groups/{$entry->group->id}" title="{$entry->group->name}">{$entry->group->name|truncate:45}</a>
+				</div>
+			{/if}
+		</div>
+
+		<div class="row message">
+			<a n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag->name">
+				<span class="label label-info">{$tag->name}</span>
+			</a>
+			{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+			<a n:href="vote!, $entry->id, 0">Upvote!</a>
+			<a n:href="vote!, $entry->id, 1">Downvote!</a>
+			<span class="important">This entry has {$entry->votesCnt} votes.</span>
+			<blockquote n:tag-if="$entry->name" style="margin-top:15px">
+				<strong n:if="$entry->name">{$entry->name}</strong>
+				<a n:tag-if="$entry->link" href="{$entry->link}">
+					{if $entry->description}
+						<br><small>{$entry->description}</small>
+					{/if}
+					{if $entry->picture}
+						<br><img src="{$entry->picture}" title="{$entry->name}">
+					{/if}
+				</a>
+			</blockquote>
+
+		</div>
+		{default $anyMarked = false}
+		{if $type == "comment"}
+			{foreach $entry->children as $reply}
+				{include #entry, entry => $reply, type => "reply"}
+				{if $marked}
+					{var $anyMarked = true}
+				{/if}
+			{/foreach}
+		{elseif $type == "post"}
+			{if $entry->isTypeQa}
+                {foreach $entry->sortedAnswers as $reply}
+                    {include #entry, entry => $reply, type => "comment"}
+                    {if $marked}
+                        {var $anyMarked = true}
+                    {/if}
+                {/foreach}
+            {else}
+				{foreach $entry->children as $comment}
+					{include #entry, entry => $comment, type => "comment"}
+					{if $marked}
+						{var $anyMarked = true}
+					{/if}
+				{/foreach}
+			{/if}
+		{/if}
+
+		{if $type != "reply"}
+			{if count($entry->children)}
+				<span class="show-comments">
+					<button class="btn btn-small btn-success">
+						<i class="icon-comment"></i>
+						Zobrazit
+						{if $anyMarked}všechny{/if}
+						{if $type == 'post'}
+							komentáře
+						{else}
+							odpovědi
+						{/if}
+						 ({count($entry->children)})
+					</button>
+				</span>
+				<span class="hide-comments">
+					<button class="btn btn-small btn-warning">
+						<i class="icon-comment"></i>
+						Skrýt
+						{if $anyMarked}všechny{/if}
+						{if $type == 'post'}
+							komentáře
+						{else}
+							odpovědi
+						{/if}
+						 ({count($entry->children)})
+					</button>
+				</span>
+
+			{/if}
+			{include #commentForm, parent_id => $entry->id}
+		{/if}
+
+	{*</div>*}
+	</div>
+{/define}
+
+{control paginator}
+
+{*<div n:foreach="$topics as $topic" class="entry topic">*}
+{foreach $topics->topics as $topic}
+	{include #entry, entry => $topic, type => "post"}
+{/foreach}
+{*</div>*}
+{dump}
+{control paginator}

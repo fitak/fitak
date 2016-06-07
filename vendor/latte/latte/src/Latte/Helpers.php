@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -10,16 +10,14 @@ namespace Latte;
 
 /**
  * Latte helpers.
- *
- * @author     David Grudl
  * @internal
  */
 class Helpers
 {
 	/** @var array  empty (void) HTML elements */
 	public static $emptyElements = array(
-		'img'=>1,'hr'=>1,'br'=>1,'input'=>1,'meta'=>1,'area'=>1,'embed'=>1,'keygen'=>1,'source'=>1,'base'=>1,
-		'col'=>1,'link'=>1,'param'=>1,'basefont'=>1,'frame'=>1,'isindex'=>1,'wbr'=>1,'command'=>1,'track'=>1
+		'img' => 1,'hr' => 1,'br' => 1,'input' => 1,'meta' => 1,'area' => 1,'embed' => 1,'keygen' => 1,'source' => 1,'base' => 1,
+		'col' => 1,'link' => 1,'param' => 1,'basefont' => 1,'frame' => 1,'isindex' => 1,'wbr' => 1,'command' => 1,'track' => 1,
 	);
 
 
@@ -88,7 +86,7 @@ class Helpers
 					$lastChar = '';
 					$php .= $token[1];
 
-				} elseif ($token[0] === T_OPEN_TAG && $token[1] === '<?' && isset($tokens[$n+1][1]) && $tokens[$n+1][1] === 'xml') {
+				} elseif ($token[0] === T_OPEN_TAG && $token[1] === '<?' && isset($tokens[$n + 1][1]) && $tokens[$n + 1][1] === 'xml') {
 					$lastChar = '';
 					$res .= '<<?php ?>?';
 					for ($tokens->next(); $tokens->valid(); $tokens->next()) {
@@ -110,6 +108,25 @@ class Helpers
 			}
 		}
 		return $res . $php;
+	}
+
+
+	/**
+	 * Finds the best suggestion.
+	 * @return string|NULL
+	 */
+	public static function getSuggestion(array $items, $value)
+	{
+		$best = NULL;
+		$min = (strlen($value) / 4 + 1) * 10 + .1;
+		foreach (array_unique($items, SORT_REGULAR) as $item) {
+			$item = is_object($item) ? $item->getName() : $item;
+			if (($len = levenshtein($item, $value, 10, 11, 10)) > 0 && $len < $min) {
+				$min = $len;
+				$best = $item;
+			}
+		}
+		return $best;
 	}
 
 }

@@ -4,22 +4,20 @@ namespace Fitak;
 
 use DateTime;
 use Nette\Utils\Strings;
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\OneHasMany;
 use Nextras\Orm\Relationships\ManyHasMany;
 use Tags;
 
 
 /**
- * @property string            $id
- * @property Post|NULL         $parent   {m:1 PostsRepository $comments}
- * @property Group             $group    {m:1 GroupsRepository $posts}
+ * @property string|NULL       $fbId
+ * @property Post|NULL         $parent   {m:1 PostsRepository $allChildren}
+ * @property Group|NULL        $group    {m:1 GroupsRepository $posts}
  * @property string            $message
  * @property DateTime          $createdTime
  * @property DateTime          $updatedTime
  * @property int|NULL          $commentsCount
- * @property string            $fromName
- * @property int               $fromId
  * @property string            $type     {enum self::TYPE_*}
  * @property string|NULL       $link
  * @property string|NULL       $name
@@ -27,11 +25,22 @@ use Tags;
  * @property string|NULL       $description
  * @property string|NULL       $picture
  * @property string|NULL       $source
+ * @property bool              $isTypeQa {default false}
+ * @property User              $user {m:1 UsersRepository $posts}
+ * @property bool              $deleted {default false}
+ * @property int               $currentUserVote {virtual}
  *
  * @property ManyHasMany|Tag[] $tags     {m:n TagsRepository primary}
- * @property OneHasMany|Post[] $comments {1:m PostsRepository $parent}
+ * @property OneHasMany|Post[] $allChildren {1:m PostsRepository $parent}
+ * @property OneHasMany|Vote[] $votes {1:m VotesRepository $data}
+ *
+ * @property-read int          $votesCnt {virtual}
+ * @property-read Post[]       $children {virtual}
+ * @property-read Post[]|NULL  $sortedAnswers {virtual}
  */
-class Post extends Orm\Entity\Entity
+
+
+class Post extends Entity
 {
 
 	const TYPE_STATUS = 'status';
@@ -45,6 +54,52 @@ class Post extends Orm\Entity\Entity
 	 * @inject
 	 */
 	public $tagParser;
+
+    public function getterChildren() {
+        return $this->allChildren->get()->findBy(['deleted' => 0]);
+    }
+
+    public function getterCurrentUserVote() {
+        return 0;
+    }
+
+    public function setterCurrentUserVote($value) {
+        return $this->currentUserVote = $value;
+
+    }
+
+	/**
+	 * @return array
+	 */
+	public function getterSortedAnswers()
+	{
+		$answers = $this->children;
+
+		$answerVotes = [];
+		foreach ($answers as $answer) {
+			$answerVotes[$answer->id] = $answer->votesCnt;
+		}
+
+		arsort($answerVotes);
+
+		$sortedAnswersIds = array_keys($answerVotes);
+
+		$sortedAnswers = [];
+		foreach ($sortedAnswersIds as $answerId) {
+			$childEntity = $this->children->getBy(['id' => $answerId]);
+			array_push($sortedAnswers, $childEntity);
+		}
+
+		return $sortedAnswers;
+	}
+
+	public function getterVotesCnt()
+	{
+		$votes = $this->votes->get();
+		$positiveVotes = $votes->findBy(['isDownvote' => 0])->count();
+		$negativeVotes = $votes->findBy(['isDownvote' => 1])->count();
+		return $positiveVotes - $negativeVotes;
+	}
 
 	/**
 	 * @return string[][] [string[] $cleanTags, string[] $originalTags]

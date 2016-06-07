@@ -2,11 +2,7 @@
 
 <h1>Tracy & SQL Exceptions | dibi</h1>
 
-<p>Dibi can display and log exceptions via Tracy, part of Nette Framework.</p>
-
-<ul>
-	<li>Tracy Debugger: http://tracy.nette.org
-</ul>
+<p>Dibi can display and log exceptions via <a href="https://tracy.nette.org">Tracy</a>.</p>
 
 <?php
 
@@ -15,29 +11,22 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 }
 
 
+// enable Tracy
 Tracy\Debugger::enable();
 
 
-dibi::connect(array(
-	'driver'   => 'sqlite3',
+$connection = dibi::connect(array(
+	'driver' => 'sqlite3',
 	'database' => 'data/sample.s3db',
 	'profiler' => array(
 		'run' => TRUE,
-	)
+	),
 ));
 
 
-// throws error because SQL is bad
-dibi::query('SELECT * FROM customers WHERE customer_id < ?', 38);
-
-
-dibi::connect(array(
-	'driver'   => 'sqlite3',
-	'database' => 'data/sample.s3db',
-	'profiler' => array(
-		'run' => TRUE,
-	)
-));
+// add panel to debug bar
+$panel = new Dibi\Bridges\Tracy\Panel;
+$panel->register($connection);
 
 
 // throws error because SQL is bad

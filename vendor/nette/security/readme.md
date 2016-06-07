@@ -2,7 +2,7 @@ Nette Security: Access Control
 ==============================
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/security.svg)](https://packagist.org/packages/nette/security)
-[![Build Status](https://travis-ci.org/nette/security.svg?branch=v2.2)](https://travis-ci.org/nette/security)
+[![Build Status](https://travis-ci.org/nette/security.svg?branch=v2.3)](https://travis-ci.org/nette/security)
 
 - user login and logout
 - verifying user privileges
@@ -120,7 +120,7 @@ class MyAuthenticator extends Nette\Object implements NS\IAuthenticator
 			throw new NS\AuthenticationException('User not found.');
 		}
 
-		if ($row->password !== md5($password)) {
+		if (!NS\Passwords::verify($password, $row->password)) {
 			throw new NS\AuthenticationException('Invalid password.');
 		}
 
@@ -129,7 +129,7 @@ class MyAuthenticator extends Nette\Object implements NS\IAuthenticator
 }
 ```
 
-Class `MyAuthenticator` communicates with the database using [Nette\Database |database] layer and works with table `users`,  where it grabs `username` and md5 hash of `password` in the appropriate columns. If the password check is successful, it returns new identity with user ID and role, which we will mention [later | #roles];
+Class `MyAuthenticator` communicates with the database using [Nette\Database |database] layer and works with table `users`,  where it grabs `username` and hash of `password` in the appropriate columns. If the password check is successful, it returns new identity with user ID and role, which we will mention [later | #roles];
 
 This authenticator would be configured in the `config.neon` file like this:
 
@@ -263,11 +263,11 @@ $acl->addRole('administrator', 'registered'); // and administrator inherits from
 
 Trivial, isn't it? This ensures all the properties of the parents will be inheritted by their children.
 
-Do note the method `getRoleParents()`, which returns an array of all parent roles, and the method `roleIntheritsFrom()`, which checks whether a role extends another. Their usage:
+Do note the method `getRoleParents()`, which returns an array of all direct parent roles, and the method `roleIntheritsFrom()`, which checks whether a role extends another. Their usage:
 
 ```php
 $acl->roleInheritsFrom('administrator', 'guest'); // TRUE
-$acl->getRoleParents('administrator'); // array('guest', 'registered')
+$acl->getRoleParents('administrator'); // array('registered') - only direct parents
 ```
 
 Now is the right time to define the set of resources that the users may acccess:

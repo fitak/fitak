@@ -1,26 +1,24 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms\Controls;
 
-use Nette,
-	Nette\Utils\Html;
+use Nette;
+use Nette\Utils\Html;
 
 
 /**
  * Set of checkboxes.
  *
- * @author     David Grudl
- *
- * @property-read Nette\Utils\Html $separatorPrototype
+ * @property-read Html $separatorPrototype
  */
 class CheckboxList extends MultiChoiceControl
 {
-	/** @var Nette\Utils\Html  separator element template */
+	/** @var Html  separator element template */
 	protected $separator;
 
 
@@ -59,7 +57,7 @@ class CheckboxList extends MultiChoiceControl
 	/**
 	 * Generates label's HTML element.
 	 * @param  string
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
 	public function getLabel($caption = NULL)
 	{
@@ -69,7 +67,7 @@ class CheckboxList extends MultiChoiceControl
 
 	/**
 	 * Returns separator HTML element template.
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
 	public function getSeparatorPrototype()
 	{
@@ -78,10 +76,11 @@ class CheckboxList extends MultiChoiceControl
 
 
 	/**
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
 	public function getControlPart($key)
 	{
+		$key = key(array((string) $key => NULL));
 		return parent::getControl()->addAttributes(array(
 			'id' => $this->getHtmlId() . '-' . $key,
 			'checked' => in_array($key, (array) $this->value, TRUE),
@@ -93,11 +92,13 @@ class CheckboxList extends MultiChoiceControl
 
 
 	/**
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
-	public function getLabelPart($key)
+	public function getLabelPart($key = NULL)
 	{
-		return parent::getLabel($this->items[$key])->for($this->getHtmlId() . '-' . $key);
+		return func_num_args()
+			? parent::getLabel($this->items[$key])->for($this->getHtmlId() . '-' . $key)
+			: $this->getLabel();
 	}
 
 }

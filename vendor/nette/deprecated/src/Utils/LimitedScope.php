@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -37,7 +37,9 @@ class LimitedScope
 	{
 		trigger_error(__METHOD__ . '() is deprecated.', E_USER_DEPRECATED);
 		if (func_num_args() > 1) {
-			foreach (func_get_arg(1) as $__k => $__v) $$__k = $__v;
+			foreach (func_get_arg(1) as $__k => $__v) {
+				$$__k = $__v;
+			}
 			unset($__k, $__v);
 		}
 		$res = eval('?>' . func_get_arg(0));
@@ -58,7 +60,9 @@ class LimitedScope
 	{
 		trigger_error(__METHOD__ . '() is deprecated.', E_USER_DEPRECATED);
 		if (func_num_args() > 1 && is_array(func_get_arg(1))) {
-			foreach (func_get_arg(1) as $__k => $__v) $$__k = $__v;
+			foreach (func_get_arg(1) as $__k => $__v) {
+				$$__k = $__v;
+			}
 			unset($__k, $__v);
 		}
 		return include func_get_arg(0);

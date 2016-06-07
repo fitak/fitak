@@ -3,52 +3,48 @@
 	"type": "library",
 	"description": "Nette Framework - innovative framework for fast and easy development of secured web applications in PHP. Write less, have cleaner code and your work will bring you joy.",
 	"keywords": ["framework", "mvc", "debugging", "templating", "database", "forms", "mailing"],
-	"homepage": "http://nette.org",
+	"homepage": "https://nette.org",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
 			"name": "David Grudl",
-			"homepage": "http://davidgrudl.com"
+			"homepage": "https://davidgrudl.com"
 		},
 		{
 			"name": "Nette Community",
-			"homepage": "http://nette.org/contributors"
+			"homepage": "https://nette.org/contributors"
 		}
 	],
 	"require": {
-		"nette/application": ">=2.2.0",
-		"nette/bootstrap": ">=2.2.0",
-		"nette/caching": ">=2.2.0",
-		"nette/component-model": ">=2.2.0",
-		"nette/database": ">=2.2.0",
-		"nette/deprecated": ">=2.2.0",
-		"nette/di": ">=2.2.0",
-		"nette/finder": ">=2.2.0",
-		"nette/forms": ">=2.2.0",
-		"nette/http": ">=2.2.0",
-		"nette/mail": ">=2.2.0",
-		"nette/neon": ">=2.2.0",
-		"nette/php-generator": ">=2.2.0",
-		"nette/reflection": ">=2.2.0",
-		"nette/robot-loader": ">=2.2.0",
-		"nette/safe-stream": ">=2.2.0",
-		"nette/security": ">=2.2.0",
-		"nette/tokenizer": ">=2.2.0",
-		"nette/utils": ">=2.2.0",
-		"latte/latte": ">=2.2.0",
-		"tracy/tracy": ">=2.2.0"
-	},
-	"require-dev": {
-		"nette/tester": "~1.1"
+		"nette/application": "@dev",
+		"nette/bootstrap": "@dev",
+		"nette/caching": "@dev",
+		"nette/component-model": "@dev",
+		"nette/database": "@dev",
+		"nette/deprecated": "@dev",
+		"nette/di": "@dev",
+		"nette/finder": "@dev",
+		"nette/forms": "@dev",
+		"nette/http": "@dev",
+		"nette/mail": "@dev",
+		"nette/neon": "@dev",
+		"nette/php-generator": "@dev",
+		"nette/reflection": "@dev",
+		"nette/robot-loader": "@dev",
+		"nette/safe-stream": "@dev",
+		"nette/security": "@dev",
+		"nette/tokenizer": "@dev",
+		"nette/utils": "@dev",
+		"latte/latte": "@dev",
+		"tracy/tracy": "@dev"
 	},
 	"autoload": {
-		"classmap": ["Nette/"],
-		"files": ["Nette/loader.php"]
+		"classmap": ["Nette/"]
 	},
 	"minimum-stability": "dev",
 	"extra": {
 		"branch-alias": {
-			"dev-master": "2.3-dev"
+			"dev-master": "2.4-dev"
 		}
 	}
 }

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\DI\Extensions;
@@ -12,17 +12,18 @@ use Nette;
 
 /**
  * PHP directives definition.
- *
- * @author     David Grudl
  */
 class PhpExtension extends Nette\DI\CompilerExtension
 {
 
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
-		$initialize = $class->methods['initialize'];
+		$initialize = $class->getMethod('initialize');
 		foreach ($this->getConfig() as $name => $value) {
-			if (!is_scalar($value)) {
+			if ($value === NULL) {
+				continue;
+
+			} elseif (!is_scalar($value)) {
 				throw new Nette\InvalidStateException("Configuration value for directive '$name' is not scalar.");
 
 			} elseif ($name === 'include_path') {

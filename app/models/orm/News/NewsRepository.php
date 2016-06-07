@@ -2,14 +2,17 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
+use Nextras\Orm\Repository\Repository;
 
 
-/**
- * @method ICollection findRecent()
- */
-class NewsRepository extends Orm\Repository\Repository
+class NewsRepository extends Repository
 {
-
+	public function findRecent()
+	{
+		$newsInterval = new \DateTime('-2 week');
+		return $this->findAll()
+			->findBy(['this->created>=' => $newsInterval])
+			->orderBy('created', ICollection::DESC);
+	}
 }

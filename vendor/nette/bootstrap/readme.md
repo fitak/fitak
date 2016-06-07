@@ -2,7 +2,7 @@ Nette Bootstrap
 ===============
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/bootstrap.svg)](https://packagist.org/packages/nette/bootstrap)
-[![Build Status](https://travis-ci.org/nette/bootstrap.svg?branch=v2.2)](https://travis-ci.org/nette/bootstrap)
+[![Build Status](https://travis-ci.org/nette/bootstrap.svg?branch=v2.3)](https://travis-ci.org/nette/bootstrap)
 
 File `bootstrap.php` loads Nette Framework and all libraries that we depend on:
 
@@ -29,7 +29,7 @@ Setup directory for temporary files
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 ```
 
-Activate [autoloading](http://doc.nette.org/en/auto-loading#toc-nette-loaders-robotloader), that will automatically load all the files with our classes:
+Activate [autoloading](https://doc.nette.org/en/auto-loading#toc-nette-loaders-robotloader), that will automatically load all the files with our classes:
 
 ```php
 $configurator->createRobotLoader()

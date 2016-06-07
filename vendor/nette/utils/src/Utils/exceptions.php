@@ -1,13 +1,11 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette;
-
-use Nette;
 
 
 /**
@@ -113,5 +111,48 @@ class UnexpectedValueException extends \UnexpectedValueException
  * The exception that is thrown when static class is instantiated.
  */
 class StaticClassException extends \LogicException
+{
+}
+
+
+namespace Nette\Utils;
+
+
+/**
+ * The exception that is thrown when an image error occurs.
+ */
+class ImageException extends \Exception
+{
+}
+
+
+/**
+ * The exception that indicates invalid image file.
+ */
+class UnknownImageFileException extends ImageException
+{
+}
+
+
+/**
+ * The exception that indicates error of JSON encoding/decoding.
+ */
+class JsonException extends \Exception
+{
+}
+
+
+/**
+ * The exception that indicates error of the last Regexp execution.
+ */
+class RegexpException extends \Exception
+{
+}
+
+
+/**
+ * The exception that indicates assertion error.
+ */
+class AssertionException extends \Exception
 {
 }

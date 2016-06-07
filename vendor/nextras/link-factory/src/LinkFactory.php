@@ -14,14 +14,18 @@ class LinkFactory extends Nette\Object
 	/** @var Nette\Application\IRouter */
 	private $router;
 
-	/** @var Nette\Http\IRequest */
-	private $httpRequest;
+	/** @var Nette\Http\UrlScript */
+	private $refUrl;
+
+	/** @var string */
+	private $refUrlHost;
 
 
 	public function __construct(Nette\Application\IRouter $router, Nette\Http\IRequest $httpRequest)
 	{
 		$this->router = $router;
-		$this->httpRequest = $httpRequest;
+		$this->refUrl = $httpRequest->getUrl();
+		$this->refUrlHost = $this->refUrl->getHostUrl();
 	}
 
 
@@ -36,8 +40,9 @@ class LinkFactory extends Nette\Object
 	 * @param  string 'Presenter:action' (creates relative link) or '//Presenter:action' (creates absolute link)
 	 * @param  array
 	 * @return string
+	 * @throws InvalidLinkException if router returns NULL
 	 */
-	public function link($destination, array $params = [])
+	public function link($destination, array $params = array())
 	{
 		if (($pos = strrpos($destination, '#')) !== FALSE) {
 			$fragment = substr($destination, $pos);
@@ -53,20 +58,32 @@ class LinkFactory extends Nette\Object
 			$absoluteUrl = FALSE;
 		}
 
-		list($presenter, $action) = explode(':', $destination);
-		$params['action'] = $action;
-		$request = new Nette\Application\Request($presenter, 'GET', $params);
-		$refUrl = $this->httpRequest->getUrl();
-		$url = $this->router->constructUrl($request, $refUrl);
-
-		if (!$absoluteUrl) {
-			$hostUrl = $refUrl->getHostUrl();
-			if (strncmp($url, $hostUrl, strlen($hostUrl)) === 0) {
-				$url = substr($url, strlen($hostUrl));
-			}
+		$pos = strrpos($destination, ':');
+		$presenter = substr($destination, 0, $pos);
+		if ($pos + 1 < strlen($destination)) {
+			$params['action'] = substr($destination, $pos + 1);
 		}
 
-		return $url . $fragment;
+		$request = new Nette\Application\Request($presenter, 'GET', $params);
+		$url = $this->router->constructUrl($request, $this->refUrl);
+		if ($url === NULL) {
+			throw new InvalidLinkException("Router failed to create link to '$destination'.");
+		}
+
+		if (!$absoluteUrl && strncmp($url, $this->refUrlHost, strlen($this->refUrlHost)) === 0) {
+			$url = substr($url, strlen($this->refUrlHost));
+		}
+
+		if ($fragment) {
+			$url .= $fragment;
+		}
+
+		return $url;
 	}
+
+}
+
+class InvalidLinkException extends \LogicException
+{
 
 }

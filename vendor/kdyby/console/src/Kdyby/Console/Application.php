@@ -14,7 +14,9 @@ use Kdyby;
 use Nette;
 use Symfony;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,6 +32,7 @@ class Application extends Symfony\Component\Console\Application
 {
 
 	const INPUT_ERROR_EXIT_CODE = 253;
+	const INVALID_APP_MODE_EXIT_CODE = 252;
 
 	/**
 	 * @var Nette\DI\Container
@@ -42,9 +45,9 @@ class Application extends Symfony\Component\Console\Application
 	 * @param string $name
 	 * @param string $version
 	 */
-	public function __construct($name = Nette\Framework::NAME, $version = Nette\Framework::VERSION)
+	public function __construct($name = 'Nette Framework', $version = NULL)
 	{
-		parent::__construct($name, $version);
+		parent::__construct($name, $version ?: (class_exists('Nette\Framework') ? Nette\Framework::VERSION : 'UNKNOWN'));
 
 		$this->setCatchExceptions(FALSE);
 		$this->setAutoExit(FALSE);
@@ -79,7 +82,31 @@ class Application extends Symfony\Component\Console\Application
 	 */
 	public function run(InputInterface $input = NULL, OutputInterface $output = NULL)
 	{
-		$output = $output ? : new ConsoleOutput();
+		$input = $input ?: new ArgvInput();
+		$output = $output ?: new ConsoleOutput();
+
+		if ($input->hasParameterOption('--debug-mode')) {
+			if ($input->hasParameterOption(array('--debug-mode=no', '--debug-mode=off', '--debug-mode=false', '--debug-mode=0'))) {
+				if ($this->serviceLocator->parameters['debugMode']) {
+					$this->renderException(new InvalidApplicationModeException(
+						"The app is running in debug mode. You have to use Kdyby\\Console\\DI\\BootstrapHelper in app/bootstrap.php, " .
+						"Kdyby\\Console cannot switch already running app to production mode . "
+					), $output);
+
+					return self::INVALID_APP_MODE_EXIT_CODE;
+				}
+
+			} else {
+				if (!$this->serviceLocator->parameters['debugMode']) {
+					$this->renderException(new InvalidApplicationModeException(
+						"The app is running in production mode. You have to use Kdyby\\Console\\DI\\BootstrapHelper in app/bootstrap.php, " .
+						"Kdyby\\Console cannot switch already running app to debug mode."
+					), $output);
+
+					return self::INVALID_APP_MODE_EXIT_CODE;
+				}
+			}
+		}
 
 		try {
 			return parent::run($input, $output);
@@ -93,11 +120,10 @@ class Application extends Symfony\Component\Console\Application
 
 		} catch (\Exception $e) {
 			if (in_array(get_class($e), array('RuntimeException', 'InvalidArgumentException'), TRUE)
-				&& preg_match('/^(The "-?-?.+" (option|argument) (does not (exist|accept a value)|requires a value)|(Not enough|Too many) arguments)\.$/', $e->getMessage()) === 1
+				&& preg_match('/^(The "-?-?.+" (option|argument) (does not (exist|accept a value)|requires a value)|(Not enough|Too many) arguments.*)\.$/', $e->getMessage()) === 1
 			) {
 				$this->renderException($e, $output);
 				Debugger::log($e->getMessage(), Debugger::ERROR);
-
 				return self::INPUT_ERROR_EXIT_CODE;
 
 			} elseif ($app = $this->serviceLocator->getByType('Nette\Application\Application', FALSE)) {
@@ -108,13 +134,17 @@ class Application extends Symfony\Component\Console\Application
 				$this->handleException($e, $output);
 			}
 
-			return max(min((int) $e->getCode(), 254), 254);
+			return max(min((int) $e->getCode(), 254), 1);
 		}
 	}
 
 
 
-	public function handleException(\Exception $e, OutputInterface $output = NULL)
+	/**
+	 * @param \Exception|\Throwable $e
+	 * @param OutputInterface|NULL $output
+	 */
+	public function handleException($e, OutputInterface $output = NULL)
 	{
 		$output = $output ? : new ConsoleOutput();
 		$this->renderException($e, $output);
@@ -124,6 +154,10 @@ class Application extends Symfony\Component\Console\Application
 			$output->writeln('');
 
 			if (Debugger::$browser) {
+				if (!file_exists($file)) {
+					$file = Debugger::$logDirectory . '/' . $file;
+				}
+
 				exec(Debugger::$browser . ' ' . escapeshellarg($file));
 			}
 		}
@@ -150,6 +184,16 @@ class Application extends Symfony\Component\Console\Application
 		}
 
 		return parent::doRunCommand($command, $input, $output);
+	}
+
+
+
+	protected function getDefaultInputDefinition()
+	{
+		$definition = parent::getDefaultInputDefinition();
+		$definition->addOption(new InputOption('--debug-mode', NULL, InputOption::VALUE_OPTIONAL, 'Run the application in debug mode?'));
+
+		return $definition;
 	}
 
 }

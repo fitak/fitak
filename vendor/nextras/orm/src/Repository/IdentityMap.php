@@ -1,22 +1,17 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
+ * This file is part of the Nextras\Orm library.
  * This file was inspired by PetrP's ORM library https://github.com/PetrP/Orm/.
- *
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Repository;
 
 use Nette\Object;
 use Nette\Reflection\ClassType;
-use Nextras\Orm\DI\EntityDependencyProvider;
 use Nextras\Orm\Entity\IEntity;
-use Nextras\Orm\Entity\Reflection\EntityMetadata;
-use Nextras\Orm\Model\MetadataStorage;
 use Nextras\Orm\StorageReflection\IStorageReflection;
 use Nextras\Orm\InvalidArgumentException;
 
@@ -26,11 +21,8 @@ class IdentityMap extends Object
 	/** @var IRepository */
 	private $repository;
 
-	/** @var array */
+	/** @var array of IEntity|bool */
 	private $entities = [];
-
-	/** @var array */
-	private $newEntities = [];
 
 	/** @var IStorageReflection cached instance */
 	private $storageReflection;
@@ -41,14 +33,11 @@ class IdentityMap extends Object
 	/** @var ClassType[] */
 	private $entityReflections;
 
-	/** @var EntityMetadata[] */
-	private $entityMetadata;
-
-	/** @var EntityDependencyProvider */
+	/** @var IDependencyProvider */
 	private $dependencyProvider;
 
 
-	public function __construct(IRepository $repository, EntityDependencyProvider $dependencyProvider = NULL)
+	public function __construct(IRepository $repository, IDependencyProvider $dependencyProvider = NULL)
 	{
 		$this->repository = $repository;
 		$this->dependencyProvider = $dependencyProvider;
@@ -72,31 +61,15 @@ class IdentityMap extends Object
 	}
 
 
-	public function add($id, IEntity $entity)
+	public function add(IEntity $entity)
 	{
-		$this->entities[implode(',', (array) $id)] = $entity;
+		$this->entities[implode(',', (array) $entity->getPersistedId())] = $entity;
 	}
 
 
 	public function remove($id)
 	{
 		$this->entities[implode(',', (array) $id)] = FALSE;
-	}
-
-
-	public function attach(IEntity $entity)
-	{
-		$this->newEntities[spl_object_hash($entity)] = $entity;
-		$entity->fireEvent('onAttach', [$this->repository, MetadataStorage::get(get_class($entity))]);
-		if ($this->dependencyProvider) {
-			$this->dependencyProvider->injectDependencies($entity);
-		}
-	}
-
-
-	public function detach(IEntity $entity)
-	{
-		unset($this->newEntities[spl_object_hash($entity)]);
 	}
 
 
@@ -107,34 +80,15 @@ class IdentityMap extends Object
 			$this->storagePrimaryKey = (array) $this->storageReflection->getStoragePrimaryKey();
 		}
 
-		$id = [];
-		foreach ($this->storagePrimaryKey as $key) {
-			if (!isset($data[$key])) {
-				throw new InvalidArgumentException("Data returned from storage does not contain primary value(s) for '$key' key.");
-			}
-			$id[] = $data[$key];
-		}
-		$id = implode(',', $id);
+		$entity = $this->createEntity($data);
+		$id = implode(',', (array) $entity->getPersistedId());
 
-		if (isset($this->entities[$id]) && $this->entities[$id]) {
-			return $this->entities[$id];
+		if (isset($this->entities[$id])) {
+			$this->repository->detach($entity);
+			return $this->entities[$id] ?: NULL;
 		}
 
-		$data = $this->storageReflection->convertStorageToEntity($data);
-		$entityClass = $this->repository->getEntityClassName($data);
-
-		if (!isset($this->entityReflections[$entityClass])) {
-			$this->entityReflections[$entityClass] = ClassType::from($entityClass);
-			$this->entityMetadata[$entityClass] = MetadataStorage::get($entityClass);
-		}
-
-		/** @var $entity IEntity */
-		$entity = $this->entities[$id] = $this->entityReflections[$entityClass]->newInstanceWithoutConstructor();
-		$entity->fireEvent('onLoad', [$this->repository, $this->entityMetadata[$entityClass], $data]);
-		if ($this->dependencyProvider) {
-			$this->dependencyProvider->injectDependencies($entity);
-		}
-		return $entity;
+		return $this->entities[$id] = $entity; // = intentionally
 	}
 
 
@@ -147,15 +101,6 @@ class IdentityMap extends Object
 	}
 
 
-	/**
-	 * @return IEntity[]
-	 */
-	public function getAllNew()
-	{
-		return array_values($this->newEntities);
-	}
-
-
 	public function check(IEntity $entity)
 	{
 		if (!in_array(get_class($entity), $this->repository->getEntityClassNames(), TRUE)) {
@@ -164,17 +109,36 @@ class IdentityMap extends Object
 	}
 
 
-	/**
-	 * @param  string   $class
-	 * @return EntityMetadata
-	 */
-	public function getEntityMetadata($class)
+	public function destroyAllEntities()
 	{
-		if (!isset($this->entityMetadata[$class])) {
-			$this->entityMetadata[$class] = MetadataStorage::get($class);
+		foreach ($this->entities as $entity) {
+			if ($entity) {
+				$this->repository->detach($entity);
+				$entity->fireEvent('onFree');
+			}
 		}
 
-		return $this->entityMetadata[$class];
+		$this->entities = [];
+	}
+
+
+	/**
+	 * @param  array
+	 * @return IEntity
+	 */
+	protected function createEntity(array $data)
+	{
+		$data = $this->storageReflection->convertStorageToEntity($data);
+		$entityClass = $this->repository->getEntityClassName($data);
+
+		if (!isset($this->entityReflections[$entityClass])) {
+			$this->entityReflections[$entityClass] = ClassType::from($entityClass);
+		}
+
+		$entity = $this->entityReflections[$entityClass]->newInstanceWithoutConstructor();
+		$this->repository->attach($entity);
+		$entity->fireEvent('onLoad', [$data]);
+		return $entity;
 	}
 
 }

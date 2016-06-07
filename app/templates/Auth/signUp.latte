@@ -1,7 +1,68 @@
 {block content}
-
+<div class="centered-simple-container">
 	<h2>Registrace</h2>
 
 	{control signUpForm}
+<div id="fb-root"></div>
+    <script id="fb">
+        "use strict";
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '367333170127666',
+                //channelUrl: 'http://localhost/fitak-dev/www/',
+                version: 'v2.3',
+                status: true,
+                cookie: true,
+                xfbml: true
+            });
+        };
 
+        (function(d){
+           var js,id = 'facebook-jssdk', ref=d.getElementById("fb");
+           if (d.getElementById(id)) { return; }
+           js = d.createElement('script'); js.id=id; js.async=true;
+           js.src="//connect.facebook.com/en_US/sdk.js";
+           ref.parentNode.insertBefore(js, ref);
+        })(document);
+
+        var fbData = {};
+
+        function retrieveData(response) {
+			fbData.accessToken = response.authResponse.accessToken;
+			fbData.fbId = response.authResponse.userID;
+			FB.api('/me', { fields: 'name, picture' }, function(userData) {
+				fbData.name = userData.name;
+				fbData.profilePicture = userData.picture.data.url;
+			});
+
+			console.log(fbData);
+			$.post({link facebookLogin!}, fbData,
+				function(r) {
+					$('#fbId').val(fbData.fbId);
+					$('#fbAccessToken').val(fbData.accessToken);
+					$('#name').val(fbData.name);
+					$('#profilePicture').val(fbData.profilePicture);
+					alert('Získána uživatelská data z FB.');
+				}).fail(function() {
+					alert("Something went wrong.");
+				});
+        }
+
+        function statusChangeCallback(response) {
+            if (response.status === 'connected') {
+				retrieveData(response);
+            } else if (response.status === 'not_authorized') {
+                alert('Please log into this app.');
+            } else {
+            	alert('Not logged to Facebook.');
+            }
+        }
+
+        function checkLoginState(){
+        	FB.login(function(response){
+				 statusChangeCallback(response);
+			 }, { scope: 'user_groups, publish_actions' });
+        }
+    </script>
+</div>
 {/block}

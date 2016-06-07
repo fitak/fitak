@@ -1,97 +1,224 @@
-{define #comment}
-    {default $marked = $comment->marked}
-    <div n:class="$marked ? 'comment-marked' : 'comment'">
-        <div class="row header">
-            <div class="col-xs-3">
-	            <strong>Od:</strong>
-	            {if $comment->topic->group_closed}
-	                Skryto
-	            {else}
-	                <a href="https://www.facebook.com/profile.php?id={$comment->from_id}">{$comment->from_name}</a>
-	            {/if}
-	        </div>
-
-            <div class="col-xs-3">
-	            <strong>Kdy:</strong>
-	            <a href="https://www.facebook.com/groups/{$comment->group_id}/permalink/{$comment->parent_id}/?comment_id={$comment->id}">{$comment->created_time|date: "j.n.Y G:i:s"}</a>
-            </div>
-        </div>
-
-        <div class="row message">
-            {$topics->getHighlight($comment)|noescape|highlight|nl2br|urlsToLinks}
-        </div>
-    </div>
+{define #post-menu}
+    <ul class="dropdown menu" data-dropdown-menu data-disable-hover='true' data-click-open = 'true' data-close-on-click='true'>
+        <li>
+            <a href="#"><i class="fa fa-chevron-down"></i></a>
+            {if $user->admin}
+            <ul class="vertical menu">
+                <li><a n:href="delete!, $entry->id">Smazat</a></li>
+            </ul>
+            {/if}
+        </li>
+    </ul>
 {/define}
 
-{control paginator}
+{define #replies-container}
+                        <div n:class="replies-container">
+                            <button class="show-replies"><i class="fa fa-chevron-down"></i>
+                                Zobrazit {$entry->isTypeQa ? komentáře : 'reakce'} [{count($entry->children)}] <i class="fa fa-chevron-down"></i>
+                            </button>
+                            <button class="hide-replies" style="display: none;"><i class="fa fa-chevron-up"></i>
+                                Skrýt {$entry->isTypeQa ? komentáře : 'reakce'} [{count($entry->children)}] <i class="fa fa-chevron-up"></i></button>
 
-<div n:foreach="$topics as $topic" class="topic">
-    <div class="row header">
-	    <div class="col-xs-3">
-	        <strong>Od:</strong>
-	        {if $topic->group_closed}
-	            Skryto
-	        {else}
-	            <a href="https://www.facebook.com/profile.php?id={$topic->from_id}">{$topic->from_name}</a>
-	        {/if}
-        </div>
+                            <div class="replies" style="display: none;">
+								{default $anyMarked = false}
+                                                        {foreach $entry->children as $reply}
+                                                            {include #comment, entry => $reply, type => "reply"}
+                                                            {if $marked}
+                                                                {var $anyMarked = true}
+                                                            {/if}
+                                                        {/foreach}
+                            <div class="reply">
+                                <div class="profile-picture">
+                                    <img src="{$user->profilePicture}">
 
-        <div class="col-xs-3">
-	        <strong>Kdy:</strong>
-	        <a href="https://www.facebook.com/groups/{$topic->group_id}/permalink/{$topic->id}">{$topic->created_time|date: "j.n.Y G:i:s"}</a>
-        </div>
+                                </div>
+                                <div class="reply-body">
+									{if $entry->isTypeQa}
+										{form commentForm}
+	                                        {input message}
+	                                        {input parent_id, value => $entry->id}
+	                                    {/form}
+                                    {else}
+                                        {form replyForm}
+                                            {input message}
+                                            {input parent_id, value => $entry->id}
+                                        {/form}
+                                    {/if}
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+{/define}
 
-        <div class="col-xs-6 hidden-sm">
-		    <strong>Zdroj:</strong>
-		    <a href="http://www.facebook.com/groups/{$topic->group_id}" title="{$topic->group_name}">{$topic->group_name|truncate:45}</a>
-        </div>
+{define #comment}
+<div n:class="$type == 'reply' ? reply : comment">
+    <div class="profile-picture">
+        {if $entry->user->profilePicture}
+                                    <img src="{$entry->user->profilePicture}">
+                                {else}
+                                    <img src="{$basePath}/img/anonymous_user.gif">
+                                {/if}
     </div>
+    <div class="comment-body">
+        <p><span class="author">{$entry->user->name}</span>{$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+        </p>
+        <ul class="extra-line">
+            <li>
+                <a n:href="vote!, $entry->id, 0" n:class="$entry->currentUserVote == 1 ? active">
+                    <i class="fa fa-thumbs-o-up"></i>
+                </a>
+            </li>
+            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
+            <li>
+                <a n:href="vote!, $entry->id, 1" n:class="$entry->currentUserVote == -1 ? active">
+                    <i class="fa fa-thumbs-o-down fa-flip-horizontal"></i>
+                </a>
+            </li>
+            <li><span class="divider">•</span></li>
+            <li><span class="date">{$entry->createdTime|date: "j.n.Y G:i"}</span></li>
+        </ul>
+        {if $type != 'reply'}
+            {include #replies-container}
+        {/if}
 
-    <div class="row message">
-        <a n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag">
-            <span class="label label-info">{$tag}</span>
-		</a>
-        {$topics->getHighlight($topic)|noescape|highlight|nl2br|urlsToLinks}
-
-		<blockquote n:tag-if="$topic->name" style="margin-top:15px">
-			<strong n:if="$topic->name">
-				{$topic->name}
-			</strong>
-			<a n:tag-if="$topic->link" href="{$topic->link}">
-				{if $topic->description}
-		            <br /><small>{$topic->description}</small>
-		        {/if}
-		        {if $topic->picture}
-		            <br /><img src="{$topic->picture}" title="{$topic->name}" />
-		        {/if}
-			</a>
-		</blockquote>
     </div>
-
-    <div class="comments">
-	    {default $anyMarked = false}
-		{foreach $topic->comments as $comment}
-		    {include #comment, $comment}
-		    {if $comment->marked}
-			    {var $anyMarked = true}
-		    {/if}
-		{/foreach}
+    <div class="post-menu comment-menu">
+        {include #post-menu}
     </div>
-
-    {if count($topic->comments)}
-        <span class="show-comments">
-            <button class="btn btn-small btn-success">
-                <i class="icon-comment"></i>
-                Zobrazit {if $anyMarked}všechny{/if} komentáře ({count($topic->comments)})
-            </button>
-        </span>
-	    <span class="hide-comments">
-	        <button class="btn btn-small btn-warning">
-	            <i class="icon-comment"></i>
-	            Skrýt {if $anyMarked}ostatní{/if} komentáře ({count($topic->comments)})
-	        </button>
-        </span>
-    {/if}
 </div>
+{/define}
 
-{control paginator}
+{define #entry}
+<div n:class="$type == 'post' ? 'post', $type == 'comment' ? 'comment', $type == 'reply' ? 'reply', $type == 'answer' ? 'answer'">
+                <div class="header-row">
+                    <div class="left-part">
+                        <div class="profile-picture">
+                        {if $entry->user->profilePicture}
+                            <img src="{$entry->user->profilePicture}">
+                        {else}
+                            <img src="{$basePath}/img/anonymous_user.gif">
+                        {/if}
+                        </div>
+                        <div class="name-date">
+                            <a class="username">{$entry->user->name}</a>
+                            <a class="date">{$entry->createdTime|date: "j.n.Y G:i"}</a>
+                        </div>
+                    </div>
+                    <div class="right-part">
+                        <div class="fb-group">
+                    {if $type == 'post'}
+                        {if $entry->group}
+                            <a href="#"><i class="fa fa-facebook-official"></i>{$entry->group->name|truncate:45}
+                            </a>
+                        {else}
+                           <i class="fa fa-rocket"></i>Pouze na Fiťák.cz
+	                    {/if}
+                    {/if}
+                        </div>
+                        <div class="post-menu">
+							{include #post-menu}
+                        </div>
+                    </div>
+                </div>
+                <div class="post-body">
+                    <div class="votes-part">
+                        <ul>
+                            <li>
+                                <a n:href="vote!, $entry->id, 0" n:class="$entry->currentUserVote == 1 ? active">
+                                    <i n:class="fa, $entry->isTypeQa ? fa-chevron-up : fa-thumbs-o-up"></i>
+                                </a>
+                            </li>
+                            <li><span class="votes-cnt">{$entry->votesCnt}</span></li>
+                            <li>
+                                <a n:href="vote!, $entry->id, 1" n:class="$entry->currentUserVote == -1 ? active">
+                                    <i n:class="fa, $entry->isTypeQa ? fa-chevron-down : fa-thumbs-o-down, fa-flip-horizontal"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="post-message">
+                        <p>
+                        <a class="label" n:if="$type == 'post'" n:foreach="$topic->tags as $tag" n:href="this, s => 'tag:' . $tag->name">{$tag->name}</a>
+                        {$topics->getHighlight($entry)|noescape|highlight|nl2br|urlsToLinks}
+                            </p>
+                            <blockquote n:tag-if="$entry->name" style="margin-top:15px">
+                                            <strong n:if="$entry->name">{$entry->name}</strong>
+                                            <a n:tag-if="$entry->link" href="{$entry->link}">
+                                                {if $entry->description}
+                                                    <br><small>{$entry->description}</small>
+                                                {/if}
+                                                {if $entry->picture}
+                                                    <br><img src="{$entry->picture}" title="{$entry->name}">
+                                                {/if}
+                                            </a>
+                                        </blockquote>
+                         {if $type == "answer"}
+                            {include #replies-container}
+                         {/if}
+                    </div>
+                </div>
+            </div>
+            {if $type == "post"}
+            <div n:class="$entry->isTypeQa ? hiding-answers : hiding-comments">
+                <button n:class="$entry->isTypeQa ? hide-answers : hide-comments"><i class="fa fa-caret-up"></i>skrýt {$entry->isTypeQa ? odpovědi : komentáře} [{count($entry->children)}]<i class="fa fa-caret-up"></i></button>
+                <button n:class="$entry->isTypeQa ? show-answers : show-comments"><i class="fa fa-caret-down"></i>zobrazit {$entry->isTypeQa ? odpovědi : komentáře} [{count($entry->children)}]<i class="fa fa-caret-down"></i></button>
+            </div>
+			{/if}
+			{if $type == "post"}
+            <div class="comments" n:tag-if="!$entry->isTypeQa">
+               {default $anyMarked = false}
+               {if $entry}
+                    {if $type == "post"}
+                        {if $entry->isTypeQa}
+                           {foreach $entry->sortedAnswers as $reply}
+                               {include #entry, entry => $reply, type => "answer"}
+                               {if $marked}
+                                   {var $anyMarked = true}
+                               {/if}
+                           {/foreach}
+                       {else}
+                            {foreach $entry->children as $comment}
+                                {include #comment, entry => $comment, type => "comment"}
+                                {if $marked}
+                                    {var $anyMarked = true}
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    {/if}
+
+				{if $entry->isTypeQa}
+					<div class="answer write-answer">
+						{form answerForm}
+							{input message}
+							{input parent_id, value => $entry->id}
+	                        <button n:name="send" class="button">Odeslat odpověď</button>
+                        {/form}
+                    </div>
+				{else}
+                <div class="comment">
+
+                    <div class="profile-picture">
+                        <img src="{$user->profilePicture}">
+                    </div>
+                    <div class="comment-body">
+                    {form commentForm}
+                        {input message}
+                        {input parent_id, value => $entry->id}
+                    {/form}
+                    </div>
+
+                </div>
+                {/if}
+                {/if}
+            </div>
+            {/if}
+{/define}
+{define #post}
+        <div n:class="post-container, $entry->isTypeQa ? qa-post : fb-post">
+            {include #entry, entry => $topic, type => "post"}
+        </div>
+{/define}
+{dump}
+{foreach $topics->topics as $topic}
+    {include #post, entry => $topic}
+{/foreach}

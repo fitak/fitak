@@ -1,0 +1,1 @@
+ALTER TABLE `data`ADD COLUMN `is_type_qa`  bit(1) NOT NULL DEFAULT 0 AFTER `user`;

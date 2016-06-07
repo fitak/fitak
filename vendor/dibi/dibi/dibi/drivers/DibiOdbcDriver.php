@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -17,7 +17,6 @@
  *   - resource (resource) => existing connection resource
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiOdbcDriver extends DibiObject implements IDibiDriver, IDibiResultDriver, IDibiReflector
@@ -290,7 +289,7 @@ class DibiOdbcDriver extends DibiObject implements IDibiDriver, IDibiResultDrive
 	{
 		// offset support is missing
 		if ($limit >= 0) {
-			$sql = 'SELECT TOP ' . (int) $limit . ' * FROM (' . $sql . ')';
+			$sql = 'SELECT TOP ' . (int) $limit . ' * FROM (' . $sql . ') t';
 		}
 
 		if ($offset) {
@@ -339,7 +338,9 @@ class DibiOdbcDriver extends DibiObject implements IDibiDriver, IDibiResultDrive
 			}
 			$count = odbc_num_fields($set);
 			$cols = array();
-			for ($i = 1; $i <= $count; $i++) $cols[] = odbc_result($set, $i);
+			for ($i = 1; $i <= $count; $i++) {
+				$cols[] = odbc_result($set, $i);
+			}
 			return $cols;
 		}
 	}
@@ -347,8 +348,8 @@ class DibiOdbcDriver extends DibiObject implements IDibiDriver, IDibiResultDrive
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 */
 	public function seek($row)
 	{
@@ -378,10 +379,10 @@ class DibiOdbcDriver extends DibiObject implements IDibiDriver, IDibiResultDrive
 		$columns = array();
 		for ($i = 1; $i <= $count; $i++) {
 			$columns[] = array(
-				'name'      => odbc_field_name($this->resultSet, $i),
-				'table'     => NULL,
-				'fullname'  => odbc_field_name($this->resultSet, $i),
-				'nativetype'=> odbc_field_type($this->resultSet, $i),
+				'name' => odbc_field_name($this->resultSet, $i),
+				'table' => NULL,
+				'fullname' => odbc_field_name($this->resultSet, $i),
+				'nativetype' => odbc_field_type($this->resultSet, $i),
 			);
 		}
 		return $columns;

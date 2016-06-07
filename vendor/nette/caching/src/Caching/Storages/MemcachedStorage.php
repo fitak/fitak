@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching\Storages;
 
-use Nette,
-	Nette\Caching\Cache;
+use Nette;
+use Nette\Caching\Cache;
 
 
 /**
  * Memcached storage.
- *
- * @author     David Grudl
  */
 class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 {
@@ -83,7 +81,7 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 	 */
 	public function read($key)
 	{
-		$key = $this->prefix . $key;
+		$key = urlencode($this->prefix . $key);
 		$meta = $this->memcache->get($key);
 		if (!$meta) {
 			return NULL;
@@ -133,10 +131,10 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 			throw new Nette\NotSupportedException('Dependent items are not supported by MemcachedStorage.');
 		}
 
-		$key = $this->prefix . $key;
-		$meta = array(
+		$key = urlencode($this->prefix . $key);
+		$meta = [
 			self::META_DATA => $data,
-		);
+		];
 
 		$expire = 0;
 		if (isset($dp[Cache::EXPIRATION])) {
@@ -168,7 +166,7 @@ class MemcachedStorage extends Nette\Object implements Nette\Caching\IStorage
 	 */
 	public function remove($key)
 	{
-		$this->memcache->delete($this->prefix . $key, 0);
+		$this->memcache->delete(urlencode($this->prefix . $key), 0);
 	}
 
 

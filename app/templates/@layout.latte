@@ -1,70 +1,109 @@
-<!DOCTYPE html>
-<html>
-<head itemscope itemtype="http://schema.org/Organization">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta name="description" content="Fiťák.cz archivátor facebook skupin">
-	<meta name="robots" content="{$robots}" n:ifset="$robots">
-	<meta itemprop="name" content="Fiťák.cz">
-	<meta itemprop="description" content="Archivace školních facebook skupin pro studenty FIT ČVUT.">
+{define #save-search}
+<span class="save-search">
+	<ul class="dropdown menu" data-dropdown-menu data-disable-hover='true' data-click-open = 'true' data-close-on-click='true'>
+        <li>
+            <i id="save-search" class="fa fa-star"></i>
+            <ul class="vertical menu">
+                <li>
+                {control saveSearchForm}
+                </li>
+            </ul>
+        </li>
+    </ul>
+</span>
+{/define}
 
+
+{define #top-bar}
+<div id="top-bar">
+	<div id="top-bar-content">
+
+		<div id="logo">
+			<a n:href="Homepage:"><img src="{$basePath}/img/logo-new.png"></a>
+		</div>
+
+
+		<div id="search">
+
+			<div class="input-group">
+			{include #save-search}
+			{form searchForm}
+				{input s}
+
+				<div class="input-group-button">
+					<button n:name="send" class="button" type="submit"><i class="fa fa-search"></i>
+					</button>
+					<div class="advanced-search" style="display:none">
+						{input limit}
+						{input from}
+						{input groups}
+					</div>
+				</div>
+			{/form}
+			</div>
+		</div>
+
+
+
+		<div id="user-profile">
+			<a n:href="User:">
+				<ul>
+					<li class="profile-picture">
+						<img src="{$user->profilePicture}">
+					</li>
+					<li class="username">{$user->name}</li>
+				</ul>
+			</a>
+		</div>
+
+		<nav>
+			<ul id="dropdown-menu" class="dropdown menu">
+				<li>
+					<a href="#"><i class="fa fa-caret-down"></i></a>
+					<ul id="dropdown-submenu" class="vertical menu">
+						{*<li><a n:href="Help:">Nápověda</a></li>*}
+						<li><a n:href="About:">O webu</a></li>
+						{*<li><a href="#">Nahlásit problém</a></li>*}
+						<hr>
+						<li><a n:href="Homepage:">Zpět na hlavní stránku</a></li>
+						<li><a n:href="User:">Uživatelské nastavení</a></li>
+						{if $user->admin}
+						<li><a n:href="Admin:">Administrace</a></li>
+						{/if}
+						<li><a n:href="Auth:SignOut">Odhlásit se</a></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+
+	</div>
+</div>
+{/define}
+
+<!doctype html>
+<html lang="cs">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Fiťák.cz</title>
-
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="{asset compiled.css}" type="text/css">
+	<link rel="stylesheet" href="{$basePath}/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{$basePath}/css/app.css">
 	<link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
-	<div class="navbar navbar-inverse navbar-fixed-top navbg" role="navigation">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" n:href="Homepage:">Fiťák.cz</a>
-			</div>
-			<div class="collapse navbar-collapse" id="navbar-collapse">
-				<ul class="nav navbar-nav">
-					<li n:class="dropdown, $presenter->islinkCurrent('Search:*') ? active">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-							Stream <span class="caret"></span>
-						</a>
-						<ul class="dropdown-menu" role="menu">
-							<li><a n:href="Search:">Vše</a></li>
-							<li n:foreach="$groupList as $group">
-								<a n:href="Search: 'groups[]' => $group->id, 'streamView' => 'true'">{$group->name}</a>
-							</li>
-						</ul>
-					</li>
-					<li n:class="$presenter->islinkCurrent('About:*') ? active"><a n:href="About:">O webu</a></li>
-					<li n:class="$presenter->islinkCurrent('User:*') ? active"><a n:href="User:">Uzivatel</a></li>
-                    <li><a href="https://github.com/fitak">GitHub</a></li>
-					<li><a href="https://www.facebook.com/fitakcz">Facebook</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
 
-	<div class="container">
-		<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			{$flash->message}
-		</div>
-		{include #content}
-	</div>
+{if $user}
+	{include #top-bar}
+{/if}
 
-	<script src="{asset compiled.js}"></script>
-	<script n:syntax="off">
-		(function(i,s,o,g,r,a,m){ i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<div id="page-wrapper">
+    {include #content}
+</div>
 
-		ga('create', 'UA-33198159-1', 'auto');
-		ga('send', 'pageview');
-	</script>
+<script src="{$basePath}/js/libs/jquery-2.1.4.min.js"></script>
+<script src="{$basePath}/js/libs/foundation.min.js"></script>
+<script src="{$basePath}/js/app.js"></script>
 
 </body>
 </html>

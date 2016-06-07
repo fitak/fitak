@@ -1,0 +1,124 @@
+Collection
+##########
+
+Each entity selection is returned as a `Nextras\Orm\Collection\ICollection` instance. `ICollection` implements `\Traversable` interface and allows you to work with entity list with additional api.
+
+/--div .[advice]
+In Orm, we use coding standard which assumes, that
+- `get*` methods return IEntity instance or NULL,
+- `find*` methods return ICollection instance.
+\--
+<br>
+
+All methods, which modify collection, treat the collection as **immutable** and return new `ICollection` instance. Available methods:
+
+- `findBy(array $conds)` - applies another filtering,
+- `getBy(array $conds)` - applies another filtering and returns the first result row,
+- `orderBy($column, $direction)` - sorts the result set by the provided column,
+- `resetOrderBy()` - removes all defined sorting columns,
+- `limitBy($limit, $offset)` - limits the collection, optionally sets the starting offset,
+- `fetch()` - returns the unfetched result row, repeated calls iterate over the whole result set,
+- `fetchAll()` - returns the whole result set as array,
+- `fetchPairs($key, $value)` - process the whole result set and returns it as array. The first argument accepts the column which will be used as array key. If null is provided, result array will be indexed naturally. The second argument accepts the column which will be used as array value. If null is provided, the whole entity will be provided as the value.
+
+/--php
+// all book entities indexed by their primary key
+$orm->books
+	->findAll()
+	->fetchPairs('id', NULL);
+
+// all book titles sorted backward and naturally indexed
+$orm->books
+	->findAll()
+	->orderBy('title', ICollection::DESC)
+	->fetchPairs(NULL, 'title');
+\--
+
+Filtering
+=========
+
+Each collection can be filtered by array of conditions. These are passed as the first parameter of `findBy()` method. Array consists of entity property names and values. Keys can contain optional operator. Default operator is equality. Let's see the example.
+
+/--php
+$books = $orm->books->findBy([
+	'author' => $author->id,
+	'publishedAt<=' => new DateTime(),
+]);
+\--
+
+Allowed operators are `=`, `!=`, `<=`, `<`, `>=` and `>`.
+
+You can filter your collection using conditions based on related entities. To filter by their value, use traversing expression: it consists of the path delimited by `->` arrow. You have to start the expression by referencing the starting point using `this` keyword.
+
+/--php
+// find all books which were authored by Jon Snow
+$orm->books->findBy(['this->author->name' => 'Jon Snow']);
+
+// find all books which were not translated by Jon Snow
+$orm->books->findBy(['this->translator->name!=' => 'Jon Snow']);
+\--
+
+There are few restrictions:
+- Filtering does not implement any support for aggregation. If you need some more complex queries, proxy your methods to mapper layer. See more in [Repository chapter | repository].
+- Traversing is currently supported only over the persisted properties. Your own virtual properties have not been implemented yet.
+
+--------------
+
+Sorting
+=======
+
+You can easily sort your collection. Use `orderBy()` method, which accepts the column name and the order direction. By default, columns are sorted in an ascending order. To change the order, use `ICollection::ASC` or `ICollection::DESC` constants.
+
+/--php
+$orm->books->findAll()->orderBy('title', ICollection::DESC);
+\--
+
+You can add more ordering rules, which will be used when the earlier defined ordering columns are same. The sorting may be reset by `resetOrderBy()` method.
+
+
+--------------
+
+Limiting
+========
+
+To limit your data collection, just use `limitBy()` method.
+
+/--php
+// get the last 10 published books
+$orm->books->findAll()->orderBy('publishedAt', ICollection::DESC)->limitBy(10);
+
+// get the 10 penultimate published books
+$orm->books->findAll()->orderBy('publishedAt', ICollection::DESC)->limitBy(10, 10);
+\--
+
+
+---------------
+
+Counting
+========
+
+It is easy to count entities in a collection. There are two methods:
+- `count()` fetches the entities from the storage and counts them,
+- `countStored()` asks the storage for the collection count, the implementation depends on the mapper layer, basically the `countStored()` method runs own SQL query.
+
+The `count()` method is quite useful if you know that you will need entities in the collection. The `countStored()` is needed if you do a pagination.
+
+/--php
+public function renderArticles($categoryId)
+{
+	$articles = $this->orm->articles->findByCategory($categoryId);
+
+	$limit = 10;
+	$offset = $this->page * 10;
+
+	$this->paginator->totalCount = $articles->countStored();
+	$this->template->articles = $articles->limitBy($limit, $offset);
+}
+\--
+/--html
+{if $articles->count()}
+	{foreach $articles} ... {/foreach}
+{else}
+	You have no articles.
+{/if}
+\--

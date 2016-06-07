@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -20,8 +20,6 @@ use Nette;
  *
  * echo $el->startTag(), $el->endTag();
  * </code>
- *
- * @author     David Grudl
  */
 class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAggregate, IHtmlString
 {
@@ -41,15 +39,18 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 	public static $xhtml = FALSE;
 
 	/** @var array  empty (void) elements */
-	public static $emptyElements = array('img'=>1,'hr'=>1,'br'=>1,'input'=>1,'meta'=>1,'area'=>1,'embed'=>1,'keygen'=>1,
-		'source'=>1,'base'=>1,'col'=>1,'link'=>1,'param'=>1,'basefont'=>1,'frame'=>1,'isindex'=>1,'wbr'=>1,'command'=>1,'track'=>1);
+	public static $emptyElements = array(
+		'img' => 1, 'hr' => 1, 'br' => 1, 'input' => 1, 'meta' => 1, 'area' => 1, 'embed' => 1, 'keygen' => 1,
+		'source' => 1, 'base' => 1, 'col' => 1, 'link' => 1, 'param' => 1, 'basefont' => 1, 'frame' => 1,
+		'isindex' => 1, 'wbr' => 1, 'command' => 1, 'track' => 1,
+	);
 
 
 	/**
 	 * Static factory.
 	 * @param  string element name (or NULL)
-	 * @param  array|string element's attributes (or textual content)
-	 * @return Html
+	 * @param  array|string element's attributes or plain text content
+	 * @return self
 	 */
 	public static function el($name = NULL, $attrs = NULL)
 	{
@@ -229,8 +230,23 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 
 	/**
+	 * Setter for data-* attributes. Booleans are converted to 'true' resp. 'false'.
+	 * @return self
+	 */
+	public function data($name, $value = NULL)
+	{
+		if (func_num_args() === 1) {
+			$this->attrs['data'] = $name;
+		} else {
+			$this->attrs["data-$name"] = is_bool($value) ? json_encode($value) : $value;
+		}
+		return $this;
+	}
+
+
+	/**
 	 * Sets element's HTML content.
-	 * @param  string
+	 * @param  string raw HTML string
 	 * @return self
 	 * @throws Nette\InvalidArgumentException
 	 */
@@ -272,7 +288,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 	public function setText($text)
 	{
 		if (!is_array($text) && !$text instanceof self) {
-			$text = htmlspecialchars((string) $text, ENT_NOQUOTES);
+			$text = htmlspecialchars((string) $text, ENT_NOQUOTES, 'UTF-8');
 		}
 		return $this->setHtml($text);
 	}
@@ -290,7 +306,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Adds new element's child.
-	 * @param  Html|string child node
+	 * @param  Html|string Html node or raw HTML string
 	 * @return self
 	 */
 	public function add($child)
@@ -302,8 +318,8 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 	/**
 	 * Creates and adds a new Html child.
 	 * @param  string  elements's name
-	 * @param  array|string element's attributes (or textual content)
-	 * @return Html  created element
+	 * @param  array|string element's attributes or raw HTML string
+	 * @return self  created element
 	 */
 	public function create($name, $attrs = NULL)
 	{
@@ -314,15 +330,15 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Inserts child node.
-	 * @param  int
-	 * @param  Html node
+	 * @param  int|NULL position of NULL for appending
+	 * @param  Html|string Html node or raw HTML string
 	 * @param  bool
 	 * @return self
-	 * @throws \Exception
+	 * @throws Nette\InvalidArgumentException
 	 */
 	public function insert($index, $child, $replace = FALSE)
 	{
-		if ($child instanceof Html || is_scalar($child)) {
+		if ($child instanceof self || is_scalar($child)) {
 			if ($index === NULL) { // append
 				$this->children[] = $child;
 
@@ -340,8 +356,8 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Inserts (replaces) child node (\ArrayAccess implementation).
-	 * @param  int
-	 * @param  Html node
+	 * @param  int|NULL position of NULL for appending
+	 * @param  Html|string Html node or raw HTML string
 	 * @return void
 	 */
 	public function offsetSet($index, $child)
@@ -352,8 +368,8 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Returns child node (\ArrayAccess implementation).
-	 * @param  int index
-	 * @return mixed
+	 * @param  int
+	 * @return self|string
 	 */
 	public function offsetGet($index)
 	{
@@ -363,7 +379,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Exists child node? (\ArrayAccess implementation).
-	 * @param  int index
+	 * @param  int
 	 * @return bool
 	 */
 	public function offsetExists($index)
@@ -374,7 +390,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Removes child node (\ArrayAccess implementation).
-	 * @param  int index
+	 * @param  int
 	 * @return void
 	 */
 	public function offsetUnset($index)
@@ -386,7 +402,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 
 	/**
-	 * Required by the \Countable interface.
+	 * Returns children count.
 	 * @return int
 	 */
 	public function count()
@@ -411,9 +427,6 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 	 */
 	public function getIterator()
 	{
-		if (func_num_args() && func_get_arg(0)) {
-			throw new Nette\DeprecatedException(__METHOD__ . " doesn't support deep iterator any more.");
-		}
 		return new \ArrayIterator($this->children);
 	}
 
@@ -430,7 +443,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 
 	/**
 	 * Renders element's start tag, content and end tag.
-	 * @param  int indent
+	 * @param  int
 	 * @return string
 	 */
 	public function render($indent = NULL)
@@ -504,7 +517,15 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 		}
 
 		$s = '';
-		foreach ($this->attrs as $key => $value) {
+		$attrs = $this->attrs;
+		if (isset($attrs['data']) && is_array($attrs['data'])) { // deprecated
+			foreach ($attrs['data'] as $key => $value) {
+				$attrs['data-' . $key] = $value;
+			}
+			unset($attrs['data']);
+		}
+
+		foreach ($attrs as $key => $value) {
 			if ($value === NULL || $value === FALSE) {
 				continue;
 
@@ -517,22 +538,7 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 				continue;
 
 			} elseif (is_array($value)) {
-				if ($key === 'data') { // deprecated
-					foreach ($value as $k => $v) {
-						if ($v !== NULL && $v !== FALSE) {
-							if (is_array($v)) {
-								$v = Json::encode($v);
-							}
-							$q = strpos($v, '"') === FALSE ? '"' : "'";
-							$s .= ' data-' . $k . '='
-								. $q . str_replace(array('&', $q), array('&amp;', $q === '"' ? '&quot;' : '&#39;'), $v)
-								. (strpos($v, '`') !== FALSE && strpbrk($v, ' <>"\'') === FALSE ? ' ' : '')
-								. $q;
-						}
-					}
-					continue;
-
-				} elseif (strncmp($key, 'data-', 5) === 0) {
+				if (strncmp($key, 'data-', 5) === 0) {
 					$value = Json::encode($value);
 
 				} else {
@@ -550,13 +556,20 @@ class Html extends Nette\Object implements \ArrayAccess, \Countable, \IteratorAg
 					$value = implode($key === 'style' || !strncmp($key, 'on', 2) ? ';' : ' ', $tmp);
 				}
 
+			} elseif (is_float($value)) {
+				$value = rtrim(rtrim(number_format($value, 10, '.', ''), '0'), '.');
+
 			} else {
 				$value = (string) $value;
 			}
 
 			$q = strpos($value, '"') === FALSE ? '"' : "'";
-			$s .= ' ' . $key . '='
-				. $q . str_replace(array('&', $q), array('&amp;', $q === '"' ? '&quot;' : '&#39;'), $value)
+			$s .= ' ' . $key . '=' . $q
+				. str_replace(
+					array('&', $q, '<'),
+					array('&amp;', $q === '"' ? '&quot;' : '&#39;', self::$xhtml ? '&lt;' : '<'),
+					$value
+				)
 				. (strpos($value, '`') !== FALSE && strpbrk($value, ' <>"\'') === FALSE ? ' ' : '')
 				. $q;
 		}

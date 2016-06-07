@@ -17,5 +17,6 @@ $configurator->addConfig(__DIR__ . '/config/common.neon');
 $configurator->addConfig(__DIR__ . '/config/local.neon');
 $container = $configurator->createContainer();
 
+Tracy\Debugger::$logSeverity = E_NOTICE;
 
 return $container;

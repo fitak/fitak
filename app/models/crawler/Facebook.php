@@ -33,19 +33,24 @@ class Facebook
 	/**
 	 * @var string graph api prefix
 	 */
-	private $version = 'v2.3';
+	private $graphVersion;
 
 	/**
-	 * @param string $appId
-	 * @param string $appSecret
+	 *
+	 * @param string   $appId
+	 * @param string   $appSecret
 	 * @param string[] $scope
-	 * @param Session $session
+	 * @param string   $graphVersion
+	 * @param Session  $session
+	 *
+	 * @throws \Exception
 	 */
-	public function __construct($appId, $appSecret, $scope, Session $session)
+	public function __construct($appId, $appSecret, $scope, $graphVersion, Session $session)
 	{
 		FacebookSession::setDefaultApplication($appId, $appSecret);
 		$this->login = new FacebookRedirectLoginHelper('http://copy.this.url/');
 		$this->scope = $scope;
+		$this->graphVersion = $graphVersion;
 
 		$session->start();
 	}
@@ -95,7 +100,7 @@ class Facebook
 			throw new \ImplementationException('Call setSession prior to calling ' . __METHOD__);
 		}
 
-		$req = new FacebookRequest($this->fbs, 'GET', '/me/groups', NULL, $this->version);
+		$req = new FacebookRequest($this->fbs, 'GET', '/me/groups', NULL, $this->graphVersion);
 		/** @var \StdClass $res */
 		$res = $req->execute()->getResponse();
 		return $res->data;
@@ -114,7 +119,14 @@ class Facebook
 			throw new \ImplementationException('Call setSession prior to calling ' . __METHOD__);
 		}
 
-		$req = new FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since", NULL, $this->version);
+		$fields = "id,message,created_time,updated_time," .
+			"from{name,picture}," .
+			"caption,type,picture,link,description,source," .
+			"comments{comments{message,created_time," .
+			"from{name,picture}}," .
+			"message,created_time," .
+			"from{name,picture}}";
+		$req = new  FacebookRequest($this->fbs, 'GET', "/$groupId/feed?since=$since&fields=$fields", NULL, $this->graphVersion);
 		do
 		{
 			$res = $req->execute();
@@ -149,7 +161,7 @@ class Facebook
 			yield $comment;
 		}
 
-		$res = new FacebookResponse(new FacebookRequest($this->fbs, 'GET', "/$post->id/comments", NULL, $this->version), $post->comments, NULL);
+		$res = new FacebookResponse(new FacebookRequest($this->fbs, 'GET', "/$post->id/comments", NULL, $this->graphVersion), $post->comments, NULL);
 		$req = $res->getRequestForNextPage();
 
 		while ($req)

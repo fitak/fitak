@@ -1,0 +1,2 @@
+INSERT INTO `users` (`id`, `email`, `password_hash`, `sign_up_token_hash`, `sign_up_time`, `password_reset_token_hash`, `facebook_id`, `facebook_access_token`, `last_name`, `first_name`) VALUES
+(4, 'hermamat@fit.cvut.cz', '$2y$10$qJrNK8XPCsptu8vviCSRAu2PS6BIxBw4TI5ZPcI2Gc3owDMkRV9L2', NULL, '2015-12-07 20:56:44', NULL, NULL, NULL, NULL, NULL);

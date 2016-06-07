@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -11,9 +11,7 @@ use Nette;
 
 
 /**
- * Validation utilites.
- *
- * @author     David Grudl
+ * Validation utilities.
  */
 class Validators extends Nette\Object
 {
@@ -26,7 +24,7 @@ class Validators extends Nette\Object
 		'number' => NULL, // is_int || is_float,
 		'numeric' => array(__CLASS__, 'isNumeric'),
 		'numericint' => array(__CLASS__, 'isNumericInt'),
-		'string' =>  'is_string',
+		'string' => 'is_string',
 		'unicode' => array(__CLASS__, 'isUnicode'),
 		'array' => 'is_array',
 		'list' => array('Nette\Utils\Arrays', 'isList'),
@@ -52,7 +50,7 @@ class Validators extends Nette\Object
 	);
 
 	protected static $counters = array(
-		'string' =>  'strlen',
+		'string' => 'strlen',
 		'unicode' => array('Nette\Utils\Strings', 'length'),
 		'array' => 'count',
 		'list' => 'count',
@@ -96,6 +94,7 @@ class Validators extends Nette\Object
 	 * @param  array
 	 * @param  string  item
 	 * @param  string  expected types separated by pipe
+	 * @param  string
 	 * @return void
 	 */
 	public static function assertField($arr, $field, $expected = NULL, $label = "item '%' in array")
@@ -138,14 +137,15 @@ class Validators extends Nette\Object
 			}
 
 			if (isset($item[1])) {
+				$length = $value;
 				if (isset(static::$counters[$type])) {
-					$value = call_user_func(static::$counters[$type], $value);
+					$length = call_user_func(static::$counters[$type], $value);
 				}
 				$range = explode('..', $item[1]);
 				if (!isset($range[1])) {
 					$range[1] = $range[0];
 				}
-				if (($range[0] !== '' && $value < $range[0]) || ($range[1] !== '' && $value > $range[1])) {
+				if (($range[0] !== '' && $length < $range[0]) || ($range[1] !== '' && $length > $range[1])) {
 					continue;
 				}
 			}
@@ -238,11 +238,13 @@ class Validators extends Nette\Object
 	public static function isEmail($value)
 	{
 		$atom = "[-a-z0-9!#$%&'*+/=?^_`{|}~]"; // RFC 5322 unquoted characters in local-part
-		$localPart = "(?:\"(?:[ !\\x23-\\x5B\\x5D-\\x7E]*|\\\\[ -~])+\"|$atom+(?:\\.$atom+)*)"; // quoted or unquoted
 		$alpha = "a-z\x80-\xFF"; // superset of IDN
-		$domain = "[0-9$alpha](?:[-0-9$alpha]{0,61}[0-9$alpha])?"; // RFC 1034 one domain component
-		$topDomain = "[$alpha](?:[-0-9$alpha]{0,17}[$alpha])?";
-		return (bool) preg_match("(^$localPart@(?:$domain\\.)+$topDomain\\z)i", $value);
+		return (bool) preg_match("(^
+			(\"([ !#-[\\]-~]*|\\\\[ -~])+\"|$atom+(\\.$atom+)*)  # quoted or unquoted
+			@
+			([0-9$alpha]([-0-9$alpha]{0,61}[0-9$alpha])?\\.)+    # domain - RFC 1034
+			[$alpha]([-0-9$alpha]{0,17}[$alpha])?                # top domain
+		\\z)ix", $value);
 	}
 
 
@@ -254,9 +256,16 @@ class Validators extends Nette\Object
 	public static function isUrl($value)
 	{
 		$alpha = "a-z\x80-\xFF";
-		$domain = "[0-9$alpha](?:[-0-9$alpha]{0,61}[0-9$alpha])?";
-		$topDomain = "[$alpha](?:[-0-9$alpha]{0,17}[$alpha])?";
-		return (bool) preg_match("(^https?://(?:(?:$domain\\.)*$topDomain|\\d{1,3}\.\\d{1,3}\.\\d{1,3}\.\\d{1,3}|\[[0-9a-f:]{3,39}\])(:\\d{1,5})?(/\\S*)?\\z)i", $value);
+		return (bool) preg_match("(^
+			https?://(
+				(([-_0-9$alpha]+\\.)*                       # subdomain
+					[0-9$alpha]([-0-9$alpha]{0,61}[0-9$alpha])?\\.)?  # domain
+					[$alpha]([-0-9$alpha]{0,17}[$alpha])?   # top domain
+				|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}  # IPv4
+				|\[[0-9a-f:]{3,39}\]                        # IPv6
+			)(:\\d{1,5})?                                   # port
+			(/\\S*)?                                        # path
+		\\z)ix", $value);
 	}
 
 
@@ -291,12 +300,4 @@ class Validators extends Nette\Object
 		return is_string($value) && preg_match('#^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\z#', $value);
 	}
 
-}
-
-
-/**
- * The exception that indicates assertion error.
- */
-class AssertionException extends \Exception
-{
 }

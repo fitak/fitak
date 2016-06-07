@@ -1,16 +1,16 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Macros;
 
-use Latte,
-	Latte\CompileException,
-	Latte\MacroNode,
-	Latte\PhpWriter;
+use Latte;
+use Latte\CompileException;
+use Latte\MacroNode;
+use Latte\PhpWriter;
 
 
 /**
@@ -33,8 +33,6 @@ use Latte,
  * - {contentType ...} HTTP Content-Type header
  * - {status ...} HTTP status
  * - {l} {r} to display { }
- *
- * @author     David Grudl
  */
 class CoreMacros extends MacroSet
 {
@@ -79,6 +77,7 @@ class CoreMacros extends MacroSet
 		$me->addMacro('use', array($me, 'macroUse'));
 		$me->addMacro('contentType', array($me, 'macroContentType'));
 		$me->addMacro('status', array($me, 'macroStatus'));
+		$me->addMacro('php', array($me, 'macroExpr'));
 
 		$me->addMacro('class', NULL, NULL, array($me, 'macroClass'));
 		$me->addMacro('attr', NULL, NULL, array($me, 'macroAttr'));
@@ -106,6 +105,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroIf(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		if ($node->data->capture = ($node->args === '')) {
 			return 'ob_start()';
 		}
@@ -140,6 +142,12 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroElse(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		} elseif ($node->args) {
+			$hint = substr($node->args, 0, 2) === 'if' ? ', did you mean {elseif}?' : '';
+			trigger_error("Arguments are not allowed in {{$node->name}}$hint", E_USER_WARNING);
+		}
 		$ifNode = $node->parentNode;
 		if ($ifNode && $ifNode->name === 'if' && $ifNode->data->capture) {
 			if (isset($ifNode->data->else)) {
@@ -220,6 +228,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroUse(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		call_user_func(Latte\Helpers::checkCallback(array($node->tokenizer->fetchWord(), 'install')), $this->getCompiler())
 			->initialize();
 	}
@@ -253,6 +264,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroEndForeach(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers && $node->modifiers !== '|noiterator') {
+			trigger_error('Only modifier |noiterator is allowed here.', E_USER_WARNING);
+		}
 		if ($node->modifiers !== '|noiterator' && preg_match('#\W(\$iterator|include|require|get_defined_vars)\W#', $this->getCompiler()->expandTokens($node->content))) {
 			$node->openingCode = '<?php $iterations = 0; foreach ($iterator = $_l->its[] = new Latte\Runtime\CachingIterator('
 			. preg_replace('#(.*)\s+as\s+#i', '$1) as ', $writer->formatArgs(), 1) . ') { ?>';
@@ -270,6 +284,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroBreakContinueIf(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		$cmd = str_replace('If', '', $node->name);
 		if ($node->parentNode && $node->parentNode->prefix === $node::PREFIX_NONE) {
 			return $writer->write("if (%node.args) { echo \"</{$node->parentNode->htmlNode->name}>\\n\"; $cmd; }");
@@ -283,7 +300,10 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroClass(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write('if ($_l->tmp = array_filter(%node.array)) echo \' class="\' . %escape(implode(" ", array_unique($_l->tmp))) . \'"\'');
+		if (isset($node->htmlNode->attrs['class'])) {
+			throw new CompileException('It is not possible to combine class with n:class.');
+		}
+		return $writer->write('if ($_l->tmp = array_filter(%node.array)) echo \' class="\', %escape(implode(" ", array_unique($_l->tmp))), \'"\'');
 	}
 
 
@@ -301,9 +321,14 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroDump(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		$args = $writer->formatArgs();
-		return 'Tracy\Debugger::barDump(' . ($node->args ? $writer->write("array(%var => $args)", $args) : 'get_defined_vars()')
-			. ', "Template " . str_replace(dirname(dirname($template->getName())), "\xE2\x80\xA6", $template->getName()))';
+		return $writer->write(
+			'Tracy\Debugger::barDump(' . ($args ? "($args)" : 'get_defined_vars()'). ', %var)',
+			$args ?: 'variables'
+		);
 	}
 
 
@@ -312,6 +337,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroDebugbreak(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		return $writer->write(($node->args == NULL ? '' : 'if (!(%node.args)); else')
 			. 'if (function_exists("debugbreak")) debugbreak(); elseif (function_exists("xdebug_break")) xdebug_break()');
 	}
@@ -323,6 +351,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroVar(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		if ($node->args === '' && $node->parentNode && $node->parentNode->name === 'switch') {
 			return '} else {';
 		}
@@ -371,7 +402,7 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroExpr(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write(($node->name === '?' ? '' : 'echo ') . '%modify(%node.args)');
+		return $writer->write(($node->name === '=' ? 'echo ' : '') . '%modify(%node.args)');
 	}
 
 
@@ -380,6 +411,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroContentType(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		if (strpos($node->args, 'xhtml') !== FALSE) {
 			$this->getCompiler()->setContentType(Latte\Compiler::CONTENT_XHTML);
 
@@ -414,6 +448,9 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroStatus(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		return $writer->write((substr($node->args, -1) === '?' ? 'if (!headers_sent()) ' : '') .
 			'header((isset($_SERVER["SERVER_PROTOCOL"]) ? $_SERVER["SERVER_PROTOCOL"] : "HTTP/1.1") . " " . %0.var, TRUE, %0.var)', (int) $node->args
 		);

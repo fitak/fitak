@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -18,7 +18,6 @@
  *   - resource (resource) => existing connection resource
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDriver, IDibiReflector
@@ -67,7 +66,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 				$string = '';
 				DibiConnection::alias($config, 'user', 'username');
 				DibiConnection::alias($config, 'dbname', 'database');
-				foreach (array('host','hostaddr','port','dbname','user','password','connect_timeout','options','sslmode','service') as $key) {
+				foreach (array('host', 'hostaddr', 'port', 'dbname', 'user', 'password', 'connect_timeout', 'options', 'sslmode', 'service') as $key) {
 					if (isset($config[$key])) {
 						$string .= $key . '=' . $config[$key] . ' ';
 					}
@@ -114,6 +113,16 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 
 
 	/**
+	 * Pings database.
+	 * @return bool
+	 */
+	public function ping()
+	{
+		return pg_ping($this->connection);
+	}
+
+
+	/**
 	 * Executes the SQL query.
 	 * @param  string      SQL statement.
 	 * @return IDibiResultDriver|NULL
@@ -154,7 +163,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	{
 		if ($sequence === NULL) {
 			// PostgreSQL 8.1 is needed
-			$res = $this->query("SELECT LASTVAL()");
+			$res = $this->query('SELECT LASTVAL()');
 		} else {
 			$res = $this->query("SELECT CURRVAL('$sequence')");
 		}
@@ -300,8 +309,9 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	 */
 	public function escapeLike($value, $pos)
 	{
+		$bs = pg_escape_string($this->connection, '\\'); // standard_conforming_strings = on/off
 		$value = pg_escape_string($this->connection, $value);
-		$value = strtr($value, array( '%' => '\\\\%', '_' => '\\\\_'));
+		$value = strtr($value, array('%' => $bs . '%', '_' => $bs . '_', '\\' => '\\\\'));
 		return ($pos <= 0 ? "'%" : "'") . $value . ($pos >= 0 ? "%'" : "'");
 	}
 
@@ -374,8 +384,8 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 */
 	public function seek($row)
 	{
@@ -404,9 +414,9 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 		$columns = array();
 		for ($i = 0; $i < $count; $i++) {
 			$row = array(
-				'name'      => pg_field_name($this->resultSet, $i),
-				'table'     => pg_field_table($this->resultSet, $i),
-				'nativetype'=> pg_field_type($this->resultSet, $i),
+				'name' => pg_field_name($this->resultSet, $i),
+				'table' => pg_field_table($this->resultSet, $i),
+				'nativetype' => pg_field_type($this->resultSet, $i),
 			);
 			$row['fullname'] = $row['table'] ? $row['table'] . '.' . $row['name'] : $row['name'];
 			$columns[] = $row;
@@ -450,17 +460,17 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 			FROM
 				information_schema.tables
 			WHERE
-				table_schema = current_schema()";
+				table_schema = ANY (current_schemas(false))";
 
 		if ($version >= 9.3) {
-			$query .= "
+			$query .= '
 				UNION ALL
 				SELECT
 					matviewname, 1
 				FROM
 					pg_matviews
 				WHERE
-					schemaname = current_schema()";
+					schemaname = ANY (current_schemas(false))';
 		}
 
 		$res = $this->query($query);
@@ -476,20 +486,22 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	 */
 	public function getColumns($table)
 	{
-		$_table = $this->escape($table, dibi::TEXT);
+		$_table = $this->escape($this->escape($table, dibi::IDENTIFIER), dibi::TEXT);
 		$res = $this->query("
 			SELECT indkey
 			FROM pg_class
 			LEFT JOIN pg_index on pg_class.oid = pg_index.indrelid AND pg_index.indisprimary
-			WHERE pg_class.relname = $_table
+			WHERE pg_class.oid = $_table::regclass
 		");
 		$primary = (int) pg_fetch_object($res->resultSet)->indkey;
 
 		$res = $this->query("
 			SELECT *
-			FROM information_schema.columns
-			WHERE table_name = $_table AND table_schema = current_schema()
-			ORDER BY ordinal_position
+			FROM information_schema.columns c
+			JOIN pg_class ON pg_class.relname = c.table_name
+			JOIN pg_namespace nsp ON nsp.oid = pg_class.relnamespace AND nsp.nspname = c.table_schema
+			WHERE pg_class.oid = $_table::regclass
+			ORDER BY c.ordinal_position
 		");
 
 		if (!$res->getRowCount()) {
@@ -541,11 +553,18 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	 */
 	public function getIndexes($table)
 	{
-		$_table = $this->escape($table, dibi::TEXT);
+		$_table = $this->escape($this->escape($table, dibi::IDENTIFIER), dibi::TEXT);
 		$res = $this->query("
-			SELECT ordinal_position, column_name
-			FROM information_schema.columns
-			WHERE table_name = $_table AND table_schema = current_schema()
+			SELECT
+				a.attnum AS ordinal_position,
+				a.attname AS column_name
+			FROM
+				pg_attribute a
+				JOIN pg_class cls ON a.attrelid = cls.oid
+			WHERE
+				a.attrelid = $_table::regclass
+				AND a.attnum > 0
+				AND NOT a.attisdropped
 			ORDER BY ordinal_position
 		");
 
@@ -559,7 +578,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 			FROM pg_class
 			LEFT JOIN pg_index on pg_class.oid = pg_index.indrelid
 			INNER JOIN pg_class as pg_class2 on pg_class2.oid = pg_index.indexrelid
-			WHERE pg_class.relname = $_table
+			WHERE pg_class.oid = $_table::regclass
 		");
 
 		$indexes = array();
@@ -582,7 +601,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	 */
 	public function getForeignKeys($table)
 	{
-		$_table = $this->escape($table, dibi::TEXT);
+		$_table = $this->escape($this->escape($table, dibi::IDENTIFIER), dibi::TEXT);
 
 		$res = $this->query("
 			SELECT

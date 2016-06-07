@@ -19,7 +19,9 @@
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
  */
 
-class RecorderTest extends PHPUnit_Framework_TestCase
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+
+class RecorderTest extends MockeryTestCase
 {
 
     public function setup()
@@ -172,19 +174,33 @@ class RecorderTest extends PHPUnit_Framework_TestCase
         $mock->bar(2);
         $mock->mockery_verify();
     }
-
 }
 
 class MockeryTestSubject
 {
-    public function foo() { return 1; }
-    public function bar($i) { return $i * 2; }
+    public function foo()
+    {
+        return 1;
+    }
+    public function bar($i)
+    {
+        return $i * 2;
+    }
 }
 
 class MockeryTestSubjectUser
 {
     public $subject = null;
-    public function __construct($subject) { $this->subject = $subject; }
-    public function doFoo() { return $this->subject->foo(); }
-    public function doBar() { return $this->subject->bar(2); }
+    public function __construct($subject)
+    {
+        $this->subject = $subject;
+    }
+    public function doFoo()
+    {
+        return $this->subject->foo();
+    }
+    public function doBar()
+    {
+        return $this->subject->bar(2);
+    }
 }

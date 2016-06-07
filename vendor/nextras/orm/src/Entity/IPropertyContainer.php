@@ -1,17 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity;
 
 
-interface IPropertyContainer
+interface IPropertyContainer extends IProperty
 {
 
 	/**
@@ -27,20 +25,13 @@ interface IPropertyContainer
 	 * @internal
 	 * @return mixed
 	 */
-	public function getInjectedValue();
+	public function & getInjectedValue();
 
 
 	/**
-	 * Returns raw value.
-	 * @return mixed
-	 */
-	public function getRawValue();
-
-
-	/**
-	 * Returns true if modified.
+	 * Returns wheter property container has a value.
 	 * @return bool
 	 */
-	public function isModified();
+	public function hasInjectedValue();
 
 }

@@ -2,8 +2,8 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
+use Nextras\Orm\Repository\Repository;
 
 
 /**
@@ -11,7 +11,7 @@ use Nextras\Orm\Entity\Collection\ICollection;
  * @method ICollection findByName(array $names)
  * @property-read TagsMapper $mapper
  */
-class TagsRepository extends Orm\Repository\Repository
+class TagsRepository extends Repository
 {
 
 	public function findTrending()

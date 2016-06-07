@@ -1,7 +1,7 @@
 Facebook SDK for PHP
 ====================
 
-[![Latest Stable Version](http://img.shields.io/badge/Latest%20Stable-4.0.10-blue.svg)](https://packagist.org/packages/facebook/php-sdk-v4)
+[![Latest Stable Version](http://img.shields.io/badge/Latest%20Stable-4.0.23-blue.svg)](https://packagist.org/packages/facebook/php-sdk-v4)
 
 
 This repository contains the open source PHP SDK that allows you to access Facebook
@@ -16,6 +16,12 @@ This version of the Facebook SDK for PHP requires PHP 5.4 or greater.
 Minimal example:
 
 ```php
+<?php
+
+// Skip these two lines if you're using Composer
+define('FACEBOOK_SDK_V4_SRC_DIR', '/path/to/facebook-php-sdk-v4/src/Facebook/');
+require __DIR__ . '/path/to/facebook-php-sdk-v4/autoload.php';
+
 use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
 use Facebook\GraphUser;

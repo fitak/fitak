@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching\Storages;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Cache dummy storage.
- *
- * @author     David Grudl
  */
 class DevNullStorage extends Nette\Object implements Nette\Caching\IStorage
 {

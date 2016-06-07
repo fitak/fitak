@@ -1,6 +1,8 @@
 /app/config/local.neon
 /log/
 /tests/temp/
+/tests/php.ini
+/tests/coverage.html
 /tmp/
 /www/build
 fitak.sublime-project
@@ -11,3 +13,4 @@ output
 pubring.gpg~
 secring.gpg
 app/config/production-dev.neon
+/node_modules/elasticdump

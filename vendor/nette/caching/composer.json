@@ -1,26 +1,27 @@
 {
 	"name": "nette/caching",
 	"description": "Nette Caching Component",
-	"homepage": "http://nette.org",
+	"homepage": "https://nette.org",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
 			"name": "David Grudl",
-			"homepage": "http://davidgrudl.com"
+			"homepage": "https://davidgrudl.com"
 		},
 		{
 			"name": "Nette Community",
-			"homepage": "http://nette.org/contributors"
+			"homepage": "https://nette.org/contributors"
 		}
 	],
 	"require": {
-		"php": ">=5.3.1",
+		"php": ">=5.4.4",
 		"nette/finder": "~2.2",
 		"nette/utils": "~2.2"
 	},
 	"require-dev": {
-		"nette/tester": "~1.0",
-		"latte/latte": "~2.2.2"
+		"nette/tester": "~1.6",
+		"nette/di": "~2.3",
+		"latte/latte": "~2.3.0"
 	},
 	"conflict": {
 		"nette/nette": "<2.2"
@@ -28,5 +29,10 @@
 	"autoload": {
 		"classmap": ["src/"]
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.4-dev"
+		}
+	}
 }

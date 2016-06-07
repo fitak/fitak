@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Mail;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Sends emails via the SMTP server.
- *
- * @author     David Grudl
  */
 class SmtpMailer extends Nette\Object implements IMailer
 {
@@ -65,6 +63,7 @@ class SmtpMailer extends Nette\Object implements IMailer
 	/**
 	 * Sends email.
 	 * @return void
+	 * @throws SmtpException
 	 */
 	public function send(Message $mail)
 	{
@@ -115,9 +114,9 @@ class SmtpMailer extends Nette\Object implements IMailer
 	 */
 	protected function connect()
 	{
-		$this->connection = @fsockopen( // intentionally @
-			($this->secure === 'ssl' ? 'ssl://' : '') . $this->host,
-			$this->port, $errno, $error, $this->timeout
+		$this->connection = @stream_socket_client( // @ is escalated to exception
+			($this->secure === 'ssl' ? 'ssl://' : '') . $this->host . ':' . $this->port,
+			$errno, $error, $this->timeout
 		);
 		if (!$this->connection) {
 			throw new SmtpException($error, $errno);
@@ -159,7 +158,7 @@ class SmtpMailer extends Nette\Object implements IMailer
 
 
 	/**
-	 * Writes data to server and checks response.
+	 * Writes data to server and checks response against expected code if some provided.
 	 * @param  string
 	 * @param  int   response code
 	 * @param  string  error message
@@ -168,8 +167,11 @@ class SmtpMailer extends Nette\Object implements IMailer
 	protected function write($line, $expectedCode = NULL, $message = NULL)
 	{
 		fwrite($this->connection, $line . Message::EOL);
-		if ($expectedCode && !in_array((int) $this->read(), (array) $expectedCode, TRUE)) {
-			throw new SmtpException('SMTP server did not accept ' . ($message ? $message : $line));
+		if ($expectedCode) {
+			$response = $this->read();
+			if (!in_array((int) $response, (array) $expectedCode, TRUE)) {
+				throw new SmtpException('SMTP server did not accept ' . ($message ? $message : $line) . ' with error: ' . trim($response));
+			}
 		}
 	}
 
@@ -190,14 +192,4 @@ class SmtpMailer extends Nette\Object implements IMailer
 		return $s;
 	}
 
-}
-
-
-/**
- * SMTP mailer exception.
- *
- * @author     David Grudl
- */
-class SmtpException extends \Exception
-{
 }

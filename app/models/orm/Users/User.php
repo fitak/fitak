@@ -4,28 +4,35 @@ namespace Fitak;
 
 use DateTime;
 use Nette\Utils\Strings;
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Relationships\ManyHasMany;
+use Nextras\Orm\Relationships\OneHasMany;
 
 
 /**
- * @property string            $email
- * @property string|NULL       $facebookId
- * @property string|NULL       $facebookAccessToken
- * @property string            $passwordHash
- * @property string|NULL       $firstName
- * @property string|NULL       $lastName
+ * @property string|NULL       $email
+ * @property string|NULL       $passwordHash
+ * @property string|NULL       $fbId
+ * @property string|NULL       $fbAccessToken
+ * @property string            $name
  * @property string|NULL       $signUpTokenHash
- * @property DateTime          $signUpTime
+ * @property DateTime|NULL     $signUpTime
  * @property string|NULL       $passwordResetTokenHash
+ * @property string|NULL       $profilePicture
+ * @property bool              $registered
+ * @property bool              $admin {default 0}
+ *
  * @property ManyHasMany|Tag[] $favoriteTags        {m:n TagsRepository $favoredBy primary}
+ * @property ManyHasMany|SavedSearch[] $savedSearches        {m:n SavedSearchesRepository $users primary}
+ * @property OneHasMany|Post[] $posts  {1:m PostsRepository $user}
+ * @property OneHasMany|Vote[] $votes  {1:m VotesRepository $user}
  *
  * @property-read bool         $isActivated {virtual} only activated users can sign in
  */
-class User extends Orm\Entity\Entity
+class User extends Entity
 {
 
-	public function getIsActivated()
+	protected function getterIsActivated()
 	{
 		return $this->signUpTokenHash === NULL;
 	}

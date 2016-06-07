@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * Reflection metadata class for a database.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  *
  * @property-read string $name
@@ -115,7 +114,6 @@ class DibiDatabaseInfo extends DibiObject
 /**
  * Reflection metadata class for a database table.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  *
  * @property-read string $name
@@ -307,7 +305,6 @@ class DibiTableInfo extends DibiObject
 /**
  * Reflection metadata class for a result set.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  *
  * @property-read array $columns
@@ -393,7 +390,7 @@ class DibiResultInfo extends DibiObject
 			$this->columns = array();
 			$reflector = $this->driver instanceof IDibiReflector ? $this->driver : NULL;
 			foreach ($this->driver->getResultColumns() as $info) {
-				$this->columns[] = $this->names[$info['name']] = new DibiColumnInfo($reflector, $info);
+				$this->columns[] = $this->names[strtolower($info['name'])] = new DibiColumnInfo($reflector, $info);
 			}
 		}
 	}
@@ -404,7 +401,6 @@ class DibiResultInfo extends DibiObject
 /**
  * Reflection metadata class for a table or result set column.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  *
  * @property-read string $name
@@ -481,7 +477,7 @@ class DibiColumnInfo extends DibiObject
 	 */
 	public function getTableName()
 	{
-		return isset($this->info['table']) ? $this->info['table'] : NULL;
+		return isset($this->info['table']) && $this->info['table'] != NULL ? $this->info['table'] : NULL; // intentionally ==
 	}
 
 
@@ -570,7 +566,7 @@ class DibiColumnInfo extends DibiObject
 			'^_' => dibi::TEXT, // PostgreSQL arrays
 			'BYTEA|BLOB|BIN' => dibi::BINARY,
 			'TEXT|CHAR|POINT|INTERVAL' => dibi::TEXT,
-			'YEAR|BYTE|COUNTER|SERIAL|INT|LONG|SHORT' => dibi::INTEGER,
+			'YEAR|BYTE|COUNTER|SERIAL|INT|LONG|SHORT|^TINY$' => dibi::INTEGER,
 			'CURRENCY|REAL|MONEY|FLOAT|DOUBLE|DECIMAL|NUMERIC|NUMBER' => dibi::FLOAT,
 			'^TIME$' => dibi::TIME,
 			'TIME' => dibi::DATETIME, // DATETIME, TIMESTAMP
@@ -604,7 +600,6 @@ class DibiColumnInfo extends DibiObject
 /**
  * Reflection metadata class for a foreign key.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  * @todo
  *
@@ -650,7 +645,6 @@ class DibiForeignKeyInfo extends DibiObject
 /**
  * Reflection metadata class for a index or primary key.
  *
- * @author     David Grudl
  * @package    dibi\reflection
  *
  * @property-read string $name

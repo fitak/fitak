@@ -30,13 +30,13 @@ class TagCloudControl extends UI\Control
 
 		if ($this->trendingTags)
 		{
-			$maximum = $this->trendingTags[0]['count'];
+			$maximum = $this->trendingTags[0]->toArray()['count'];
 			foreach ($this->trendingTags as $tag)
 			{
 				if ($tag->name === 'mute') continue;
 				$tagCloud[] = [
-					'name' => $tag->name,
-					'size' => round(1 + ($tag->count * 100) / $maximum * 0.015, 1),
+					'name' => strtoupper($tag->name),
+					'size' => round(($tag->count * 100) / $maximum * 0.015, 1),
 				];
 			}
 

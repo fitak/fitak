@@ -2,28 +2,29 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi SQL builder via fluent interfaces. EXPERIMENTAL!
  *
- * @author     David Grudl
- * @package    dibi
- *
- * @property-read string $command
- * @property-read DibiConnection $connection
- * @property-read DibiResultIterator $iterator
- * @method DibiFluent select($field)
+ * @method DibiFluent select(...$field)
  * @method DibiFluent distinct()
  * @method DibiFluent from($table)
- * @method DibiFluent where($cond)
- * @method DibiFluent groupBy($field)
- * @method DibiFluent having($cond)
- * @method DibiFluent orderBy($field)
+ * @method DibiFluent where(...$cond)
+ * @method DibiFluent groupBy(...$field)
+ * @method DibiFluent having(...$cond)
+ * @method DibiFluent orderBy(...$field)
  * @method DibiFluent limit(int $limit)
  * @method DibiFluent offset(int $offset)
+ * @method DibiFluent join(...$table)
+ * @method DibiFluent leftJoin(...$table)
+ * @method DibiFluent innerJoin(...$table)
+ * @method DibiFluent rightJoin(...$table)
+ * @method DibiFluent outerJoin(...$table)
+ * @method DibiFluent on(...$cond)
+ * @method DibiFluent using(...$cond)
  */
 class DibiFluent extends DibiObject implements IDataSource
 {
@@ -177,7 +178,10 @@ class DibiFluent extends DibiObject implements IDataSource
 			} elseif (is_string($arg) && preg_match('#^[a-z:_][a-z0-9_.:]*\z#i', $arg)) { // identifier
 				$args = array('%n', $arg);
 
-			} elseif (is_array($arg) || ($arg instanceof Traversable && !$arg instanceof self)) { // any array
+			} elseif ($arg instanceof self) {
+				$args = array('%SQL', $arg);
+
+			} elseif (is_array($arg) || $arg instanceof Traversable) { // any array
 				if (isset(self::$modifiers[$clause])) {
 					$args = array(self::$modifiers[$clause], $arg);
 
@@ -317,7 +321,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	 */
 	public function fetch()
 	{
-		if ($this->command === 'SELECT') {
+		if ($this->command === 'SELECT' && !$this->clauses['LIMIT'] && !$this->clauses['OFFSET']) {
 			return $this->query($this->_export(NULL, array('%lmt', 1)))->fetch();
 		} else {
 			return $this->query($this->_export())->fetch();
@@ -331,7 +335,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	 */
 	public function fetchSingle()
 	{
-		if ($this->command === 'SELECT') {
+		if ($this->command === 'SELECT' && !$this->clauses['LIMIT'] && !$this->clauses['OFFSET']) {
 			return $this->query($this->_export(NULL, array('%lmt', 1)))->fetchSingle();
 		} else {
 			return $this->query($this->_export())->fetchSingle();
@@ -403,7 +407,7 @@ class DibiFluent extends DibiObject implements IDataSource
 	public function count()
 	{
 		return (int) $this->query(array(
-			'SELECT COUNT(*) FROM (%ex', $this->_export(), ') AS [data]'
+			'SELECT COUNT(*) FROM (%ex', $this->_export(), ') [data]',
 		))->fetchSingle();
 	}
 

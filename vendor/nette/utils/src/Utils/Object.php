@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette;
 
-use Nette,
-	Nette\Utils\ObjectMixin;
+use Nette;
+use Nette\Utils\ObjectMixin;
 
 
 /**
@@ -42,12 +42,10 @@ use Nette,
  * Adding method to class (i.e. to all instances) works similar to JavaScript
  * prototype property. The syntax for adding a new method is:
  * <code>
- * MyClass::extensionMethod('newMethod', function(MyClass $obj, $arg, ...) { ... });
+ * MyClass::extensionMethod('newMethod', function (MyClass $obj, $arg, ...) { ... });
  * $obj = new MyClass;
  * $obj->newMethod($x);
  * </code>
- *
- * @author     David Grudl
  *
  * @property-read Nette\Reflection\ClassType|\ReflectionClass $reflection
  */

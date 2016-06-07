@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.9.4 (XXXX-XX-XX)
+
+* `shouldIgnoreMissing` will respect global `allowMockingNonExistentMethods`
+  config
+* Some support for variadic parameters
+* Hamcrest is now a required dependency
+* Instance mocks now respect `shouldIgnoreMissing` call on control instance
+* This will be the *last version to support PHP 5.3*
+* Added `Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration` trait
+* Added `makePartial` to `Mockery\MockInterface` as it was missing
+
+## 0.9.3 (2014-12-22)
+
+* Added a basic spy implementation
+* Added `Mockery\Adapter\Phpunit\MockeryTestCase` for more reliable PHPUnit
+  integration
+
 ## 0.9.2 (2014-09-03)
 
 * Some workarounds for the serilisation problems created by changes to PHP in 5.5.13, 5.4.29,

@@ -5,7 +5,7 @@ namespace Fitak;
 use ElasticSearch;
 use Kdyby;
 use Nette;
-use Nextras\Orm;
+use Nextras\Orm\Entity\IEntity;
 
 
 class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscriber
@@ -36,27 +36,28 @@ class ElasticSearchUpdater extends Nette\Object implements Kdyby\Events\Subscrib
 			$post->description,
 			$post->caption,
 		]));
+		$group = $post->group ? $post->group->id : NULL;
 		return [
 			'tags' => $post->getParsedTags()[0],
 			'message' => $post->getMessageWithoutTags(),
 			'message_addons' => $addons,
+			'author' => $post->user->name,
+			'is_topic' => ($post->parent === NULL),
+            'deleted' => ($post->deleted),
+			'updated_time' => $post->updatedTime->getTimestamp(),
+			'group' => $group,
 		];
 	}
 
-	public function onAfterInsert(Orm\Entity\IEntity $post)
+	public function onAfterInsert(IEntity $post)
 	{
 		if ($post instanceof Post)
 		{
-			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, [
-				'author' => $post->fromName,
-				'is_topic' => ($post->parent === NULL),
-				'updated_time' => $post->updatedTime->getTimestamp(),
-				'group' => $post->group->id,
-			] + $this->getDefaultData($post));
+			$this->elastic->addToIndex(ElasticSearch::TYPE_CONTENT, $post->id, $this->getDefaultData($post));
 		}
 	}
 
-	public function onAfterUpdate(Orm\Entity\IEntity $post)
+	public function onAfterUpdate(IEntity $post)
 	{
 		if ($post instanceof Post)
 		{

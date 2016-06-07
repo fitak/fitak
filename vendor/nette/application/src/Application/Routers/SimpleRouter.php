@@ -1,23 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Routers;
 
-use Nette,
-	Nette\Application;
+use Nette;
+use Nette\Application;
 
 
 /**
  * The bidirectional route for trivial routing via query parameters.
- *
- * @author     David Grudl
- *
- * @property-read array $defaults
- * @property-read int $flags
  */
 class SimpleRouter extends Nette\Object implements Application\IRouter
 {
@@ -105,7 +100,7 @@ class SimpleRouter extends Nette\Object implements Application\IRouter
 
 		// presenter name
 		$presenter = $appRequest->getPresenterName();
-		if (strncasecmp($presenter, $this->module, strlen($this->module)) === 0) {
+		if (strncmp($presenter, $this->module, strlen($this->module)) === 0) {
 			$params[self::PRESENTER_KEY] = substr($presenter, strlen($this->module));
 		} else {
 			return NULL;

@@ -1,23 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching;
 
-use Nette,
-	Nette\Utils\Callback;
+use Nette;
+use Nette\Utils\Callback;
 
 
 /**
  * Implements the cache for a application.
- *
- * @author     David Grudl
- *
- * @property-read IStorage $storage
- * @property-read string $namespace
  */
 class Cache extends Nette\Object implements \ArrayAccess
 {
@@ -79,7 +74,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	/**
 	 * Returns new nested cache object.
 	 * @param  string
-	 * @return Cache
+	 * @return self
 	 */
 	public function derive($namespace)
 	{
@@ -98,7 +93,9 @@ class Cache extends Nette\Object implements \ArrayAccess
 	{
 		$data = $this->storage->read($this->generateKey($key));
 		if ($data === NULL && $fallback) {
-			return $this->save($key, Callback::closure($fallback));
+			return $this->save($key, function (& $dependencies) use ($fallback) {
+				return call_user_func_array($fallback, [& $dependencies]);
+			});
 		}
 		return $data;
 	}
@@ -123,12 +120,20 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function save($key, $data, array $dependencies = NULL)
 	{
-		$this->release();
+		$this->key = $this->data = NULL;
 		$key = $this->generateKey($key);
 
 		if ($data instanceof Nette\Callback || $data instanceof \Closure) {
 			$this->storage->lock($key);
-			$data = call_user_func_array($data, array(& $dependencies));
+			try {
+				$data = call_user_func_array($data, [& $dependencies]);
+			} catch (\Throwable $e) {
+				$this->storage->remove($key);
+				throw $e;
+			} catch (\Exception $e) {
+				$this->storage->remove($key);
+				throw $e;
+			}
 		}
 
 		if ($data === NULL) {
@@ -143,34 +148,33 @@ class Cache extends Nette\Object implements \ArrayAccess
 	private function completeDependencies($dp, $data)
 	{
 		// convert expire into relative amount of seconds
-		if (isset($dp[Cache::EXPIRATION])) {
-			$dp[Cache::EXPIRATION] = Nette\Utils\DateTime::from($dp[Cache::EXPIRATION])->format('U') - time();
+		if (isset($dp[self::EXPIRATION])) {
+			$dp[self::EXPIRATION] = Nette\Utils\DateTime::from($dp[self::EXPIRATION])->format('U') - time();
 		}
 
 		// convert FILES into CALLBACKS
 		if (isset($dp[self::FILES])) {
-			//clearstatcache();
 			foreach (array_unique((array) $dp[self::FILES]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkFile'), $item, @filemtime($item)); // @ - stat may fail
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkFile'], $item, @filemtime($item)]; // @ - stat may fail
 			}
 			unset($dp[self::FILES]);
 		}
 
 		// add namespaces to items
 		if (isset($dp[self::ITEMS])) {
-			$dp[self::ITEMS] = array_unique(array_map(array($this, 'generateKey'), (array) $dp[self::ITEMS]));
+			$dp[self::ITEMS] = array_unique(array_map([$this, 'generateKey'], (array) $dp[self::ITEMS]));
 		}
 
 		// convert CONSTS into CALLBACKS
 		if (isset($dp[self::CONSTS])) {
 			foreach (array_unique((array) $dp[self::CONSTS]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkConst'), $item, constant($item));
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkConst'], $item, constant($item)];
 			}
 			unset($dp[self::CONSTS]);
 		}
 
 		if (!is_array($dp)) {
-			$dp = array();
+			$dp = [];
 		}
 		return $dp;
 	}
@@ -197,7 +201,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function clean(array $conditions = NULL)
 	{
-		$this->release();
+		$this->key = $this->data = NULL;
 		$this->storage->clean((array) $conditions);
 	}
 
@@ -210,8 +214,10 @@ class Cache extends Nette\Object implements \ArrayAccess
 	public function call($function)
 	{
 		$key = func_get_args();
-		$key[0] = Callback::toReflection($function);
-		return $this->load($key, function() use ($function, $key) {
+		if (is_array($function) && is_object($function[0])) {
+			$key[0][0] = get_class($function[0]);
+		}
+		return $this->load($key, function () use ($function, $key) {
 			return Callback::invokeArgs($function, array_slice($key, 1));
 		});
 	}
@@ -221,16 +227,18 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 * Caches results of function/method calls.
 	 * @param  mixed
 	 * @param  array  dependencies
-	 * @return Closure
+	 * @return \Closure
 	 */
 	public function wrap($function, array $dependencies = NULL)
 	{
-		$cache = $this;
-		return function() use ($cache, $function, $dependencies) {
-			$key = array(Callback::toReflection($function), func_get_args());
-			$data = $cache->load($key);
+		return function () use ($function, $dependencies) {
+			$key = [$function, func_get_args()];
+			if (is_array($function) && is_object($function[0])) {
+				$key[0][0] = get_class($function[0]);
+			}
+			$data = $this->load($key);
 			if ($data === NULL) {
-				$data = $cache->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
+				$data = $this->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
 			}
 			return $data;
 		};
@@ -268,26 +276,21 @@ class Cache extends Nette\Object implements \ArrayAccess
 
 
 	/**
-	 * Inserts (replaces) item into the cache (\ArrayAccess implementation).
-	 * @param  mixed key
-	 * @param  mixed
-	 * @return void
-	 * @throws Nette\InvalidArgumentException
+	 * @deprecated
 	 */
 	public function offsetSet($key, $data)
 	{
+		trigger_error('Using [] is deprecated; use Cache::save(key, data) instead.', E_USER_DEPRECATED);
 		$this->save($key, $data);
 	}
 
 
 	/**
-	 * Retrieves the specified item from the cache or NULL if the key is not found (\ArrayAccess implementation).
-	 * @param  mixed key
-	 * @return mixed|NULL
-	 * @throws Nette\InvalidArgumentException
+	 * @deprecated
 	 */
 	public function offsetGet($key)
 	{
+		trigger_error('Using [] is deprecated; use Cache::load(key) instead.', E_USER_DEPRECATED);
 		$key = is_scalar($key) ? (string) $key : serialize($key);
 		if ($this->key !== $key) {
 			$this->key = $key;
@@ -298,36 +301,32 @@ class Cache extends Nette\Object implements \ArrayAccess
 
 
 	/**
-	 * Exists item in cache? (\ArrayAccess implementation).
-	 * @param  mixed key
-	 * @return bool
-	 * @throws Nette\InvalidArgumentException
+	 * @deprecated
 	 */
 	public function offsetExists($key)
 	{
-		$this->release();
+		trigger_error('Using [] is deprecated; use Cache::load(key) !== NULL instead.', E_USER_DEPRECATED);
+		$this->key = $this->data = NULL;
 		return $this->offsetGet($key) !== NULL;
 	}
 
 
 	/**
-	 * Removes the specified item from the cache.
-	 * @param  mixed key
-	 * @return void
-	 * @throws Nette\InvalidArgumentException
+	 * @deprecated
 	 */
 	public function offsetUnset($key)
 	{
+		trigger_error('Using [] is deprecated; use Cache::remove(key) instead.', E_USER_DEPRECATED);
 		$this->save($key, NULL);
 	}
 
 
 	/**
-	 * Discards the internal cache used by ArrayAccess.
-	 * @return void
+	 * @deprecated
 	 */
 	public function release()
 	{
+		trigger_error(__METHOD__ . '() is deprecated.', E_USER_DEPRECATED);
 		$this->key = $this->data = NULL;
 	}
 

@@ -3,7 +3,8 @@
 namespace Fitak;
 
 use Nette;
-use Nette\Bridges\ApplicationLatte\TemplateFactory as NetteTemplateFactory;
+//use Nette\Bridges\ApplicationLatte\TemplateFactory as NetteTemplateFactory;
+use Nette\Application\UI\ITemplateFactory as NetteTemplateFactory;
 
 
 class TemplateFactory extends Nette\Object

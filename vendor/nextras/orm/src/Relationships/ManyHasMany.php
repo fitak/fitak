@@ -1,17 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
 
 use Nextras\Orm\Entity\IEntity;
-use Nextras\Orm\NotImplementedException;
 
 
 class ManyHasMany extends HasMany
@@ -20,49 +17,45 @@ class ManyHasMany extends HasMany
 	protected $isPersisting = FALSE;
 
 
-	public function persist($recursive = TRUE)
+	public function persist($recursive = TRUE, & $queue = NULL)
 	{
 		if ($this->isPersisting) {
 			return;
 		}
 
 		$this->isPersisting = TRUE;
-		$toRemove = $toAdd = [];
+		$toAdd = [];
+		$toRemove = [];
 
 		foreach ((array) $this->toRemove as $entity) {
 			if (isset($entity->id)) {
 				$toRemove[$entity->id] = $entity->id;
 			}
-			unset($this->injectedValue[$entity->id]);
 		}
 
-		if ($this->collection) {
+		if ($this->collection && $recursive) {
 			foreach ($this->collection as $entity) {
-				if ($recursive || !isset($entity->id)) {
-					$this->getTargetRepository()->persist($entity, $recursive);
-				}
+				$this->getTargetRepository()->persist($entity, $recursive, $queue);
 			}
 		}
 
 		foreach ((array) $this->toAdd as $entity) {
-			if ($recursive || !isset($entity->id)) {
-				$this->getTargetRepository()->persist($entity, $recursive);
+			if ($recursive) {
+				$this->getTargetRepository()->persist($entity, $recursive, $queue);
 			}
 			$toAdd[$entity->id] = $entity->id;
-			$this->injectedValue[$entity->id] = $entity->id;
 		}
 
-		$this->toRemove = $this->toAdd = [];
-		if ($this->collection && $this->collection->getRelationshipMapper() === NULL) {
-			$this->collection = NULL;
-		}
+		$this->toAdd = [];
+		$this->toRemove = [];
+		$this->collection = NULL;
 
-		if ($this->metadata->relationshipIsMain) {
+		if ($this->metadata->relationship->isMain) {
 			if ($toRemove) {
-				$this->getCollection()->getRelationshipMapper()->remove($this->parent, $toRemove);
+				$this->getRelationshipMapper()->remove($this->parent, $toRemove);
 			}
 			if ($toAdd) {
-				$this->getCollection()->getRelationshipMapper()->add($this->parent, $toAdd);
+				$this->getRelationshipMapper()->add($this->parent, $toAdd);
 			}
 		}
 
@@ -71,29 +64,15 @@ class ManyHasMany extends HasMany
 	}
 
 
-	public function getInjectedValue()
+	protected function modify()
 	{
-		// is called only by Mapper\Memory\RMManyHasMany
-		// and only if there is no unpersisted collection
-		return $this->injectedValue;
-	}
-
-
-	public function getStorableValue()
-	{
-		return serialize($this->getInjectedValue());
-	}
-
-
-	public function getRawValue()
-	{
-		throw new NotImplementedException();
+		$this->isModified = TRUE;
 	}
 
 
 	protected function createCollection()
 	{
-		if ($this->metadata->relationshipIsMain) {
+		if ($this->metadata->relationship->isMain) {
 			$mapperOne = $this->parent->getRepository()->getMapper();
 			$mapperTwo = $this->getTargetRepository()->getMapper();
 		} else {
@@ -108,7 +87,7 @@ class ManyHasMany extends HasMany
 
 	protected function updateRelationshipAdd(IEntity $entity)
 	{
-		$otherSide = $entity->getProperty($this->metadata->relationshipProperty);
+		$otherSide = $entity->getProperty($this->metadata->relationship->property);
 		$otherSide->collection = NULL;
 		$otherSide->toAdd[spl_object_hash($this->parent)] = $this->parent;
 	}
@@ -116,7 +95,7 @@ class ManyHasMany extends HasMany
 
 	protected function updateRelationshipRemove(IEntity $entity)
 	{
-		$otherSide = $entity->getProperty($this->metadata->relationshipProperty);
+		$otherSide = $entity->getProperty($this->metadata->relationship->property);
 		$otherSide->collection = NULL;
 		$otherSide->toRemove[spl_object_hash($this->parent)] = $this->parent;
 	}

@@ -11,7 +11,7 @@ use Nextras\Application\LinkFactory;
 class PasswordResetManager extends Nette\Object
 {
 
-	/** @var RepositoryContainer */
+	/** @var Orm */
 	private $orm;
 
 	/** @var Nette\Mail\IMailer */
@@ -20,7 +20,7 @@ class PasswordResetManager extends Nette\Object
 	/** @var LinkFactory */
 	private $linkFactory;
 
-	public function __construct(RepositoryContainer $orm, Mail\IMailer $mailer, LinkFactory $linkFactory)
+	public function __construct(Orm $orm, Mail\IMailer $mailer, LinkFactory $linkFactory)
 	{
 		$this->orm = $orm;
 		$this->mailer = $mailer;

@@ -1,18 +1,16 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
+ * This file is part of the Nextras\Orm library.
  * This file was inspired by YetORM https://github.com/uestla/YetORM/.
- *
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity\Reflection;
 
+use DateTimeZone;
 use Nette\Object;
-use Nette\Utils\DateTime;
 use Nextras\Orm\InvalidArgumentException;
 use stdClass;
 
@@ -24,12 +22,16 @@ class PropertyMetadata extends Object
 	const WRITE = 2;
 	const READWRITE = 3;
 
-	/** @const int Relationship types */
-	const RELATIONSHIP_ONE_HAS_ONE = 1;
-	const RELATIONSHIP_ONE_HAS_ONE_DIRECTED = 2;
-	const RELATIONSHIP_ONE_HAS_MANY = 3;
-	const RELATIONSHIP_MANY_HAS_ONE = 4;
-	const RELATIONSHIP_MANY_HAS_MANY = 5;
+	/** @deprecated */
+	const RELATIONSHIP_ONE_HAS_ONE_DIRECTED = PropertyRelationshipMetadata::ONE_HAS_ONE_DIRECTED;
+	/** @deprecated */
+	const RELATIONSHIP_ONE_HAS_MANY = PropertyRelationshipMetadata::ONE_HAS_MANY;
+	/** @deprecated */
+	const RELATIONSHIP_MANY_HAS_ONE = PropertyRelationshipMetadata::MANY_HAS_ONE;
+	/** @deprecated */
+	const RELATIONSHIP_MANY_HAS_MANY = PropertyRelationshipMetadata::MANY_HAS_MANY;
+	/** @deprecated */
+	const RELATIONSHIP_ONE_HAS_ONE = PropertyRelationshipMetadata::ONE_HAS_ONE;
 
 	/** @var string property name */
 	public $name;
@@ -52,26 +54,20 @@ class PropertyMetadata extends Object
 	/** @var bool */
 	public $isReadonly;
 
+	/** @var bool */
+	public $isVirtual = FALSE;
+
 	/** @var int */
 	public $access;
 
 	/** @var mixed */
 	public $defaultValue;
 
+	/** @var PropertyRelationshipMetadata|NULL */
+	public $relationship;
+
 	/** @var stdClass */
 	public $args;
-
-	/** @var string */
-	public $relationshipRepository;
-
-	/** @var string */
-	public $relationshipProperty;
-
-	/** @var bool */
-	public $relationshipIsMain = FALSE;
-
-	/** @var int */
-	public $relationshipType;
 
 	/** @var mixed[] */
 	public $enum;
@@ -147,8 +143,13 @@ class PropertyMetadata extends Object
 				if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
 					return TRUE;
 				}
-				if ($value !== '' && (is_string($value) || is_int($value) || is_float($value))) {
-					$value = DateTime::from($value);
+
+				if (is_string($value) && $value !== '') {
+					$value = new \DateTime($value);
+					$value->setTimezone(new DateTimeZone(date_default_timezone_get()));
+					return TRUE;
+				} elseif (ctype_digit($value)) {
+					$value = new \DateTime("@{$value}");
 					return TRUE;
 				}
 

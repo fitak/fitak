@@ -1,0 +1,123 @@
+{block content}
+<h2>O webu</h2>
+<ul>
+	<li><a href="#uvod">Úvod</a></li>
+	<li><a href="#pouzivejte-tagy">Používejte tagy</a>
+	<li><a href="#specialni-tagy">Speciální tagy</a></li></li>
+	<li><a href="#vyhledavani-tagu">Vyhledávání tagů</a></li>
+	<li><a href="#spolecny-vyvoj">Společný vývoj</a></li>
+	<li><a href="#pozadi">Pozadí</a></li>
+	<li><a href="#kontakt">Kontakt</a></li>
+</ul>
+
+<h3 id="uvod">Úvod</h3>
+<p>
+	Tento web archivuje školní Facebook skupiny
+	<a href="http://fit.cvut.cz">Fakulty informačních technologií</a>
+	<a href="http://www.cvut.cz">Českého vysokého učení technického</a> v Praze. Tyto
+	skupiny obsahují velké množství informací. Ty ale bohužel velmi rychle zapadnou a vyhledávání v nich je
+	poměrně obtížné. Od narození naší fakulty jsme vyprodukovali již
+	<abbr title="a to je fakt moc">{$count} příspěvků</abbr>!
+</p>
+<p>
+	<strong>Nyní jsou indexovány tyto skupiny:</strong>
+</p>
+<ul>
+	<li n:foreach="$groups as $group">
+		<a href="https://www.facebook.com/groups/{$group->id}/">{$group->name}</a>
+	</li>
+</ul>
+<p>
+	Pokud vám tu nějaká chybí, stačí <a href="mailto:admin@fitak.cz">napsat</a>. Příspěvky,
+	které pocházejí z uzavřených skupin, mají skrytého autora. Indexace probíhá zcela automaticky
+	a to v 5 minutovém intervalu.
+</p>
+
+<h3 id="pouzivejte-tagy">Používejte tagy</h3>
+<p>
+	Na školních facebook skupinách používáme tagy pro rychlejší orientaci. Tagy se nacházejí
+	na začátku příspěvku a jsou v hranatých závorkách. Může jich být i víc za sebou. Příklad užití:
+</p>
+<pre>[pa1][zkouska] Na co se máme připravit?</pre>
+<p>
+	Fitak tuto myšlenku podporuje a dále rozvijí. Ze všech příspěvků jsou tyto tagy vybírány a
+	konsolidovány. Například tagy
+</p>
+<pre>[Semestralka][Semestrálka][SEMESTRALKa]</pre>
+<p>
+	se převedou na jednotný tvar
+</p>
+<pre>[semestralka]</pre>
+<p>
+	To pak v důsledku umožňuje mj. rychlé a efektivní vyhledávání (popsáno níže).
+</p>
+<p>
+	I tak ale není systém všemocný a je potřeba dodržovat jakousi kulturu. Proto pro jednotlivé
+	předměty používáme zkratky bez kódu programu, tedy:
+</p>
+<pre>[pa1], [zma] nebo [lin]</pre>
+<p>
+	Další oblíbené tagy, které se ujaly v širším měřítku:
+</p>
+<pre>[ot], [prace], [zkouska], [semestralka], [latex], [rozvrh] nebo [kos]</pre>
+<p>
+	Kromě písmen (preferujeme malá a bez diakritiky) a číslic mohou tagy obsahovat ještě tyto znaky
+	(v opačném případě nebudou zaindexovány):
+</p>
+<pre>.-_</pre>
+<p class="text-warning">
+	<strong>Vyvarujte se mezerám uvnitř tagu</strong> a nesnažte se být za každou cenu kreativní při vymýšlení těch nových. Můžete se inspirovat třeba trendy z <a n:href="Homepage:">hlavní stránky</a>.
+</p>
+
+<h3 id="specialni-tagy">Speciální tagy</h3>
+<p>
+	Tento tag způsobí, že dané vlákno bude na Fiťák.cz kompletně skryto a to i včetně jeho komentářů.
+</p>
+<pre>[mute]</pre>
+
+<h3 id="vyhledavani-tagu">Vyhledávní tagů</h3>
+<p>
+	Na začátek dotazu stačí vložit makro <i>tag:</i> a za něj název tagu, který chcete filtrovat. Těch
+	může být i více, pokud je oddělíte čárkou. Vše zadávejte bez mezer (nicméně pokud je použijete
+	rozumně, tak je systém taky zvládne).
+</p>
+<p>
+	<strong>Pokud chcete vyhledat slovo</strong> <em>test</em> v příspěvcích, které mají tag
+	<em>[pa1]</em> nebo <em>[zma]</em> nebo <em>[mlo]</em>, použijte zápis:
+</p>
+<pre>tag:pa1,zma,mlo test</pre>
+<p>
+	Můžete si například jednoduše sestavit filtr, který bude vypisovat jen novinky z předmětů, které
+	právě absolvujete a odkaz si přidat do záložek. Aneb
+	<a n:href="Search:default 'tag:pa1,pai,cao,uos,mlo,zma'">první</a> a
+	<a n:href="Search:default 'tag:pa2,ted,sap,lin'">druhý</a> semestr - teď už vám nic neuteče a
+	nemusíte kvůli tomu trávit všechen volný čas na facebooku, dobré ne? :)
+</p>
+
+
+<h3 id="spolecny-vyvoj">Společný vývoj</h3>
+<p>
+	Fiťákův kód je otevřený a pečuje o něj malá komunita vývojářů - fiťáků.
+</p>
+<p>
+	<strong>Git repositář je k dispozici na:</strong>
+	<a href="https://github.com/fitak/fitak"><i class="icon-github"></i> https://github.com/fitak/fitak</a>
+</p>
+<p>
+	Budeme rádi, pokud tam budete ohlašovat bugy, či posílat návrhy na vylepšení. Pokud nás chcete pozdravit, napište na <a href="mailto:admin@fitak.cz">admin@fitak.cz</a>.
+</p>
+
+<h3 id="pozadi">Pozadí</h3>
+<p>
+	Technologie pohánějící Fiťáka: Elasticsearch, Nette, PHP, MySQL, Composer, Git, HTML, CSS, JavaScript, jQuery, Twitter Bootstrap a FB API..
+</p>
+<p>
+	Fiťák běží na <a href="http://www.digitalocean.com">DigitalOcean.com</a>.
+</p>
+
+<h3 id="kontakt">Kontakt</h3>
+<p class="autor">
+	<a href="http://miksu.cz" title="osobní stránka">Vojtěch Mikšů</a> -
+	<a href="mailto:admin@fitak.cz">admin@fitak.cz</a>
+</p>
+{/block}

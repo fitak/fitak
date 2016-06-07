@@ -84,10 +84,13 @@ class FacebookRedirectLoginHelper
    *
    * @param array $scope List of permissions to request during login
    * @param string $version Optional Graph API version if not default (v2.0)
+   * @param boolean $displayAsPopup Indicate if the page will be displayed as a popup
+   * @param bool|string $authType 'reauthenticate' or 'https', true is equivalent to 'reauthenticate',
+   *                              false or invalid value will not add auth type parameter
    *
    * @return string
    */
-  public function getLoginUrl($scope = array(), $version = null)
+  public function getLoginUrl(array $scope = array(), $version = null, $displayAsPopup = false, $authType = false)
   {
     $version = ($version ?: FacebookRequest::GRAPH_API_VERSION);
     $this->state = $this->random(16);
@@ -97,6 +100,41 @@ class FacebookRedirectLoginHelper
       'redirect_uri' => $this->redirectUrl,
       'state' => $this->state,
       'sdk' => 'php-sdk-' . FacebookRequest::VERSION,
+      'scope' => implode(',', $scope)
+    );
+
+    if (in_array($authType, array(true, 'reauthenticate', 'https'), true)) {
+      $params['auth_type'] = $authType === true ? 'reauthenticate' : $authType;
+    }
+    
+    if ($displayAsPopup)
+    {
+      $params['display'] = 'popup';
+    }
+    
+    return 'https://www.facebook.com/' . $version . '/dialog/oauth?' .
+      http_build_query($params, null, '&');
+  }
+
+  /**
+   * Returns a URL to which the user should be sent to re-request permissions.
+   *
+   * @param array $scope List of permissions to re-request
+   * @param string $version Optional Graph API version if not default (v2.0)
+   *
+   * @return string
+   */
+  public function getReRequestUrl(array $scope = array(), $version = null)
+  {
+    $version = ($version ?: FacebookRequest::GRAPH_API_VERSION);
+    $this->state = $this->random(16);
+    $this->storeState($this->state);
+    $params = array(
+      'client_id' => $this->appId,
+      'redirect_uri' => $this->redirectUrl,
+      'state' => $this->state,
+      'sdk' => 'php-sdk-' . FacebookRequest::VERSION,
+      'auth_type' => 'rerequest',
       'scope' => implode(',', $scope)
     );
     return 'https://www.facebook.com/' . $version . '/dialog/oauth?' .
@@ -111,9 +149,16 @@ class FacebookRedirectLoginHelper
    *   a successful logout
    *
    * @return string
+   *
+   * @throws FacebookSDKException
    */
   public function getLogoutUrl(FacebookSession $session, $next)
   {
+    if ($session->getAccessToken()->isAppSession()) {
+      throw new FacebookSDKException(
+        'Cannot generate a Logout URL with an App Session.', 722
+      );
+    }
     $params = array(
       'next' => $next,
       'access_token' => $session->getToken()
@@ -129,7 +174,6 @@ class FacebookRedirectLoginHelper
    */
   public function getSessionFromRedirect()
   {
-    $this->loadState();
     if ($this->isValidRedirect()) {
       $params = array(
         'client_id' => FacebookSession::_getTargetAppId($this->appId),
@@ -144,8 +188,17 @@ class FacebookRedirectLoginHelper
         '/oauth/access_token',
         $params
       ))->execute()->getResponse();
-      if (isset($response['access_token'])) {
-        return new FacebookSession($response['access_token']);
+
+      // Graph v2.3 and greater return objects on the /oauth/access_token endpoint
+      $accessToken = null;
+      if (is_object($response) && isset($response->access_token)) {
+        $accessToken = $response->access_token;
+      } elseif (is_array($response) && isset($response['access_token'])) {
+        $accessToken = $response['access_token'];
+      }
+
+      if (isset($accessToken)) {
+        return new FacebookSession($accessToken);
       }
     }
     return null;
@@ -158,8 +211,21 @@ class FacebookRedirectLoginHelper
    */
   protected function isValidRedirect()
   {
-    return $this->getCode() && isset($_GET['state'])
-        && $_GET['state'] == $this->state;
+    $savedState = $this->loadState();
+    if (!$this->getCode() || !isset($_GET['state'])) {
+      return false;
+    }
+    $givenState = $_GET['state'];
+    $savedLen = mb_strlen($savedState);
+    $givenLen = mb_strlen($givenState);
+    if ($savedLen !== $givenLen) {
+      return false;
+    }
+    $result = 0;
+    for ($i = 0; $i < $savedLen; $i++) {
+      $result |= ord($savedState[$i]) ^ ord($givenState[$i]);
+    }
+    return $result === 0;
   }
 
   /**
@@ -231,12 +297,12 @@ class FacebookRedirectLoginHelper
   {
     if (!is_numeric($bytes)) {
       throw new FacebookSDKException(
-        "random() expects an integer"
+        'random() expects an integer'
       );
     }
     if ($bytes < 1) {
       throw new FacebookSDKException(
-        "random() expects an integer greater than zero"
+        'random() expects an integer greater than zero'
       );
     }
     $buf = '';

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Routers;
@@ -12,9 +12,6 @@ use Nette;
 
 /**
  * The router broker.
- *
- * @author     David Grudl
- * @property-read string $module
  */
 class RouteList extends Nette\Utils\ArrayList implements Nette\Application\IRouter
 {
@@ -62,23 +59,14 @@ class RouteList extends Nette\Utils\ArrayList implements Nette\Application\IRout
 			$routes['*'] = array();
 
 			foreach ($this as $route) {
-				$presenter = $route instanceof Route ? $route->getTargetPresenter() : NULL;
+				$presenters = $route instanceof Route && is_array($tmp = $route->getTargetPresenters())
+					? $tmp : array_keys($routes);
 
-				if ($presenter === FALSE) {
-					continue;
-				}
-
-				if (is_string($presenter)) {
-					$presenter = strtolower($presenter);
+				foreach ($presenters as $presenter) {
 					if (!isset($routes[$presenter])) {
 						$routes[$presenter] = $routes['*'];
 					}
 					$routes[$presenter][] = $route;
-
-				} else {
-					foreach ($routes as $id => $foo) {
-						$routes[$id][] = $route;
-					}
 				}
 			}
 
@@ -86,7 +74,7 @@ class RouteList extends Nette\Utils\ArrayList implements Nette\Application\IRout
 		}
 
 		if ($this->module) {
-			if (strncasecmp($tmp = $appRequest->getPresenterName(), $this->module, strlen($this->module)) === 0) {
+			if (strncmp($tmp = $appRequest->getPresenterName(), $this->module, strlen($this->module)) === 0) {
 				$appRequest = clone $appRequest;
 				$appRequest->setPresenterName(substr($tmp, strlen($this->module)));
 			} else {
@@ -94,7 +82,7 @@ class RouteList extends Nette\Utils\ArrayList implements Nette\Application\IRout
 			}
 		}
 
-		$presenter = strtolower($appRequest->getPresenterName());
+		$presenter = $appRequest->getPresenterName();
 		if (!isset($this->cachedRoutes[$presenter])) {
 			$presenter = '*';
 		}

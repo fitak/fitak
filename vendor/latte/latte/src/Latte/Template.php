@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -10,8 +10,6 @@ namespace Latte;
 
 /**
  * Template.
- *
- * @author     David Grudl
  * @internal
  */
 class Template extends Object
@@ -19,23 +17,16 @@ class Template extends Object
 	/** @var Engine */
 	private $engine;
 
-	/** @var Engine */
+	/** @var string */
 	private $name;
 
 	/** @var array */
 	protected $params = array();
 
-	/** @var array run-time filters */
-	protected $filters = array(
-		NULL => array(), // dynamic
-	);
 
-
-	public function __construct(array $params, array & $filters, Engine $engine, $name)
+	public function __construct(array $params, Engine $engine, $name)
 	{
-		$params['template'] = $this;
 		$this->setParameters($params);
-		$this->filters = & $filters;
 		$this->engine = $engine;
 		$this->name = $name;
 	}

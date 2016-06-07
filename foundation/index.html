@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="cs">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Test</title>
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+
+<div id="top-bar">
+	<div id="top-bar-content">
+
+		<div id="logo">
+			<a href="#"><img src="etc/logo-new.png"></a>
+		</div>
+
+		<div id="search">
+			<div class="input-group">
+				<input>
+				<div class="input-group-button">
+					<button class="button" type="submit"><i class="fa fa-search"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="user-profile">
+			<a href="#">
+				<ul>
+					<li class="profile-picture">
+						<img src="etc/profile_matej_herman.jpg">
+					</li>
+					<li class="username">Matěj Heřman</li>
+				</ul>
+			</a>
+		</div>
+
+		<nav>
+			<ul id="dropdown-menu" class="dropdown menu">
+				<li>
+					<a href="#"><i class="fa fa-caret-down"></i></a>
+					<ul id="dropdown-submenu" class="vertical menu">
+						<li><a href="#">Nápověda</a></li>
+						<li><a href="#">O webu</a></li>
+						<li><a href="#">Nahlásit problém</a></li>
+						<hr>
+						<li><a href="#">Zpět na hlavní stránku</a></li>
+						<li><a href="#">Uživatelské nastavení</a></li>
+						<li><a href="#">Odhlásit se</a></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+
+	</div>
+</div>
+
+<div id="page-wrapper">
+	<div id="main-container">
+
+		<div class="post-container">
+			<div class="post post-form">
+				<div class="post-type">
+					<ul data-toggle="buttons-radio">
+						<li>
+							<input type="radio" id="r1" name="r-group" data-toggle="button" checked>
+							<label class="radio-button" for="r1" title="FB-like příspěvky"><i class="fa fa-comments fa-2x"></i></label>
+						</li>
+						<li>
+							<input type="radio" id="r2" name="r-group" data-toggle="button">
+							<label class="radio-button" for="r2" title="Q&A příspěvek"><i class="fa fa-question-circle fa-2x"></i></label>
+						</li>
+					</ul>
+				</div>
+				<div class="post-message">
+					<textarea placeholder="Začněte psát příspěvek..." name="message"></textarea>
+				</div>
+			</div>
+			<div class="post-bottom">
+				<div>
+					<select dir="rtl">
+						<option value="husker">Pouze na Fiťák.cz</option>
+						<option value="starbuck">FIT ČVUT - skupina pro nové studenty z
+							roku 2011/2012
+						</option>
+						<option value="hotdog">FIT ČVUT - skupina pro nové studenty z
+							roku 2012/2013
+						</option>
+						<option value="apollo">FIT ČVUT 2013/2014</option>
+					</select>
+				</div>
+				<button class="button">Odeslat</button>
+			</div>
+		</div>
+
+		<div class="post-container fb-post">
+			<div class="post">
+				<div class="header-row">
+					<div class="left-part">
+						<div class="profile-picture">
+							<a href="#"><img src="etc/profile_ifor_zmajlo.jpg"></a>
+						</div>
+						<div class="name-date">
+							<a class="username">Igor Žmaljo</a>
+							<a class="date">25. 1. 2015 11:06</a>
+						</div>
+					</div>
+					<div class="right-part">
+						<div class="fb-group">
+							<a href="#"><i class="fa fa-facebook-official"></i>Nechceme
+								vypadnout z BI-ZMA (FIT ČVUT)
+							</a>
+						</div>
+						<div class="post-menu">
+						<a href="#"><i class="fa fa-chevron-down"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="post-body">
+					<div class="votes-part">
+						<ul>
+							<li>
+								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">4</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="post-message">
+						<p>
+							<a href="#" class="label">zma</a><a href="#" class="label">F</a>Zdravím,
+							touhle dobou vím, že
+							se
+							nestíhám doučit vše co je potřeba na řádný termín. Když se teď
+							zaměřím na MLO, měl bych na to více času a pravděpodobně ho
+							mohl
+							i udělat. Tím bych měl asi všechny předměty kromě ZMA, a svůj
+							skutečný pokus o ZMA nechám až na opravný termín.<br>
+							Chci se zeptat, co by to znamenalo teď neudělat ZMA? Nebudu
+							pak
+							moct dělat jiný předmět který ze zma vychází? Opakuje se až
+							zase
+							v zimě? Stojí mi za to použít 1 z 6 extra pokusů?<br>
+							díky</p>
+					</div>
+				</div>
+			</div>
+			<div class="hiding-comments">
+				<button class="hide-comments"><i class="fa fa-caret-up"></i>skrýt komentáře [2]<i class="fa fa-caret-up"></i></button>
+				<button class="show-comments"><i class="fa fa-caret-down"></i>zobrazit komentáře [2]<i class="fa fa-caret-down"></i></button>
+			</div>
+			<div class="comments">
+
+				<div class="comment">
+					<div class="profile-picture">
+						<img src="etc/profile_terorka_sudikova.jpg">
+					</div>
+					<div class="comment-body">
+						<p><span class="author">Terorka Sudíková</span>Teď tě asi
+							úplně nechápu. Máš na mysli opravný termín zkoušky nebo
+							vyloženě
+							opakovat předmět? Po řádném termínu máš nárok na jeden
+							opravný,
+							jestli ti stojí za to použít jeden ze šesti druhých opravných
+							pokusů je čistě na tvém uvážení.<br>
+							ZMA se vyučuje jen v zimním semestru, jestli je podmínkou pro
+							nějaký předmět pochybuji, ale pan Tomáš Kalvoda určitě bude
+							vědět lépe.
+						</p>
+						<ul class="extra-line">
+							<li>
+								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">0</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+							</li>
+							<li><span class="divider">&#8226;</span></li>
+							<li><span class="date">25.1.2015 11:14</span></li>
+						</ul>
+
+						<div class="replies-container">
+							<button class="show-replies"><i class="fa fa-chevron-down"></i>
+								Zobrazit odpovědi [2] <i class="fa fa-chevron-down"></i>
+							</button>
+							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
+								Skrýt odpovědi [2] <i class="fa fa-chevron-up"></i></button>
+
+							<div class="replies">
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_ifor_zmajlo.jpg">
+									</div>
+									<div class="reply-body">
+										<p><span class="author">Igor Žmaljo</span>Ano,
+											opravný termín zkoušky. Řádný je teď ve čtvrtek a to
+											určitě nestíhám.</p>
+										<ul class="extra-line">
+											<li>
+												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+											</li>
+											<li><span class="votes-cnt">0</span></li>
+											<li>
+												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+											</li>
+											<li><span class="divider">&#8226;</span></li>
+											<li><span class="date">25.1.2015 11:16</span></li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_terorka_sudikova.jpg">
+									</div>
+									<div class="reply-body">
+										<p><span class="author">Terorka Sudíková</span>Pokud jdeš
+											teprve na řádný termín, tak bych asi doporučovala tam
+											dojít a
+											zkusit to. Ať vidíš, kde máš největší mezery. Opravné
+											termíny
+											vidím vypsané na 3. 2., 10. 2. a 18. 2. takže pokud
+											neuděláš řádný
+											termín, máš dost času se to doučit na jeden z opravných.
+											Pokud
+											neuděláš ani ten opravný, pak se teprve budeš muset
+											rozhodovat,
+											jestli použít druhý opravný pokus.</p>
+										<ul class="extra-line">
+											<li>
+												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+											</li>
+											<li><span class="votes-cnt">0</span></li>
+											<li>
+												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+											</li>
+											<li><span class="divider">&#8226;</span></li>
+											<li><span class="date">25.1.2015 11:14</span></li>
+										</ul>
+									</div>
+								</div>
+
+
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_matej_herman.jpg">
+									</div>
+									<div class="reply-body">
+										<input placeholder="Napište odpověď...">
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="comment">
+					<div class="profile-picture">
+						<img src="etc/profile_michal_cvach.jpg">
+					</div>
+					<div class="comment-body">
+						<p><span class="author">Michal Cvach</span>Řekl bych, že podmínkou moc neni, ale v dalších matematických předmětech se asi můžou věci ze ZMA zase vyskytovat grin emoticon ...<br>
+							Jinak čistě z toho co jsem slyšel, tak se ten extra pokus na ZMA docela vyplatí, protože těch předmětů, který maj tak nízkou průchodnost za celý studium zas tolik neni...
+						</p>
+						<ul class="extra-line">
+							<li>
+								<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">1</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+							</li>
+							<li><span class="divider">&#8226;</span></li>
+							<li><span class="date">25.1.2015 11:16</span></li>
+						</ul>
+						<div class="replies-container">
+							<button class="show-replies"><i class="fa fa-chevron-down"></i>
+								Zobrazit odpovědi [0] <i class="fa fa-chevron-down"></i>
+							</button>
+							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
+								Skrýt odpovědi [0] <i class="fa fa-chevron-up"></i></button>
+
+							<div class="replies">
+
+
+							<div class="reply">
+								<div class="profile-picture">
+									<img src="etc/profile_matej_herman.jpg">
+								</div>
+								<div class="reply-body">
+									<input placeholder="Napište odpověď...">
+								</div>
+							</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="comment">
+					<div class="profile-picture">
+						<img src="etc/profile_matej_herman.jpg">
+					</div>
+					<div class="comment-body">
+						<input placeholder="Napište komentář">
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="post-container qa-post">
+			<div class="post">
+				<div class="header-row">
+					<div class="left-part">
+						<div class="profile-picture">
+							<a href="#"><img src="etc/profile_matej_herman.jpg"></a>
+						</div>
+						<div class="name-date">
+							<a class="username">Matěj Heřman</a>
+							<a class="date">22. 1. 2015 13:02</a>
+						</div>
+					</div>
+					<div class="right-part">
+						<div class="fb-group">
+							<i class="fa fa-rocket"></i>Pouze na Fiťák.cz
+						</div>
+						<div class="post-menu">
+						<a href="#"><i class="fa fa-chevron-down"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="post-body">
+					<div class="votes-part">
+						<ul>
+							<li>
+								<a href="#"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">0</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="post-message">
+						<p>
+							<a href="#" class="label">FI-FIL</a>Věděl by někdo jaké jsou podmínky absolvování předmětu FI-FIL pro nás fiťáky?<br>
+
+							Na Eduxu je, že se vše řídí podle stránek katedry, nicméně tam se evidentně počítá s variantou předmětu za 4 kredity a s cvičeními (my to máme za 2 kredity a bez cvičení).<br>
+
+							A případně doplňující otázka - mám ještě šanci ten předmět dát, když jsem tam dosud nebyl?<br>
+
+							Díky.</p>
+
+						<div class="qa-comments-container">
+							<button class="show-replies"><i class="fa fa-chevron-down"></i>
+								Zobrazit komentáře [0] <i class="fa fa-chevron-down"></i>
+							</button>
+							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
+								Skrýt komentáře [0] <i class="fa fa-chevron-up"></i></button>
+
+							<div class="replies">
+
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_matej_herman.jpg">
+									</div>
+									<div class="reply-body">
+										<input placeholder="Napište komentář...">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="hiding-answers">
+				<button class="hide-answers"><i class="fa fa-caret-up"></i>skrýt odpovědi [2]<i class="fa fa-caret-up"></i></button>
+				<button class="show-answers"><i class="fa fa-caret-down"></i>zobrazit odpovědi [2]<i class="fa fa-caret-down"></i></button>
+			</div>
+			<div class="answer best">
+				<div class="header-row">
+					<div class="left-part">
+						<div class="profile-picture">
+							<a href="#"><img src="etc/profile_ifor_zmajlo.jpg"></a>
+						</div>
+						<div class="name-date">
+							<a class="username">Igor Žmajlo</a>
+							<a class="date">23. 1. 2015 8:51</a>
+						</div>
+					</div>
+					<div class="right-part">
+					</div>
+				</div>
+				<div class="post-body">
+					<div class="votes-part">
+						<ul>
+							<li>
+								<a href="#"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">5</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
+							</li>
+							<li>
+								<a class="green" href="#"><i class="fa fa-check"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="post-message">
+						<p>
+							Tak dle e-mailu od Zamarovského:<br>
+
+							zkouškové termíny budou v KOSu<br>
+							učit se na zkoušku z: Zamarovský, "Příběh antické filosofie", hlavně část po Aristotela včetně.<br>
+							žádné podmínky na vypracování čehokoliv během semestru nejsou</p>
+
+						<div class="qa-comments-container">
+							<button class="show-replies"><i class="fa fa-chevron-down"></i>
+								Zobrazit komentáře [0] <i class="fa fa-chevron-down"></i>
+							</button>
+							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
+								Skrýt komentáře [0] <i class="fa fa-chevron-up"></i></button>
+
+							<div class="replies">
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_matej_herman.jpg">
+									</div>
+									<div class="reply-body">
+										<input placeholder="Napište komentář...">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="answer">
+				<div class="header-row">
+					<div class="left-part">
+						<div class="profile-picture">
+							<a href="#"><img src="etc/profile_terorka_sudikova.jpg"></a>
+						</div>
+						<div class="name-date">
+							<a class="username">Terorka Sudíková</a>
+							<a class="date">22. 1. 2015 19:34</a>
+						</div>
+					</div>
+					<div class="right-part">
+						<!--<div class="post-menu">-->
+						<!--<a href="#"><i class="fa fa-chevron-down"></i></a>-->
+						<!--</div>-->
+					</div>
+				</div>
+				<div class="post-body">
+					<div class="votes-part">
+						<ul>
+							<li>
+								<a href="#"><i class="fa fa-chevron-up"></i></a>
+							</li>
+							<li><span class="votes-cnt">&minus;2</span></li>
+							<li>
+								<a class="active" href="#"><i class="fa fa-chevron-down"></i></a>
+							</li>
+						</ul>
+					</div>
+					<div class="post-message">
+						<p>
+							Jestli ti můžu dát radu, neber tenhle předmět moc vážně. Já jsem přednášejícího viděl u zkoušky po prvé v životě, na prvním pokusu měl špatnou náladu, tak mě vyrazil. Po druhé už měl náladu dobrou, tak mi dal B za prakticky stejné znalosti. Na FELu bohužel takoví lidé pořád učí, i když podle mého názoru nemají na ČVUT co dělat. Na FITu jsem se naštěstí s ničím podobným nesetkal.<br>
+
+							Pokud nebude mít Zamarovsky vyloženě špatnou náladu, tak by mělo stačit naučit se jedno libovolné téma. U zkoušky se totiž většinou ptá, co umíš nejlíp a to chce pak slyšet.</p>
+
+						<div class="qa-comments-container">
+							<button class="show-replies"><i class="fa fa-chevron-down"></i>
+								Zobrazit komentáře [2] <i class="fa fa-chevron-down"></i>
+							</button>
+							<button class="hide-replies"><i class="fa fa-chevron-up"></i>
+								Skrýt komentáře [2] <i class="fa fa-chevron-up"></i></button>
+
+							<div class="replies">
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_ifor_zmajlo.jpg">
+									</div>
+									<div class="reply-body">
+										<p><span class="author">Igor Žmaljo</span>Díky, takže tomu rozumím správně, že během semestru žádná práce (semestrálka) vyžadována není a termín zkoušky bude normálně v KOSu?</p>
+										<ul class="extra-line">
+											<li>
+												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+											</li>
+											<li><span class="votes-cnt">0</span></li>
+											<li>
+												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+											</li>
+											<li><span class="divider">&#8226;</span></li>
+											<li><span class="date">22.1.2015 19:56</span></li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_terorka_sudikova.jpg">
+									</div>
+									<div class="reply-body">
+										<p><span class="author">Terorka Sudíková</span>Spíš mu napiš, že vypíše zkoušku v KOSu není úplně stoprocentní, pokud si dobře pamatuju. Nebo jak píše kolega, můžeš vychytat ten test na přednášce, pokud tam budeš chodit :)</p>
+										<ul class="extra-line">
+											<li>
+												<a href="#"><i class="fa fa-thumbs-o-up"></i></a>
+											</li>
+											<li><span class="votes-cnt">1</span></li>
+											<li>
+												<a class="active" href="#"><i class="fa fa-thumbs-o-down fa-flip-horizontal"></i></a>
+											</li>
+											<li><span class="divider">&#8226;</span></li>
+											<li><span class="date">22.1.2015 22:04</span></li>
+										</ul>
+									</div>
+								</div>
+
+
+								<div class="reply">
+									<div class="profile-picture">
+										<img src="etc/profile_matej_herman.jpg">
+									</div>
+									<div class="reply-body">
+										<input placeholder="Napište komentář...">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="answer write-answer">
+				<textarea placeholder="Napište odpověď..."></textarea>
+				<button class="button">Odeslat odpověď</button>
+			</div>
+
+		</div>
+
+	</div>
+	<div id="sidebar">
+		<h1>Oblíbená hledání</h1>
+		<a class="label">Moje předměty <i class="fa fa-remove"></i></a><a class="label">Web a multimédia <i class="fa fa-remove"></i></a><a class="label">B121 <i class="fa fa-remove"></i></a><a class="label">Vtipy | Hlášky <i class="fa fa-remove"></i></a><a class="label">Spam | OT <i class="fa fa-remove"></i></a>
+		<h1>Aktuální témata</h1>
+		<div class="cloud">
+			<a class="small">3DT</a>
+			<a class="large">AAG</a>
+			<a class="small">cvika</a>
+			<a class="small">DBS</a>
+			<a class="smaller">EFA</a>
+			<a class="small">GIT</a>
+			<a class="small">GRA</a>
+			<a class="medium">KOS</a>
+			<a class="medium">MLO</a>
+			<a class="small">OT</a>
+			<a class="large">PA1</a>
+			<a class="smaller">PA2</a>
+			<a class="small">predmety</a>
+			<a class="small">PS1</a>
+			<a class="small">rozstrel</a>
+			<a class="larger">rozvrh</a>
+			<a class="small">SAP</a>
+			<a class="small">SP1</a>
+			<a class="small">teoreticka</a>
+			<a class="small">teorie</a>
+			<a class="smaller">ustni</a>
+			<a class="larger">ZDM</a>
+			<a class="medium">zkouska</a>
+			<a class="smaller">zma</a>
+		</div>
+	</div>
+</div>
+
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/foundation.min.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

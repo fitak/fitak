@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\DI\Config\Adapters;
 
-use Nette,
-	Nette\DI\Config\Helpers;
+use Nette;
+use Nette\DI\Config\Helpers;
 
 
 /**
  * Reading and generating INI files.
- *
- * @author     David Grudl
  */
 class IniAdapter extends Nette\Object implements Nette\DI\Config\IAdapter
 {
@@ -33,7 +31,7 @@ class IniAdapter extends Nette\Object implements Nette\DI\Config\IAdapter
 	 */
 	public function load($file)
 	{
-		$ini = @parse_ini_file($file, TRUE); // intentionally @
+		$ini = @parse_ini_file($file, TRUE); // @ escalated to exception
 		if ($ini === FALSE) {
 			$error = error_get_last();
 			throw new Nette\InvalidStateException("parse_ini_file(): $error[message]");

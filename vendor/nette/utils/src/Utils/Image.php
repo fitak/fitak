@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -20,13 +20,11 @@ use Nette;
  * $image->send();
  * </code>
  *
- * @author     David Grudl
- *
  * @method void alphaBlending(bool $on)
  * @method void antialias(bool $on)
- * @method void arc($x, $y, $w, $h, $s, $e, $color)
- * @method void char($font, $x, $y, $char, $color)
- * @method void charUp($font, $x, $y, $char, $color)
+ * @method void arc($x, $y, $w, $h, $start, $end, $color)
+ * @method void char(int $font, $x, $y, string $char, $color)
+ * @method void charUp(int $font, $x, $y, string $char, $color)
  * @method int colorAllocate($red, $green, $blue)
  * @method int colorAllocateAlpha($red, $green, $blue, $alpha)
  * @method int colorAt($x, $y)
@@ -42,7 +40,7 @@ use Nette;
  * @method void colorSet($index, $red, $green, $blue)
  * @method array colorsForIndex($index)
  * @method int colorsTotal()
- * @method int colorTransparent([$color])
+ * @method int colorTransparent($color = NULL)
  * @method void convolution(array $matrix, float $div, float $offset)
  * @method void copy(Image $src, $dstX, $dstY, $srcX, $srcY, $srcW, $srcH)
  * @method void copyMerge(Image $src, $dstX, $dstY, $srcX, $srcY, $srcW, $srcH, $opacity)
@@ -57,26 +55,16 @@ use Nette;
  * @method void filledPolygon(array $points, $numPoints, $color)
  * @method void filledRectangle($x1, $y1, $x2, $y2, $color)
  * @method void fillToBorder($x, $y, $border, $color)
- * @method void filter($filtertype [, ...])
- * @method int fontHeight($font)
- * @method int fontWidth($font)
- * @method array ftBBox($size, $angle, string $fontFile, string $text [, array $extrainfo])
- * @method array ftText($size, $angle, $x, $y, $col, string $fontFile, string $text [, array $extrainfo])
+ * @method void filter($filtertype)
+ * @method array ftText($size, $angle, $x, $y, $col, string $fontFile, string $text, array $extrainfo = NULL)
  * @method void gammaCorrect(float $inputgamma, float $outputgamma)
- * @method int interlace([$interlace])
+ * @method int interlace($interlace = NULL)
  * @method bool isTrueColor()
  * @method void layerEffect($effect)
  * @method void line($x1, $y1, $x2, $y2, $color)
- * @method int loadFont(string $file)
  * @method void paletteCopy(Image $source)
  * @method void polygon(array $points, $numPoints, $color)
- * @method array psBBox(string $text, $font, $size [, $space] [, $tightness] [, float $angle])
- * @method void psEncodeFont($fontIndex, string $encodingfile)
- * @method void psExtendFont($fontIndex, float $extend)
- * @method void psFreeFont($fontindex)
- * @method resource psLoadFont(string $filename)
- * @method void psSlantFont($fontIndex, float $slant)
- * @method array psText(string $text, $font, $size, $color, $backgroundColor, $x, $y [, $space] [, $tightness] [, float $angle] [, $antialiasSteps])
+ * @method array psText(string $text, $font, $size, $color, $backgroundColor, $x, $y, $space = NULL, $tightness = NULL, float $angle = NULL, $antialiasSteps = NULL)
  * @method void rectangle($x1, $y1, $x2, $y2, $col)
  * @method Image rotate(float $angle, $backgroundColor)
  * @method void saveAlpha(bool $saveflag)
@@ -88,9 +76,7 @@ use Nette;
  * @method void string($font, $x, $y, string $s, $col)
  * @method void stringUp($font, $x, $y, string $s, $col)
  * @method void trueColorToPalette(bool $dither, $ncolors)
- * @method array ttfBBox($size, $angle, string $fontfile, string $text)
  * @method array ttfText($size, $angle, $x, $y, $color, string $fontfile, string $text)
- * @method int types()
  * @property-read int $width
  * @property-read int $height
  * @property-read resource $imageResource
@@ -112,7 +98,7 @@ class Image extends Nette\Object
 	/** {@link resize()} fills given area exactly */
 	const EXACT = 8;
 
-	/** @int image types {@link send()} */
+	/** image types */
 	const JPEG = IMAGETYPE_JPEG,
 		PNG = IMAGETYPE_PNG,
 		GIF = IMAGETYPE_GIF;
@@ -151,7 +137,7 @@ class Image extends Nette\Object
 	 * @param  mixed  detected image format
 	 * @throws Nette\NotSupportedException if gd extension is not loaded
 	 * @throws UnknownImageFileException if file not found or file type is not known
-	 * @return Image
+	 * @return self
 	 */
 	public static function fromFile($file, & $format = NULL)
 	{
@@ -159,31 +145,29 @@ class Image extends Nette\Object
 			throw new Nette\NotSupportedException('PHP extension GD is not loaded.');
 		}
 
+		static $funcs = array(
+			self::JPEG => 'imagecreatefromjpeg',
+			self::PNG => 'imagecreatefrompng',
+			self::GIF => 'imagecreatefromgif',
+		);
 		$info = @getimagesize($file); // @ - files smaller than 12 bytes causes read error
+		$format = $info[2];
 
-		switch ($format = $info[2]) {
-			case self::JPEG:
-				return new static(imagecreatefromjpeg($file));
-
-			case self::PNG:
-				return new static(imagecreatefrompng($file));
-
-			case self::GIF:
-				return new static(imagecreatefromgif($file));
-
-			default:
-				throw new UnknownImageFileException("Unknown image type or file '$file' not found.");
+		if (!isset($funcs[$format])) {
+			throw new UnknownImageFileException(is_file($file) ? "Unknown type of file '$file'." : "File '$file' not found.");
 		}
+		return new static(Callback::invokeSafe($funcs[$format], array($file), function ($message) {
+			throw new ImageException($message);
+		}));
 	}
 
 
 	/**
-	 * Get format from the image stream in the string.
-	 * @param  string
-	 * @return mixed  detected image format
+	 * @deprecated
 	 */
 	public static function getFormatFromString($s)
 	{
+		trigger_error(__METHOD__ . '() is deprecated; use finfo_buffer() instead.', E_USER_DEPRECATED);
 		$types = array('image/jpeg' => self::JPEG, 'image/gif' => self::GIF, 'image/png' => self::PNG);
 		$type = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $s);
 		return isset($types[$type]) ? $types[$type] : NULL;
@@ -194,7 +178,8 @@ class Image extends Nette\Object
 	 * Create a new image from the image stream in the string.
 	 * @param  string
 	 * @param  mixed  detected image format
-	 * @return Image
+	 * @return self
+	 * @throws ImageException
 	 */
 	public static function fromString($s, & $format = NULL)
 	{
@@ -202,9 +187,13 @@ class Image extends Nette\Object
 			throw new Nette\NotSupportedException('PHP extension GD is not loaded.');
 		}
 
-		$format = static::getFormatFromString($s);
+		if (func_num_args() > 1) {
+			$format = @static::getFormatFromString($s); // @ suppress trigger_error
+		}
 
-		return new static(imagecreatefromstring($s));
+		return new static(Callback::invokeSafe('imagecreatefromstring', array($s), function ($message) {
+			throw new ImageException($message);
+		}));
 	}
 
 
@@ -213,7 +202,7 @@ class Image extends Nette\Object
 	 * @param  int
 	 * @param  int
 	 * @param  array
-	 * @return Image
+	 * @return self
 	 */
 	public static function fromBlank($width, $height, $color = NULL)
 	{
@@ -230,7 +219,7 @@ class Image extends Nette\Object
 		$image = imagecreatetruecolor($width, $height);
 		if (is_array($color)) {
 			$color += array('alpha' => 0);
-			$color = imagecolorallocatealpha($image, $color['red'], $color['green'], $color['blue'], $color['alpha']);
+			$color = imagecolorresolvealpha($image, $color['red'], $color['green'], $color['blue'], $color['alpha']);
 			imagealphablending($image, FALSE);
 			imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, $color);
 			imagealphablending($image, TRUE);
@@ -442,10 +431,12 @@ class Image extends Nette\Object
 			$top = round(($srcHeight - $newHeight) / 100 * $top);
 		}
 		if ($left < 0) {
-			$newWidth += $left; $left = 0;
+			$newWidth += $left;
+			$left = 0;
 		}
 		if ($top < 0) {
-			$newHeight += $top; $top = 0;
+			$newHeight += $top;
+			$top = 0;
 		}
 		$newWidth = min((int) $newWidth, $srcWidth - $left);
 		$newHeight = min((int) $newHeight, $srcHeight - $top);
@@ -460,9 +451,9 @@ class Image extends Nette\Object
 	public function sharpen()
 	{
 		imageconvolution($this->image, array( // my magic numbers ;)
-			array( -1, -1, -1 ),
-			array( -1, 24, -1 ),
-			array( -1, -1, -1 ),
+			array(-1, -1, -1),
+			array(-1, 24, -1),
+			array(-1, -1, -1),
 		), 16, 0);
 		return $this;
 	}
@@ -494,9 +485,19 @@ class Image extends Nette\Object
 				$left, $top, 0, 0, $image->getWidth(), $image->getHeight()
 			);
 
-		} elseif ($opacity <> 0) {
+		} elseif ($opacity != 0) {
+			$cutting = imagecreatetruecolor($image->getWidth(), $image->getHeight());
+			imagecopy(
+				$cutting, $this->image,
+				0, 0, $left, $top, $image->getWidth(), $image->getHeight()
+			);
+			imagecopy(
+				$cutting, $image->getImageResource(),
+				0, 0, 0, 0, $image->getWidth(), $image->getHeight()
+			);
+
 			imagecopymerge(
-				$this->image, $image->getImageResource(),
+				$this->image, $cutting,
 				$left, $top, 0, 0, $image->getWidth(), $image->getHeight(),
 				$opacity
 			);
@@ -515,7 +516,7 @@ class Image extends Nette\Object
 	public function save($file = NULL, $quality = NULL, $type = NULL)
 	{
 		if ($type === NULL) {
-			switch (strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
+			switch (strtolower($ext = pathinfo($file, PATHINFO_EXTENSION))) {
 				case 'jpg':
 				case 'jpeg':
 					$type = self::JPEG;
@@ -525,6 +526,9 @@ class Image extends Nette\Object
 					break;
 				case 'gif':
 					$type = self::GIF;
+					break;
+				default:
+					throw new Nette\InvalidArgumentException("Unsupported file extension '$ext'.");
 			}
 		}
 
@@ -541,7 +545,7 @@ class Image extends Nette\Object
 				return imagegif($this->image, $file);
 
 			default:
-				throw new Nette\InvalidArgumentException('Unsupported image type.');
+				throw new Nette\InvalidArgumentException("Unsupported image type '$type'.");
 		}
 	}
 
@@ -568,7 +572,10 @@ class Image extends Nette\Object
 	{
 		try {
 			return $this->toString();
+		} catch (\Throwable $e) {
 		} catch (\Exception $e) {
+		}
+		if (isset($e)) {
 			if (func_num_args()) {
 				throw $e;
 			}
@@ -585,8 +592,8 @@ class Image extends Nette\Object
 	 */
 	public function send($type = self::JPEG, $quality = NULL)
 	{
-		if ($type !== self::GIF && $type !== self::PNG && $type !== self::JPEG) {
-			throw new Nette\InvalidArgumentException('Unsupported image type.');
+		if (!in_array($type, array(self::JPEG, self::PNG, self::GIF), TRUE)) {
+			throw new Nette\InvalidArgumentException("Unsupported image type '$type'.");
 		}
 		header('Content-Type: ' . image_type_to_mime_type($type));
 		return $this->save(NULL, $quality, $type);
@@ -599,30 +606,33 @@ class Image extends Nette\Object
 	 * @param  string  method name
 	 * @param  array   arguments
 	 * @return mixed
-	 * @throws MemberAccessException
+	 * @throws Nette\MemberAccessException
 	 */
 	public function __call($name, $args)
 	{
 		$function = 'image' . $name;
-		if (function_exists($function)) {
-			foreach ($args as $key => $value) {
-				if ($value instanceof self) {
-					$args[$key] = $value->getImageResource();
-
-				} elseif (is_array($value) && isset($value['red'])) { // rgb
-					$args[$key] = imagecolorallocatealpha(
-						$this->image,
-						$value['red'], $value['green'], $value['blue'], $value['alpha']
-					);
-				}
-			}
-			array_unshift($args, $this->image);
-
-			$res = call_user_func_array($function, $args);
-			return is_resource($res) && get_resource_type($res) === 'gd' ? $this->setImageResource($res) : $res;
+		if (!function_exists($function)) {
+			return parent::__call($name, $args);
 		}
 
-		return parent::__call($name, $args);
+		foreach ($args as $key => $value) {
+			if ($value instanceof self) {
+				$args[$key] = $value->getImageResource();
+
+			} elseif (is_array($value) && isset($value['red'])) { // rgb
+				$args[$key] = imagecolorallocatealpha(
+					$this->image,
+					$value['red'], $value['green'], $value['blue'], $value['alpha']
+				) ?: imagecolorresolvealpha(
+					$this->image,
+					$value['red'], $value['green'], $value['blue'], $value['alpha']
+				);
+			}
+		}
+		array_unshift($args, $this->image);
+
+		$res = call_user_func_array($function, $args);
+		return is_resource($res) && get_resource_type($res) === 'gd' ? $this->setImageResource($res) : $res;
 	}
 
 
@@ -633,12 +643,4 @@ class Image extends Nette\Object
 		$this->setImageResource(imagecreatefromstring(ob_get_clean()));
 	}
 
-}
-
-
-/**
- * The exception that indicates invalid image file.
- */
-class UnknownImageFileException extends \Exception
-{
 }

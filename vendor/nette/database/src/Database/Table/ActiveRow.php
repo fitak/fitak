@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Table;
@@ -13,9 +13,6 @@ use Nette;
 /**
  * Single row representation.
  * ActiveRow is based on the great library NotORM http://www.notorm.com written by Jakub Vrana.
- *
- * @author     Jakub Vrana
- * @author     Jan Skrasek
  */
 class ActiveRow implements \IteratorAggregate, IRow
 {
@@ -38,7 +35,6 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	/**
 	 * @internal
-	 * @ignore
 	 */
 	public function setTable(Selection $table)
 	{
@@ -59,7 +55,10 @@ class ActiveRow implements \IteratorAggregate, IRow
 	{
 		try {
 			return (string) $this->getPrimary();
+		} catch (\Throwable $e) {
 		} catch (\Exception $e) {
+		}
+		if (isset($e)) {
 			if (func_num_args()) {
 				throw $e;
 			}
@@ -167,10 +166,23 @@ class ActiveRow implements \IteratorAggregate, IRow
 	 */
 	public function update($data)
 	{
+		if ($data instanceof \Traversable) {
+			$data = iterator_to_array($data);
+		}
+
+		$primary = $this->getPrimary();
+		if (!is_array($primary)) {
+			$primary = array($this->table->getPrimary() => $primary);
+		}
+
 		$selection = $this->table->createSelectionInstance()
-			->wherePrimary($this->getPrimary());
+			->wherePrimary($primary);
 
 		if ($selection->update($data)) {
+			if ($tmp = array_intersect_key($data, $primary)) {
+				$selection = $this->table->createSelectionInstance()
+					->wherePrimary($tmp + $primary);
+			}
 			$selection->select('*');
 			if (($row = $selection->fetch()) === FALSE) {
 				throw new Nette\InvalidStateException('Database refetch failed; row does not exist!');
@@ -265,10 +277,14 @@ class ActiveRow implements \IteratorAggregate, IRow
 	}
 
 
+	/**
+	 * @param  string
+	 * @return ActiveRow|mixed
+	 * @throws Nette\MemberAccessException
+	 */
 	public function &__get($key)
 	{
-		$this->accessColumn($key);
-		if (array_key_exists($key, $this->data)) {
+		if ($this->accessColumn($key)) {
 			return $this->data[$key];
 		}
 
@@ -279,14 +295,14 @@ class ActiveRow implements \IteratorAggregate, IRow
 		}
 
 		$this->removeAccessColumn($key);
-		throw new Nette\MemberAccessException("Cannot read an undeclared column '$key'.");
+		$hint = Nette\Utils\ObjectMixin::getSuggestion(array_keys($this->data), $key);
+		throw new Nette\MemberAccessException("Cannot read an undeclared column '$key'" . ($hint ? ", did you mean '$hint'?" : '.'));
 	}
 
 
 	public function __isset($key)
 	{
-		$this->accessColumn($key);
-		if (array_key_exists($key, $this->data)) {
+		if ($this->accessColumn($key)) {
 			return isset($this->data[$key]);
 		}
 		$this->removeAccessColumn($key);
@@ -300,13 +316,19 @@ class ActiveRow implements \IteratorAggregate, IRow
 	}
 
 
-	protected function accessColumn($key, $selectColumn = TRUE)
+	/**
+	 * @internal
+	 */
+	public function accessColumn($key, $selectColumn = TRUE)
 	{
-		$this->table->accessColumn($key, $selectColumn);
-		if ($this->table->getDataRefreshed() && !$this->dataRefreshed) {
+		if ($this->table->accessColumn($key, $selectColumn) && !$this->dataRefreshed) {
+			if (!isset($this->table[$this->getSignature()])) {
+				throw new Nette\InvalidStateException('Database refetch failed; row does not exist!');
+			}
 			$this->data = $this->table[$this->getSignature()]->data;
 			$this->dataRefreshed = TRUE;
 		}
+		return isset($this->data[$key]) || array_key_exists($key, $this->data);
 	}
 
 

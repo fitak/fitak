@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Macros;
 
-use Latte,
-	Latte\MacroNode;
+use Latte;
+use Latte\MacroNode;
 
 
 /**
  * Base IMacro implementation. Allows add multiple macros.
- *
- * @author     David Grudl
  */
 class MacroSet extends Latte\Object implements Latte\IMacro
 {
@@ -74,6 +72,22 @@ class MacroSet extends Latte\Object implements Latte\IMacro
 	{
 		list($begin, $end, $attr) = $this->macros[$node->name];
 		$node->isEmpty = !$end;
+
+		if ($node->modifiers
+			&& (!$begin || (is_string($begin) && strpos($begin, '%modify') === FALSE))
+			&& (!$end || (is_string($end) && strpos($end, '%modify') === FALSE))
+			&& (!$attr || (is_string($attr) && strpos($attr, '%modify') === FALSE))
+		) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+
+		if ($node->args
+			&& (!$begin || (is_string($begin) && strpos($begin, '%node') === FALSE))
+			&& (!$end || (is_string($end) && strpos($end, '%node') === FALSE))
+			&& (!$attr || (is_string($attr) && strpos($attr, '%node') === FALSE))
+		) {
+			trigger_error("Arguments are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 
 		if ($attr && $node->prefix === $node::PREFIX_NONE) {
 			$node->isEmpty = TRUE;

@@ -3,12 +3,13 @@
 namespace Fitak;
 
 use Nette\Database\Drivers\MySqlDriver;
-use Nextras\Orm;
 use Nextras\Orm\Entity\IEntity;
+use Nextras\Orm\Entity\Reflection\PropertyMetadata;
 use Nextras\Orm\Mapper\IMapper;
+use Nextras\Orm\Mapper\Mapper;
 
 
-class PostsMapper extends Orm\Mapper\Mapper
+class PostsMapper extends Mapper
 {
 
 	/** @var string */
@@ -23,7 +24,7 @@ class PostsMapper extends Orm\Mapper\Mapper
 		return $storageReflection;
 	}
 
-	public function getManyHasManyParameters(IMapper $mapper)
+	public function getManyHasManyParameters(PropertyMetadata $sourceProperty, IMapper $mapper)
 	{
 		if ($mapper instanceof TagsMapper)
 		{
@@ -34,7 +35,7 @@ class PostsMapper extends Orm\Mapper\Mapper
 		}
 		else
 		{
-			return parent::getManyHasManyParameters($mapper);
+			return parent::getManyHasManyParameters($sourceProperty, $mapper);
 		}
 	}
 

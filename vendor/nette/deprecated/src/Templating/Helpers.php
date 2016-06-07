@@ -1,14 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Templating;
 
-use Nette,
-	Latte;
+use Nette;
+use Latte;
+use Nette\Utils\Strings;
 
 
 /**
@@ -22,7 +23,7 @@ class Helpers extends Latte\Runtime\Filters
 		'webalize' => 'Nette\Utils\Strings::webalize',
 		'padleft' => 'Nette\Utils\Strings::padLeft',
 		'padright' => 'Nette\Utils\Strings::padRight',
-		'reverse' =>  'Nette\Utils\Strings::reverse',
+		'reverse' => 'Nette\Utils\Strings::reverse',
 		'url' => 'rawurlencode',
 	);
 
@@ -44,7 +45,7 @@ class Helpers extends Latte\Runtime\Filters
 
 	/**
 	 * Date/time modification.
-	 * @param  string|int|DateTime
+	 * @param  string|int|\DateTime
 	 * @param  string|int
 	 * @param  string
 	 * @return Nette\Utils\DateTime

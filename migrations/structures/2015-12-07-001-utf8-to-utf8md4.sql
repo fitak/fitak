@@ -1,0 +1,9 @@
+ALTER TABLE `data` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `data_tags` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `groups` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `ip` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `key_value` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `news` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `tags` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `tags_favorite` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+ALTER TABLE `users` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;

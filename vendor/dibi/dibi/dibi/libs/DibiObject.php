@@ -2,14 +2,14 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * DibiObject is the ultimate ancestor of all instantiable classes.
  *
- * DibiObject is copy of Nette\Object from Nette Framework (http://nette.org).
+ * DibiObject is copy of Nette\Object from Nette Framework (https://nette.org).
  *
  * It defines some handful methods and enhances object core of PHP:
  *   - access to undeclared members throws exceptions
@@ -39,12 +39,11 @@
  * Adding method to class (i.e. to all instances) works similar to JavaScript
  * prototype property. The syntax for adding a new method is:
  * <code>
- * MyClass::extensionMethod('newMethod', function(MyClass $obj, $arg, ...) { ... });
+ * MyClass::extensionMethod('newMethod', function (MyClass $obj, $arg, ...) { ... });
  * $obj = new MyClass;
  * $obj->newMethod($x);
  * </code>
  *
- * @author     David Grudl
  * @package    dibi
  */
 abstract class DibiObject
@@ -209,8 +208,8 @@ abstract class DibiObject
 		}
 
 		// property getter support
-		$name[0] = $name[0] & "\xDF"; // case-sensitive checking, capitalize first character
-		$m = 'get' . $name;
+		$uname = ucfirst($name);
+		$m = 'get' . $uname;
 		if (self::hasAccessor($class, $m)) {
 			// ampersands:
 			// - uses & __get() because declaration should be forward compatible (e.g. with Nette\Web\Html)
@@ -219,13 +218,12 @@ abstract class DibiObject
 			return $val;
 		}
 
-		$m = 'is' . $name;
+		$m = 'is' . $uname;
 		if (self::hasAccessor($class, $m)) {
 			$val = $this->$m();
 			return $val;
 		}
 
-		$name = func_get_arg(0);
 		throw new LogicException("Cannot read an undeclared property $class::\$$name.");
 	}
 
@@ -246,20 +244,18 @@ abstract class DibiObject
 		}
 
 		// property setter support
-		$name[0] = $name[0] & "\xDF"; // case-sensitive checking, capitalize first character
-		if (self::hasAccessor($class, 'get' . $name) || self::hasAccessor($class, 'is' . $name)) {
+		$uname = ucfirst($name);
+		if (self::hasAccessor($class, 'get' . $uname) || self::hasAccessor($class, 'is' . $uname)) {
 			$m = 'set' . $name;
 			if (self::hasAccessor($class, $m)) {
 				$this->$m($value);
 				return;
 
 			} else {
-				$name = func_get_arg(0);
 				throw new LogicException("Cannot assign to a read-only property $class::\$$name.");
 			}
 		}
 
-		$name = func_get_arg(0);
 		throw new LogicException("Cannot assign to an undeclared property $class::\$$name.");
 	}
 
@@ -271,8 +267,7 @@ abstract class DibiObject
 	 */
 	public function __isset($name)
 	{
-		$name[0] = $name[0] & "\xDF";
-		return $name !== '' && self::hasAccessor(get_class($this), 'get' . $name);
+		return $name !== '' && self::hasAccessor(get_class($this), 'get' . ucfirst($name));
 	}
 
 

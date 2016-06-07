@@ -1,17 +1,19 @@
-[Dibi](http://dibiphp.com) - smart database layer for PHP  [![Buy me a coffee](http://files.nette.org/images/coffee1s.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9XXL5ZJHAYQUN)
+[Dibi](https://dibiphp.com) - smart database layer for PHP  [![Buy me a coffee](https://files.nette.org/images/coffee1s.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9XXL5ZJHAYQUN)
 =========================================================
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/dibi/dibi.svg)](https://packagist.org/packages/dibi/dibi)
 [![Build Status](https://travis-ci.org/dg/dibi.svg?branch=master)](https://travis-ci.org/dg/dibi)
+[![Latest Stable Version](https://poser.pugx.org/dibi/dibi/v/stable)](https://github.com/dg/dibi/releases)
+[![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/dg/dibi/blob/master/license.md)
 
 Database access functions in PHP are not standardised. This library
 hides the differences between them, and above all, it gives you a very handy interface.
 
-The best way to install Dibi is to use a [Composer](http://getcomposer.org/download):
+The best way to install Dibi is to use a [Composer](https://getcomposer.org/download):
 
     php composer.phar require dibi/dibi
 
-Or you can download the latest package from http://dibiphp.com. In this
+Or you can download the latest package from https://dibiphp.com. In this
 package is also `Dibi.minified`, shrinked single-file version of whole Dibi,
 useful when you don't want to modify the library, but just use it.
 
@@ -22,7 +24,7 @@ Examples
 --------
 
 Refer to the `examples` directory for examples. Dibi documentation is
-available on the [homepage](http://dibiphp.com).
+available on the [homepage](https://dibiphp.com).
 
 Connect to database:
 

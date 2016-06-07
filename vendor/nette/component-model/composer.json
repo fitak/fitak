@@ -1,24 +1,24 @@
 {
 	"name": "nette/component-model",
 	"description": "Nette Component Model",
-	"homepage": "http://nette.org",
+	"homepage": "https://nette.org",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
 			"name": "David Grudl",
-			"homepage": "http://davidgrudl.com"
+			"homepage": "https://davidgrudl.com"
 		},
 		{
 			"name": "Nette Community",
-			"homepage": "http://nette.org/contributors"
+			"homepage": "https://nette.org/contributors"
 		}
 	],
 	"require": {
 		"php": ">=5.3.1",
-		"nette/utils": "~2.2"
+		"nette/utils": "^2.3.5"
 	},
 	"require-dev": {
-		"nette/tester": "~1.0"
+		"nette/tester": "~1.3"
 	},
 	"conflict": {
 		"nette/nette": "<2.2"

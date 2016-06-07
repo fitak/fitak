@@ -4,7 +4,7 @@
  * Requirements Checker: This script will check if your system meets
  * the requirements for running Nette Framework.
  *
- * This file is part of the Nette Framework (http://nette.org)
+ * This file is part of the Nette Framework (https://nette.org)
  */
 
 
@@ -41,9 +41,9 @@ $tests[] = array(
 $tests[] = array(
 	'title' => 'PHP version',
 	'required' => TRUE,
-	'passed' => version_compare(PHP_VERSION, '5.3.1', '>='),
+	'passed' => version_compare(PHP_VERSION, '5.6.0', '>='),
 	'message' => PHP_VERSION,
-	'description' => 'Your PHP version is too old. Nette Framework requires at least PHP 5.3.1 or higher.',
+	'description' => 'Your PHP version is too old. Nette Framework requires at least PHP 5.6.0 or higher.',
 );
 
 $tests[] = array(

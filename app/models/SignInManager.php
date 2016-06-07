@@ -8,17 +8,17 @@ use Nette;
 class SignInManager extends Nette\Object
 {
 
-	/** @var RepositoryContainer */
+	/** @var Orm */
 	private $orm;
 
 	/** @var Nette\Security\IUserStorage */
 	private $userStorage;
 
 	/**
-	 * @param RepositoryContainer         $orm
+	 * @param Orm         $orm
 	 * @param Nette\Security\IUserStorage $userStorage
 	 */
-	public function __construct(RepositoryContainer $orm, Nette\Security\IUserStorage $userStorage)
+	public function __construct(Orm $orm, Nette\Security\IUserStorage $userStorage)
 	{
 		$this->orm = $orm;
 		$this->userStorage = $userStorage;
@@ -37,7 +37,6 @@ class SignInManager extends Nette\Object
 		{
 			throw new Nette\Security\AuthenticationException('User not found', Nette\Security\IAuthenticator::IDENTITY_NOT_FOUND);
 		}
-
 		if (!$user->isActivated)
 		{
 			throw new Nette\Security\AuthenticationException('User is not activated', Nette\Security\IAuthenticator::NOT_APPROVED);
@@ -69,7 +68,7 @@ class SignInManager extends Nette\Object
      */
     public function signInFacebook($id)
     {
-        $user = $this->orm->users->getByFacebookId($id);
+        $user = $this->orm->users->getByFbId($id);
         if ($user === NULL) {
             throw new Nette\Security\AuthenticationException('Tento pouzivatel nie je prihlaseny.');
         }

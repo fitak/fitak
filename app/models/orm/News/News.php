@@ -3,14 +3,14 @@
 namespace Fitak;
 
 use DateTime;
-use Nextras\Orm;
+use Nextras\Orm\Entity\Entity;
 
 
 /**
  * @property string   $message
  * @property DateTime $created
  */
-class News extends Orm\Entity\Entity
+class News extends Entity
 {
 
 }

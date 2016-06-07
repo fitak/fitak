@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms\Controls;
 
-use Nette,
-	Nette\Http\FileUpload;
+use Nette;
+use Nette\Http\FileUpload;
 
 
 /**
  * Text box and browse button that allow users to select a file to upload to the server.
- *
- * @author     David Grudl
  */
 class UploadControl extends BaseControl
 {
@@ -88,68 +86,6 @@ class UploadControl extends BaseControl
 	public function isFilled()
 	{
 		return $this->value instanceof FileUpload ? $this->value->isOk() : (bool) $this->value; // ignore NULL object
-	}
-
-
-	/********************* validators ****************d*g**/
-
-
-	/**
-	 * Is file size in limit?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateFileSize(UploadControl $control, $limit)
-	{
-		foreach (static::toArray($control->getValue()) as $file) {
-			if ($file->getSize() > $limit || $file->getError() === UPLOAD_ERR_INI_SIZE) {
-				return FALSE;
-			}
-		}
-		return TRUE;
-	}
-
-
-	/**
-	 * Has file specified mime type?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateMimeType(UploadControl $control, $mimeType)
-	{
-		$mimeTypes = is_array($mimeType) ? $mimeType : explode(',', $mimeType);
-		foreach (static::toArray($control->getValue()) as $file) {
-			$type = strtolower($file->getContentType());
-			if (!in_array($type, $mimeTypes, TRUE) && !in_array(preg_replace('#/.*#', '/*', $type), $mimeTypes, TRUE)) {
-				return FALSE;
-			}
-		}
-		return TRUE;
-	}
-
-
-	/**
-	 * Is file image?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateImage(UploadControl $control)
-	{
-		foreach (static::toArray($control->getValue()) as $file) {
-			if (!$file->isImage()) {
-				return FALSE;
-			}
-		}
-		return TRUE;
-	}
-
-
-	/**
-	 * @return array
-	 */
-	private static function toArray($value)
-	{
-		return $value instanceof FileUpload ? array($value) : (array) $value;
 	}
 
 }

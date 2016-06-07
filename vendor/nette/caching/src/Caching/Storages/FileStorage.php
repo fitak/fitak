@@ -1,20 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching\Storages;
 
-use Nette,
-	Nette\Caching\Cache;
+use Nette;
+use Nette\Caching\Cache;
 
 
 /**
  * Cache file storage.
- *
- * @author     David Grudl
  */
 class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 {
@@ -65,16 +63,16 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 
 	public function __construct($dir, IJournal $journal = NULL)
 	{
-		$this->dir = realpath($dir);
-		if ($this->dir === FALSE) {
+		if (!is_dir($dir)) {
 			throw new Nette\DirectoryNotFoundException("Directory '$dir' not found.");
 		}
 
+		$this->dir = $dir;
 		$this->useDirs = (bool) static::$useDirectories;
 		$this->journal = $journal;
 
 		if (mt_rand() / mt_getrandmax() < static::$gcProbability) {
-			$this->clean(array());
+			$this->clean([]);
 		}
 	}
 
@@ -164,9 +162,9 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 	 */
 	public function write($key, $data, array $dp)
 	{
-		$meta = array(
+		$meta = [
 			self::META_TIME => microtime(),
-		);
+		];
 
 		if (isset($dp[Cache::EXPIRATION])) {
 			if (empty($dp[Cache::SLIDING])) {
@@ -328,12 +326,10 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 		if ($head && strlen($head) === self::META_HEADER_LEN) {
 			$size = (int) substr($head, -6);
 			$meta = stream_get_contents($handle, $size, self::META_HEADER_LEN);
-			$meta = @unserialize($meta); // intentionally @
-			if (is_array($meta)) {
-				$meta[self::FILE] = $file;
-				$meta[self::HANDLE] = $handle;
-				return $meta;
-			}
+			$meta = unserialize($meta);
+			$meta[self::FILE] = $file;
+			$meta[self::HANDLE] = $handle;
+			return $meta;
 		}
 
 		flock($handle, LOCK_UN);
@@ -356,7 +352,7 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 		if (empty($meta[self::META_SERIALIZED])) {
 			return $data;
 		} else {
-			return @unserialize($data); // intentionally @
+			return unserialize($data);
 		}
 	}
 

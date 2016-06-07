@@ -1,17 +1,15 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
 
 
 /**
- * Traversing helper. Internal class.
- *
- * @author     David Grudl
+ * Traversing helper.
  * @internal
  */
 class TokenIterator extends Object
@@ -61,7 +59,7 @@ class TokenIterator extends Object
 
 	/**
 	 * Returns next token.
-	 * @param  desired token
+	 * @param  int|string  (optional) desired token type or value
 	 * @return array|NULL
 	 */
 	public function nextToken()
@@ -72,7 +70,7 @@ class TokenIterator extends Object
 
 	/**
 	 * Returns next token value.
-	 * @param  desired token
+	 * @param  int|string  (optional) desired token type or value
 	 * @return string|NULL
 	 */
 	public function nextValue()
@@ -83,7 +81,7 @@ class TokenIterator extends Object
 
 	/**
 	 * Returns all next tokens.
-	 * @param  desired token
+	 * @param  int|string  (optional) desired token type or value
 	 * @return array[]
 	 */
 	public function nextAll()
@@ -93,8 +91,8 @@ class TokenIterator extends Object
 
 
 	/**
-	 * Returns all next tokens until it sees a token with the given value.
-	 * @param  tokens
+	 * Returns all next tokens until it sees a given token type or value.
+	 * @param  int|string  token type or value to stop before
 	 * @return array[]
 	 */
 	public function nextUntil($arg)
@@ -104,8 +102,8 @@ class TokenIterator extends Object
 
 
 	/**
-	 * Returns concatenation of all next tokens.
-	 * @param  desired token
+	 * Returns concatenation of all next token values.
+	 * @param  int|string  (optional) token type or value to be joined
 	 * @return string
 	 */
 	public function joinAll()
@@ -115,8 +113,8 @@ class TokenIterator extends Object
 
 
 	/**
-	 * Returns concatenation of all next tokens until it sees a token with the given value.
-	 * @param  tokens
+	 * Returns concatenation of all next tokens until it sees a given token type or value.
+	 * @param  int|string  token type or value to stop before
 	 * @return string
 	 */
 	public function joinUntil($arg)
@@ -127,7 +125,7 @@ class TokenIterator extends Object
 
 	/**
 	 * Checks the current token.
-	 * @param  token
+	 * @param  int|string  token type or value
 	 * @return bool
 	 */
 	public function isCurrent($arg)
@@ -143,8 +141,8 @@ class TokenIterator extends Object
 
 
 	/**
-	 * Checks the next token.
-	 * @param  token
+	 * Checks the next token existence.
+	 * @param  int|string  (optional) token type or value
 	 * @return bool
 	 */
 	public function isNext()
@@ -154,8 +152,8 @@ class TokenIterator extends Object
 
 
 	/**
-	 * Checks the previous token.
-	 * @param  token
+	 * Checks the previous token existence.
+	 * @param  int|string  (optional) token type or value
 	 * @return bool
 	 */
 	public function isPrev()
@@ -165,7 +163,7 @@ class TokenIterator extends Object
 
 
 	/**
-	 * @return TokenIterator
+	 * @return self
 	 */
 	public function reset()
 	{
@@ -174,6 +172,9 @@ class TokenIterator extends Object
 	}
 
 
+	/**
+	 * Moves cursor to next token.
+	 */
 	protected function next()
 	{
 		$this->position++;
@@ -182,6 +183,12 @@ class TokenIterator extends Object
 
 	/**
 	 * Looks for (first) (not) wanted tokens.
+	 * @param  array of desired token types or values
+	 * @param  bool
+	 * @param  bool
+	 * @param  bool
+	 * @param  bool
+	 * @param  bool
 	 * @return mixed
 	 */
 	protected function scan($wanted, $onlyFirst, $advance, $strings = FALSE, $until = FALSE, $prev = FALSE)

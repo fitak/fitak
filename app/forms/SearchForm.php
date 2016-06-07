@@ -1,6 +1,6 @@
 <?php
 
-use Fitak\RepositoryContainer;
+use Fitak\Orm;
 use Nette\Application\UI\Form;
 
 class SearchForm extends Form
@@ -8,7 +8,7 @@ class SearchForm extends Form
 
 	const SEMESTER = 'semester';
 
-	public function __construct(RepositoryContainer $orm, $advanced = TRUE)
+	public function __construct(Orm $orm, $advanced = TRUE)
 	{
 		parent::__construct();
 
@@ -57,7 +57,7 @@ class SearchForm extends Form
 			}
 		}
 
-		$this->presenter->redirect('Search:', $params);
+		$this->presenter->redirect('Homepage:', $params);
 	}
 
 }

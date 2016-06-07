@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Nette environment and configuration.
- *
- * @author     David Grudl
  * @deprecated
  */
 class Environment
@@ -157,7 +155,7 @@ class Environment
 
 	/**
 	 * Get initial instance of context.
-	 * @return \SystemContainer|Nette\DI\Container
+	 * @return Nette\DI\Container
 	 */
 	public static function getContext()
 	{

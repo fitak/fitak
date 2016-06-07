@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Entity\Reflection;
@@ -13,10 +11,11 @@ namespace Nextras\Orm\Entity\Reflection;
 use Inflect\Inflect;
 use Nette\Reflection\AnnotationsParser;
 use Nette\Reflection\ClassType;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ICollection;
+use Nextras\Orm\Entity\IProperty;
 use Nextras\Orm\InvalidArgumentException;
 use Nextras\Orm\InvalidStateException;
-use Nextras\Orm\StorageReflection\IStorageReflection;
+use Nextras\Orm\LogicException;
 use ReflectionClass;
 
 
@@ -44,21 +43,29 @@ class AnnotationParser
 	/** @var ClassType */
 	protected $reflection;
 
+	/** @var ClassType */
+	protected $currentReflection;
+
 	/** @var EntityMetadata */
 	protected $metadata;
 
 	/** @var array */
-	protected $storageProperties = [];
+	protected $primaryKey = [];
 
 	/** @var array */
-	protected $primaryKey = [];
+	protected $entityClassesMap;
+
+
+	public function __construct(array $entityClassesMap)
+	{
+		$this->entityClassesMap = $entityClassesMap;
+	}
 
 
 	public function parseMetadata($class, & $fileDependencies)
 	{
 		$this->reflection = new ClassType($class);
 		$this->metadata = new EntityMetadata($class);
-		$this->storageProperties = [];
 		$this->primaryKey = [];
 
 		$this->loadProperties($fileDependencies);
@@ -66,13 +73,12 @@ class AnnotationParser
 
 		// makes id property virtual on entities with composite primary key
 		if ($this->primaryKey && $this->metadata->hasProperty('id')) {
-			unset($this->storageProperties['id']);
+			$this->metadata->getProperty('id')->isVirtual = TRUE;
 		}
 
 		$fileDependencies = array_unique($fileDependencies);
 
 		$this->metadata->setPrimaryKey($this->primaryKey ?: ['id']);
-		$this->metadata->setStorageProperties(array_keys($this->storageProperties));
 		return $this->metadata;
 	}
 
@@ -85,11 +91,11 @@ class AnnotationParser
 		}
 
 		foreach ($this->metadata->getProperties() as $name => $property) {
-			$getter = 'get' . strtolower($name);
+			$getter = 'getter' . strtolower($name);
 			if (isset($methods[$getter])) {
 				$property->hasGetter = TRUE;
 			}
-			$setter = 'set' . strtolower($name);
+			$setter = 'setter' . strtolower($name);
 			if (isset($methods[$setter])) {
 				$property->hasSetter = TRUE;
 			}
@@ -111,6 +117,7 @@ class AnnotationParser
 		foreach (array_reverse($classTree) as $class) {
 			$reflection = ClassType::from($class);
 			$fileDependencies[] = $reflection->getFileName();
+			$this->currentReflection = $reflection;
 			$this->parseAnnotations($reflection);
 		}
 	}
@@ -135,9 +142,6 @@ class AnnotationParser
 
 				$name = substr($splitted[1], 1);
 				$types = $this->parseAnnotationTypes($splitted[0], $reflection);
-				if ($access === PropertyMetadata::READWRITE) {
-					$this->storageProperties[$name] = TRUE;
-				}
 				$this->parseAnnotationValue($name, $types, $access, isset($splitted[2]) ? $splitted[2] : NULL);
 			}
 		}
@@ -157,7 +161,7 @@ class AnnotationParser
 			if (strpos($type, '[') !== FALSE) { // Class[]
 				$type = 'array';
 			} elseif (!in_array(strtolower($type), $allTypes)) {
-				$type = AnnotationsParser::expandClassName($type, $reflection);
+				$type = $this->makeFQN($type);
 			}
 			$types[] = $type;
 		}
@@ -169,8 +173,6 @@ class AnnotationParser
 	protected function parseAnnotationValue($name, array $types, $access, $params)
 	{
 		$property = new PropertyMetadata($name, $types, $access);
-		$this->processDefaultContainer($property);
-
 		$this->metadata->setProperty($name, $property);
 		if ($params) {
 			preg_match_all('#\{([^}]+)\}#i', $params, $matches, PREG_SET_ORDER);
@@ -179,14 +181,6 @@ class AnnotationParser
 					$this->processPropertyModifier($property, preg_split('#\s+#', $match[1]));
 				}
 			}
-		}
-	}
-
-
-	protected function processDefaultContainer(PropertyMetadata $property)
-	{
-		if (isset($property->types['nette\utils\datetime']) || isset($property->types['datetime'])) {
-			$property->container = 'Nextras\Orm\Entity\PropertyContainers\DateTimePropertyContainer';
 		}
 	}
 
@@ -208,95 +202,119 @@ class AnnotationParser
 
 	protected function parseOneHasOne(PropertyMetadata $property, array $args)
 	{
-		if (count($args) === 0) {
-			throw new InvalidStateException('Missing repository name for {1:1} relationship.');
-		}
-
-		$property->relationshipType = PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE;
-		$property->relationshipRepository = $this->makeFQN(array_shift($args));
-		$property->relationshipProperty = $this->getPropertyNameSingular(array_shift($args));
+		$property->relationship = new PropertyRelationshipMetadata();
+		$property->relationship->type = PropertyRelationshipMetadata::ONE_HAS_ONE;
 		$property->container = 'Nextras\Orm\Relationships\OneHasOne';
+		$this->processRelationshipEntityProperty($args, TRUE, $property);
 	}
 
 
 	protected function parseOneHasOneDirected(PropertyMetadata $property, array $args)
 	{
-		if (count($args) === 0) {
-			throw new InvalidStateException('Missing repository name for {1:1d} relationship.');
-		}
-
-		$property->relationshipType = PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED;
-		$property->relationshipRepository = $this->makeFQN(array_shift($args));
+		$property->relationship = new PropertyRelationshipMetadata();
+		$property->relationship->type = PropertyRelationshipMetadata::ONE_HAS_ONE_DIRECTED;
 		$property->container = 'Nextras\Orm\Relationships\OneHasOneDirected';
-
-		if (count($args) === 2) {
-			$property->relationshipProperty = $this->getPropertyNameSingular(array_shift($args));
-			$property->relationshipIsMain = array_shift($args) === 'primary';
-		} else {
-			$arg = array_shift($args);
-			$property->relationshipProperty = $this->getPropertyNameSingular($arg === 'primary' ? NULL : $arg);
-			$property->relationshipIsMain = $arg === 'primary';
-		}
+		$this->processRelationshipEntityProperty($args, TRUE, $property);
+		$this->processRelationshipPrimary($args, $property);
 	}
 
 
 	protected function parseOneHasMany(PropertyMetadata $property, array $args)
 	{
-		if (count($args) === 0) {
-			throw new InvalidStateException('Missing repository name for {1:m} relationship.');
-		}
-
-		$arg = array_pop($args);
-		if (stripos($arg, 'order:') === 0) {
-			$property->args->relationship = ['order' => explode(',', substr($arg, 6)) + [1 => ICollection::ASC]];
-		} else {
-			$args[] = $arg;
-		}
-
-		$property->relationshipType = PropertyMetadata::RELATIONSHIP_ONE_HAS_MANY;
-		$property->relationshipRepository = $this->makeFQN(array_shift($args));
-		$property->relationshipProperty = $this->getPropertyNameSingular(array_shift($args));
+		$property->relationship = new PropertyRelationshipMetadata();
+		$property->relationship->type = PropertyRelationshipMetadata::ONE_HAS_MANY;
 		$property->container = 'Nextras\Orm\Relationships\OneHasMany';
+		$this->processRelationshipEntityProperty($args, TRUE, $property);
+		$this->processRelationshipOrder($args, $property);
 	}
 
 
 	protected function parseManyHasOne(PropertyMetadata $property, array $args)
 	{
-		if (count($args) === 0) {
-			throw new InvalidStateException('Missing repository name for {m:1} relationship.');
-		}
-
-		$property->relationshipType = PropertyMetadata::RELATIONSHIP_MANY_HAS_ONE;
-		$property->relationshipRepository = $this->makeFQN(array_shift($args));
-		$property->relationshipProperty = $this->getPropertyNamePlural(array_shift($args));
+		$property->relationship = new PropertyRelationshipMetadata();
+		$property->relationship->type = PropertyRelationshipMetadata::MANY_HAS_ONE;
 		$property->container = 'Nextras\Orm\Relationships\ManyHasOne';
+		$this->processRelationshipEntityProperty($args, FALSE, $property);
 	}
 
 
 	protected function parseManyHasMany(PropertyMetadata $property, array $args)
 	{
-		if (count($args) === 0) {
-			throw new InvalidStateException('Missing repository name for {m:n} relationship.');
-		}
-
-		$property->relationshipType = PropertyMetadata::RELATIONSHIP_MANY_HAS_MANY;
-		$property->relationshipRepository = $this->makeFQN(array_shift($args));
+		$property->relationship = new PropertyRelationshipMetadata();
+		$property->relationship->type = PropertyRelationshipMetadata::MANY_HAS_MANY;
 		$property->container = 'Nextras\Orm\Relationships\ManyHasMany';
+		$this->processRelationshipEntityProperty($args, FALSE, $property);
+		$this->processRelationshipPrimary($args, $property);
+		$this->processRelationshipOrder($args, $property);
+	}
 
-		$arg = array_pop($args);
-		if (stripos($arg, 'order:') === 0) {
-			$property->args->relationship = ['order' => explode(',', substr($arg, 6)) + [1 => ICollection::ASC]];
-		} else {
-			$args[] = $arg;
+
+	private function processRelationshipEntityProperty(array & $args, $useSingular, PropertyMetadata $propertyMetadata)
+	{
+		$class = array_shift($args);
+		if ($class === NULL) {
+			throw new InvalidStateException("Relationship in {$this->currentReflection->name}::\${$propertyMetadata->name} has not defined target entity name.");
 		}
 
-		if (count($args) === 2) {
-			$property->relationshipProperty = $this->getPropertyNamePlural(array_shift($args));
-			$property->relationshipIsMain = array_shift($args) === 'primary';
+		if (($pos = strpos($class, '::')) !== FALSE) {
+			$entity = $this->makeFQN(substr($class, 0, $pos));
+			if (!isset($this->entityClassesMap[$entity])) {
+				throw new InvalidStateException("Relationship in {$this->currentReflection->name}::\${$propertyMetadata->name} points to uknonw entity.");
+			}
+			$repository = $this->entityClassesMap[$entity];
+			$property = substr($class, $pos + 3); // skip ::$
+
+		} elseif (stripos($class, 'repository') === FALSE) {
+			$entity = $this->makeFQN($class);
+			if (!isset($this->entityClassesMap[$entity])) {
+				throw new InvalidStateException("Relationship in {$this->currentReflection->name}::\${$propertyMetadata->name} points to uknonw entity.");
+			}
+			$repository = $this->entityClassesMap[$entity];
+			$property = $useSingular
+				? $this->getPropertyNameSingular(NULL)
+				: $this->getPropertyNamePlural(NULL);
+
 		} else {
-			$arg = array_shift($args);
-			$property->relationshipProperty = $this->getPropertyNamePlural($arg === 'primary' ? NULL : $arg);
-			$property->relationshipIsMain = $arg === 'primary';
+			$repository = $this->makeFQN($class);
+			if (!class_exists($repository)) {
+				throw new InvalidStateException("Relationship in {$this->currentReflection->name}::\${$propertyMetadata->name} points to unknown repository.");
+			}
+			$entity = $repository::getEntityClassNames()[0];
+			$property = reset($args)[0] === '$' ? array_shift($args) : NULL;
+			$property = $useSingular
+				? $this->getPropertyNameSingular($property)
+				: $this->getPropertyNamePlural($property);
+		}
+
+		$propertyMetadata->relationship->repository = $repository;
+		$propertyMetadata->relationship->entity = $entity;
+		$propertyMetadata->relationship->property = $property;
+	}
+
+
+	private function processRelationshipOrder(array & $args, PropertyMetadata $property)
+	{
+		$order = array_shift($args);
+		if ($order === NULL) {
+			return;
+		}
+
+		if (stripos($order, 'order:') === FALSE) {
+			throw new InvalidStateException("Relationship definition in {$this->currentReflection->name}::\${$property->name} is expected to have order expression.");
+		}
+
+		$property->relationship->order = explode(',', substr($order, 6)) + [1 => ICollection::ASC];
+	}
+
+
+	private function processRelationshipPrimary(array & $args, PropertyMetadata $property)
+	{
+		$index = array_search('primary', $args, TRUE);
+		if ($index !== FALSE) {
+			$property->relationship->isMain = TRUE;
+			unset($args[$index]);
+		} else {
+			$property->relationship->isMain = FALSE;
 		}
 	}
 
@@ -312,17 +330,31 @@ class AnnotationParser
 			} else {
 				$className = $this->makeFQN($className);
 			}
+
 			$classReflection = new ReflectionClass($className);
+			$constants = $classReflection->getConstants();
 
 			if (strpos($const, '*') !== FALSE) {
 				$prefix = rtrim($const, '*');
 				$prefixLength = strlen($prefix);
-				foreach ($classReflection->getConstants() as $name => $value) {
+				$count = 0;
+				foreach ($constants as $name => $value) {
 					if (substr($name, 0, $prefixLength) === $prefix) {
 						$enumValues[$value] = $value;
+						$count += 1;
 					}
 				}
+				if ($count === 0) {
+					throw new InvalidArgumentException(
+						"No constant matching {$classReflection->name}::{$const} pattern required by enum macro in {$this->currentReflection->name}::\${$property->name} found."
+					);
+				}
 			} else {
+				if (!array_key_exists($const, $constants)) {
+					throw new InvalidArgumentException(
+						"Constant {$classReflection->name}::{$const} required by enum macro in {$this->currentReflection->name}::\${$property->name} not found."
+					);
+				}
 				$value = $classReflection->getConstant($const);
 				$enumValues[$value] = $value;
 			}
@@ -332,25 +364,30 @@ class AnnotationParser
 	}
 
 
-	protected function parseVirtual(PropertyMetadata $property, array $args)
+	protected function parseVirtual(PropertyMetadata $property)
 	{
-		unset($this->storageProperties[$property->name]);
+		$property->isVirtual = TRUE;
 	}
 
 
-	protected function parseContainer(PropertyMetadata $property, $args)
+	protected function parseContainer(PropertyMetadata $property, array $args)
 	{
-		$property->container = $this->makeFQN($args[0]);
+		$className = $this->makeFQN($args[0]);
+		$implements = class_implements($className);
+		if (!isset($implements['Nextras\\Orm\\Entity\\IProperty'])) {
+			throw new LogicException("Class '$className' in {container} for {$this->currentReflection->name}::\${$property->name} property does not implement Nextras\\Orm\\Entity\\IProperty interface.");
+		}
+		$property->container = $className;
 	}
 
 
-	protected function parseDefault(PropertyMetadata $property, $args)
+	protected function parseDefault(PropertyMetadata $property, array $args)
 	{
-		$property->defaultValue = $this->parseLiteral($args[0]);
+		$property->defaultValue = $this->parseLiteral($args[0], $property);
 	}
 
 
-	protected function parsePrimary(PropertyMetadata $propertyMetadata, $args)
+	protected function parsePrimary(PropertyMetadata $propertyMetadata)
 	{
 		$this->primaryKey[] = $propertyMetadata->name;
 	}
@@ -358,23 +395,23 @@ class AnnotationParser
 
 	protected function makeFQN($name)
 	{
-		return AnnotationsParser::expandClassName($name, $this->reflection);
+		return AnnotationsParser::expandClassName($name, $this->currentReflection);
 	}
 
 
 	protected function getPropertyNameSingular($arg)
 	{
-		return $arg ? ltrim($arg, '$') : lcfirst($this->reflection->getShortName());
+		return $arg ? ltrim($arg, '$') : lcfirst($this->currentReflection->getShortName());
 	}
 
 
 	protected function getPropertyNamePlural($arg)
 	{
-		return $arg ? ltrim($arg, '$') : Inflect::pluralize(lcfirst($this->reflection->getShortName()));
+		return $arg ? ltrim($arg, '$') : Inflect::pluralize(lcfirst($this->currentReflection->getShortName()));
 	}
 
 
-	protected function parseLiteral($literal)
+	protected function parseLiteral($literal, PropertyMetadata $property)
 	{
 		if (strcasecmp($literal, 'true') === 0) {
 			return TRUE;
@@ -382,6 +419,23 @@ class AnnotationParser
 			return FALSE;
 		} elseif (strcasecmp($literal, 'null') === 0) {
 			return NULL;
+		} elseif (strpos($literal, '::') !== FALSE) {
+			list($className, $const) = explode('::', $literal);
+			if ($className === 'self' || $className === 'static') {
+				$className = $this->metadata->className;
+			} else {
+				$className = $this->makeFQN($className);
+			}
+
+			$classReflection = new ReflectionClass($className);
+			$constants = $classReflection->getConstants();
+			if (!array_key_exists($const, $constants)) {
+				throw new InvalidArgumentException(
+					"Constant {$classReflection->name}::{$const} required by default macro in {$this->currentReflection->name}::\${$property->name} not found."
+				);
+			}
+			return $constants[$const];
+
 		} else {
 			return $literal;
 		}

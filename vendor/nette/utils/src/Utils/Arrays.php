@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Array tools library.
- *
- * @author     David Grudl
  */
 class Arrays
 {
@@ -29,7 +27,11 @@ class Arrays
 
 	/**
 	 * Returns item from array or $default if item is not set.
+	 * @param  array
+	 * @param  string|int|array one or more keys
+	 * @param  mixed
 	 * @return mixed
+	 * @throws Nette\InvalidArgumentException if item does not exist and default value is not provided
 	 */
 	public static function get(array $arr, $key, $default = NULL)
 	{
@@ -48,8 +50,11 @@ class Arrays
 
 
 	/**
-	 * Returns reference to array item or $default if item is not set.
+	 * Returns reference to array item.
+	 * @param  array
+	 * @param  string|int|array one or more keys
 	 * @return mixed
+	 * @throws Nette\InvalidArgumentException if traversed item is not an array
 	 */
 	public static function & getRef(& $arr, $key)
 	{
@@ -82,7 +87,7 @@ class Arrays
 
 	/**
 	 * Searches the array for a given key and returns the offset if successful.
-	 * @return int    offset if it is found, FALSE otherwise
+	 * @return int|FALSE offset if it is found, FALSE otherwise
 	 */
 	public static function searchKey($arr, $key)
 	{
@@ -147,8 +152,8 @@ class Arrays
 	{
 		$res = array();
 		$cb = $preserveKeys
-			? function($v, $k) use (& $res) { $res[$k] = $v; }
-			: function($v) use (& $res) { $res[] = $v; };
+			? function ($v, $k) use (& $res) { $res[$k] = $v; }
+			: function ($v) use (& $res) { $res[] = $v; };
 		array_walk_recursive($arr, $cb);
 		return $res;
 	}
@@ -166,7 +171,7 @@ class Arrays
 
 	/**
 	 * Reformats table to associative tree. Path looks like 'field|field[]field->field=field'.
-	 * @return array|stdClass
+	 * @return array|\stdClass
 	 */
 	public static function associate(array $arr, $path)
 	{
@@ -213,6 +218,44 @@ class Arrays
 		}
 
 		return $res;
+	}
+
+
+	/**
+	 * Normalizes to associative array.
+	 * @return array
+	 */
+	public static function normalize(array $arr, $filling = NULL)
+	{
+		$res = array();
+		foreach ($arr as $k => $v) {
+			$res[is_int($k) ? $v : $k] = is_int($k) ? $filling : $v;
+		}
+		return $res;
+	}
+
+
+	/**
+	 * Picks element from the array by key and return its value.
+	 * @param  array
+	 * @param  string|int array key
+	 * @param  mixed
+	 * @return mixed
+	 * @throws Nette\InvalidArgumentException if item does not exist and default value is not provided
+	 */
+	public static function pick(array & $arr, $key, $default = NULL)
+	{
+		if (array_key_exists($key, $arr)) {
+			$value = $arr[$key];
+			unset($arr[$key]);
+			return $value;
+
+		} elseif (func_num_args() < 3) {
+			throw new Nette\InvalidArgumentException("Missing item '$key'.");
+
+		} else {
+			return $default;
+		}
 	}
 
 }

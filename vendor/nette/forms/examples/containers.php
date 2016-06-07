@@ -6,12 +6,12 @@
 
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {
-	die('Install packages using `composer update --dev`');
+	die('Install packages using `composer install`');
 }
 
-use Nette\Forms\Form,
-	Tracy\Debugger,
-	Tracy\Dumper;
+use Nette\Forms\Form;
+use Tracy\Debugger;
+use Tracy\Dumper;
 
 Debugger::enable();
 
@@ -59,4 +59,4 @@ if ($form->isSuccess()) {
 
 <?php echo $form ?>
 
-<footer><a href="http://doc.nette.org/en/forms">see documentation</a></footer>
+<footer><a href="https://doc.nette.org/en/forms">see documentation</a></footer>

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Loaders;
@@ -12,8 +12,6 @@ use Latte;
 
 /**
  * Template loader.
- *
- * @author     David Grudl
  */
 class FileLoader extends Latte\Object implements Latte\ILoader
 {
@@ -49,7 +47,7 @@ class FileLoader extends Latte\Object implements Latte\ILoader
 	 */
 	public function getChildName($file, $parent = NULL)
 	{
-		if ($parent && !preg_match('#/|\\\\|[a-z]:#iA', $file)) {
+		if ($parent && !preg_match('#/|\\\\|[a-z][a-z0-9+.-]*:#iA', $file)) {
 			$file = dirname($parent) . '/' . $file;
 		}
 		return $file;

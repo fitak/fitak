@@ -69,6 +69,21 @@ class WithFormatterExpectationTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('Missing argument 1 for', $string);
     }
 
+    public function testFormatObjectsExcludesStaticProperties()
+    {
+        $obj = new ClassWithPublicStaticProperty();
+        $string = Mockery::formatObjects(array($obj));
+
+        $this->assertNotContains('excludedProperty', $string);
+    }
+
+    public function testFormatObjectsExcludesStaticGetters()
+    {
+        $obj = new ClassWithPublicStaticGetter();
+        $string = Mockery::formatObjects(array($obj));
+
+        $this->assertNotContains('getExcluded', $string);
+    }
 }
 
 class ClassWithGetter
@@ -88,5 +103,19 @@ class ClassWithGetter
 
 class ClassWithGetterWithParam
 {
-    public function getBar($bar) {}
+    public function getBar($bar)
+    {
+    }
+}
+
+class ClassWithPublicStaticProperty
+{
+    public static $excludedProperty;
+}
+
+class ClassWithPublicStaticGetter
+{
+    public static function getExcluded()
+    {
+    }
 }

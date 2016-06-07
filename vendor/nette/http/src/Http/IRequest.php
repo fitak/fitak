@@ -7,13 +7,9 @@
 
 namespace Nette\Http;
 
-use Nette;
-
 
 /**
  * IHttpRequest provides access scheme for request sent via HTTP.
- *
- * @author     David Grudl
  */
 interface IRequest
 {
@@ -53,8 +49,8 @@ interface IRequest
 
 	/**
 	 * Returns uploaded file.
-	 * @param  string key (or more keys)
-	 * @return FileUpload
+	 * @param  string key
+	 * @return FileUpload|NULL
 	 */
 	function getFile($key);
 
@@ -122,19 +118,19 @@ interface IRequest
 
 	/**
 	 * Returns the IP address of the remote client.
-	 * @return string
+	 * @return string|NULL
 	 */
 	function getRemoteAddress();
 
 	/**
 	 * Returns the host of the remote client.
-	 * @return string
+	 * @return string|NULL
 	 */
 	function getRemoteHost();
 
 	/**
 	 * Returns raw content of HTTP request body.
-	 * @return string
+	 * @return string|NULL
 	 */
 	function getRawBody();
 

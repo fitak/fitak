@@ -1,25 +1,26 @@
-nette:
-#	mailer:
-#		smtp: true
-#		host: smtp.mandrillapp.com
-#		port: 587
-#		secure: tls
-#		username:
-#		password:
+mail:
+	smtp: true
+	host:
+	port: 587
+	secure: tls
+	username:
+	password:
+
 parameters:
 	database:
-		host: localhost
-		user: root
+		host:
+		user:
 		password:
-		database: fitak.cz
+		database:
 	fb:
 		appId: "APPID"
 		appSecret: "APPSECRET"
-		permissions: [offline_access, email, public_profile]
+		permissions: []
+
 	kosapi:
 		username:
 		password:
 	elastic:
 		index: fitak
 	router:
-		useHttps: %productionMode%
+		useHttps: true

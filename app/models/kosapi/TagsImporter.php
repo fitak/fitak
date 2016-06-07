@@ -10,13 +10,13 @@ use SimpleXMLElement;
 class TagsImporter extends Nette\Object
 {
 
-	/** @var RepositoryContainer */
+	/** @var Orm */
 	private $orm;
 
 	/** @var KosApi */
 	private $kosApi;
 
-	public function __construct(RepositoryContainer $orm, KosApi $kosApi)
+	public function __construct(Orm $orm, KosApi $kosApi)
 	{
 		$this->orm = $orm;
 		$this->kosApi = $kosApi;

@@ -1,40 +1,56 @@
 extensions:
 	dibi: Dibi\Bridges\Nette\DibiExtension22
-	orm: Nextras\Orm\DI\OrmExtension
+	orm: Nextras\Orm\Bridges\NetteDI\OrmExtension
 	events: Kdyby\Events\DI\EventsExtension
 	console: Kdyby\Console\DI\ConsoleExtension
 	facebook: Kdyby\Facebook\DI\FacebookExtension
+	dbal: Nextras\Dbal\Bridges\NetteDI\DbalExtension
+
+http:
+	frames: yes
+
 php:
 	date.timezone: Europe/Prague
 
 
-nette:
-	application:
-			errorPresenter: 'Error'
+application:
+	errorPresenter: 'Error'
 
-	container:
-		debugger: false
+di:
+	debugger: true
 
-	database:
+tracy:
+	strictMode: true
+
+security:
+	debugger: true
+
+session:
+	autoStart: smart
+	expiration: +90 days
+
+
+orm:
+	model: Fitak\Orm
+
+database:
+	default:
 		dsn: "mysql:host=%database.host%;dbname=%database.database%"
 		user: %database.user%
 		password: %database.password%
 		debugger: true
 		explain: true
+		autowired: true
 
-	debugger:
-		strictMode: true
-
-	security:
-		debugger: true
-
-	session:
-		autoStart: smart
-		expiration: +90 days
-
-
-orm:
-	model: Fitak\RepositoryContainer
+dbal:
+	driver: mysqli
+	dsn: "mysql:host=%database.host%;dbname=%database.database%"
+	user: %database.user%
+	password: %database.password%
+	database: %database.database%
+	charset: utf8mb4
+	debugger: true
+	explain: true
 
 facebook:
 	appId: %fb.appId%
@@ -61,7 +77,8 @@ dibi:
 
 parameters:
 	fb:
-		graphVersion: v2.3
+		permissions: []
+		graphVersion: "v2.3"
 	elastic:
 		solrPath: %appDir%/../synonyms.solr
 		hosts:
@@ -74,11 +91,13 @@ services:
 	highlighter: Highlighter
 	kosApi: Fitak\KosApi(%kosapi.username%, %kosapi.password%)
 	migrationsDriver: Nextras\Migrations\Drivers\MySqlNetteDbDriver(..., migrations)
-	pdo: @nette.database.default::getPdo()
+	pdo: @Nette\Database\Connection::getPdo()
 	tags: Tags
 	tagsImporter: Fitak\TagsImporter
 	signInManager: Fitak\SignInManager
 	signUpManager: Fitak\SignUpManager
+#	orm: Fitak\Orm
+#	repositoryContainer: Fitak\Orm
 	passwordResetManager: Fitak\PasswordResetManager
 	searchQueryParser: SearchQueryParser
 	linkFactory: Nextras\Application\LinkFactory
@@ -91,4 +110,4 @@ services:
 	routerFactory: RouterFactory(%router.useHttps%)
 	router: @routerFactory::create
 	keyValueStorage: KeyValueStorage
-	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%)
+	crawler.facebook: Fitak\Crawler\Facebook(%fb.appId%, %fb.appSecret%, %fb.permissions%, %fb.graphVersion%)

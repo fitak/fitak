@@ -31,9 +31,8 @@ class Reindex extends Command
 		$rows = $db->query('
 			SELECT
 				`id`, `message`, `group_id`, `description`, `caption`,
-				If(`parent_id` IS NULL, 1, 0) `is_topic`,
-				Unix_Timestamp(`updated_time`) `timestamp`,
-				`from_name`
+				If(`parent_id` IS NULL, 1, 0) `is_topic`, `user`, `deleted`,
+				Unix_Timestamp(`updated_time`) `timestamp`
 			FROM `data`
 		');
 
@@ -48,15 +47,26 @@ class Reindex extends Command
 				$row['description'],
 				$row['caption'],
 			]));
+
+			$user = $db->query('
+			SELECT
+				`id`, `fb_id`, `name`, `profile_picture`
+			FROM `users`
+			WHERE `id`=10'
+			)->fetch();
+
 			$data[] = [
 				'id' => $row['id'],
 				'tags' => $tagParser->extractTags($row['message'])[0],
 				'message' => $tagParser->separateMessage($row['message'])[1],
 				'message_addons' => $addons,
-				'author' => $row['from_name'],
+				'author' => $user['name'],
 				'is_topic' => $row['is_topic'],
+                'deleted' => $row['deleted'],
 				'updated_time' => $row['timestamp'],
 				'group' => $row['group_id'],
+				'profile_picture' => $user['profile_picture'],
+				'user_fb_id' => $user['fb_id']
 			];
 
 			$pb->advance();

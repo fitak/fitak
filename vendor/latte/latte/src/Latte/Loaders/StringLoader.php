@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Loaders;
@@ -12,8 +12,6 @@ use Latte;
 
 /**
  * Template loader.
- *
- * @author     David Grudl
  */
 class StringLoader extends Latte\Object implements Latte\ILoader
 {

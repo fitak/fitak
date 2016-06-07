@@ -1,5 +1,6 @@
 {block content}
-
+<div class="centered-simple-container">
+	<img src="{$basePath}/img/logo-new.png">
 	<h2>Přihlášení</h2>
 
 	{control signInForm}
@@ -7,68 +8,10 @@
 	<br>
 
 	<p>
-		Zapomněl jsi heslo? Nevadí, můžeš si ho <a n:href="lostPassword">změnit</a>.<br>
+		Zapomněl jsi heslo? Nevadí, můžeš si ho <a n:href="passwordReset">změnit</a>.<br>
 		Nejsi tu ještě zaregistrován? Nevadí, můžeš se <a n:href="signUp">zaregistrovat</a>.
 	</p>
-
-    <div id="fb-root"></div>
-    <script id="fb">
-        "use strict";
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId: '420822884755882',
-                //channelUrl: 'http://localhost/fitcom/www/',
-                version: 'v2.3',
-                status: true,
-                cookie: true,
-                xfbml: true
-            });
-        };
-
-        (function(d){
-           var js,id = 'facebook-jssdk', ref=d.getElementById("fb");
-           if (d.getElementById(id)) { return; }
-           js = d.createElement('script'); js.id=id; js.async=true;
-           js.src="//connect.facebook.com/en_US/sdk.js";
-           ref.parentNode.insertBefore(js, ref);
-        })(document);
-
-        var sendData = {};
-        function statusChangeCallback(response) {
-            console.log(response);
-
-            if (response.status === 'connected') {
-                sendData.accessToken = response.authResponse.accessToken;
-                sendData.accountId = response.authResponse.userID;
-                FB.api('/me', function(userData) {
-                    sendData.userData = userData;
-
-                    $.post({link facebookLogin!}, sendData,
-                        function(r) {
-                            console.debug(r);
-                            if (r.hasOwnProperty("redirect")) {
-                                window.location.href = r.redirect;
-                            } else {
-                                alert("Sorry, something went wrong on our side.");
-                            }
-                        }).fail(function() {
-                            alert("Something went wrong.");
-                        });
-                });
-
-            } else if (response.status === 'not_authorized') {
-                alert('Please log into this app.');
-            } else {
-                alert('Please log into Facebook.');
-            }
-        }
-
-        function checkLoginState(){
-            FB.getLoginStatus(function(response){
-                statusChangeCallback(response);
-            });
-        }
-    </script>
-    <fb:login-button scope="public_profile,email" onLogin="checkLoginState();">
-    </fb:login-button>
+	<div class="callout alert">Tato verze ještě není plně funkční a slouží pouze pro testování!!<br>
+	Využívejte zatím nadále verzi, která běží na <a href="https://www.fitak.cz/">https://www.fitak.cz/</a></div>
+</div>
 {/block}

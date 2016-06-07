@@ -59,7 +59,9 @@ class StaticRouter extends Nette\Object implements IRouter
 		}
 
 		$params = $httpRequest->getQuery();
-		list($presenter, $params['action']) = explode(':', $destination);
+		$pos = strrpos($destination, ':');
+		$presenter = substr($destination, 0, $pos);
+		$params['action'] = substr($destination, $pos + 1);
 
 		return new AppRequest(
 			$presenter,
@@ -83,20 +85,19 @@ class StaticRouter extends Nette\Object implements IRouter
 			return NULL;
 		}
 
-		$presenter = $appRequest->getPresenterName();
 		$params = $appRequest->getParameters();
 		if (!isset($params['action']) || !is_string($params['action'])) {
 			return NULL;
 		}
 
-		$key = $presenter . ':' . $params['action'];
+		$key = $appRequest->getPresenterName() . ':' . $params['action'];
 		if (!isset($this->tableOut[$key])) {
 			return NULL;
 		}
 
 		if ($this->lastRefUrl !== $refUrl) {
-			$schema = ($this->flags & self::SECURED ? 'https' : 'http') . '://';
-			$this->lastBaseUrl = $schema . $refUrl->getAuthority() . $refUrl->getBasePath();
+			$scheme = ($this->flags & self::SECURED ? 'https' : 'http');
+			$this->lastBaseUrl = $scheme . '://' . $refUrl->getAuthority() . $refUrl->getBasePath();
 			$this->lastRefUrl = $refUrl;
 		}
 

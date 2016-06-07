@@ -1,20 +1,20 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Relationships;
 
 use Nette\Object;
-use Nextras\Orm\Entity\Collection\ArrayCollection;
-use Nextras\Orm\Entity\Collection\ICollection;
+use Nextras\Orm\Collection\ArrayCollection;
+use Nextras\Orm\Collection\EmptyCollection;
+use Nextras\Orm\Collection\ICollection;
 use Nextras\Orm\Entity\IEntity;
 use Nextras\Orm\Entity\Reflection\PropertyMetadata;
+use Nextras\Orm\Mapper\IRelationshipMapper;
 use Nextras\Orm\Repository\IRepository;
 use Nextras\Orm\InvalidStateException;
 
@@ -27,16 +27,13 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	/** @var PropertyMetadata */
 	protected $metadata;
 
-	/** @var mixed */
-	protected $injectedValue;
-
 	/** @var ICollection */
 	protected $collection;
 
-	/** @var array */
+	/** @var IEntity[] */
 	protected $toAdd = [];
 
-	/** @var array */
+	/** @var IEntity[] */
 	protected $toRemove = [];
 
 	/** @var IRepository */
@@ -48,18 +45,28 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	/** @var bool */
 	protected $isModified = FALSE;
 
+	/** @var IRelationshipMapper */
+	protected $relationshipMapper;
 
-	public function __construct(IEntity $parent, PropertyMetadata $metadata, $value)
+
+	public function __construct(IEntity $parent, PropertyMetadata $metadata)
 	{
 		$this->parent = $parent;
 		$this->metadata = $metadata;
-		$this->injectedValue = $value;
 	}
 
 
 	public function setParent(IEntity $parent)
 	{
 		$this->parent = $parent;
+	}
+
+
+	public function setRawValue($value)
+	{
+		if ($value !== NULL) { // NULL passed when property is initialized
+			$this->set($value);
+		}
 	}
 
 
@@ -79,7 +86,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 		}
 
 		$this->updateRelationshipAdd($entity);
-		$this->isModified = TRUE;
+		$this->modify();
 		$this->collection = NULL;
 		return $entity;
 	}
@@ -101,7 +108,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 		}
 
 		$this->updateRelationshipRemove($entity);
-		$this->isModified = TRUE;
+		$this->modify();
 		$this->collection = NULL;
 		return $entity;
 	}
@@ -125,7 +132,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 			return FALSE;
 
 		} else {
-			return (bool) $this->getCollection()->getById($entity->id);
+			return (bool) $this->getCollection()->getBy(['id' => $entity->id]);
 		}
 	}
 
@@ -146,7 +153,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 
 	public function get()
 	{
-		return $this->getCollection()->toCollection();
+		return clone $this->getCollection(TRUE);
 	}
 
 
@@ -164,17 +171,14 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	}
 
 
+	/**
+	 * @return ICollection|IEntity[]|\Traversable
+	 */
 	public function getIterator()
 	{
 		/** @var ICollection $collection */
 		$collection = $this->collection === NULL && !$this->toAdd && !$this->toRemove ? $this->getCachedCollection(NULL) : $this->getCollection();
 		return $collection->getEntityIterator($this->parent);
-	}
-
-
-	public function setInjectedValue($values)
-	{
-		$this->set($values);
 	}
 
 
@@ -191,18 +195,34 @@ abstract class HasMany extends Object implements IRelationshipCollection
 
 
 	/**
+	 * Returns primary values of enitities in relationship.
+	 * @return mixed[]
+	 */
+	public function getRawValue()
+	{
+		$primaryValues = [];
+		foreach ($this->getIterator() as $entity) {
+			if ($entity->isPersisted()) {
+				$primaryValues[] = $entity->getValue('id');
+			}
+		}
+		return $primaryValues;
+	}
+
+
+	/**
 	 * @return ICollection
 	 */
-	protected function getCollection()
+	protected function getCollection($forceNew = FALSE)
 	{
-		if ($this->collection !== NULL) {
+		if ($this->collection !== NULL && !$forceNew) {
 			return $this->collection;
 		}
 
 		if ($this->parent->isPersisted()) {
 			$collection = $this->createCollection();
 		} else {
-			$collection = new ArrayCollection([]);
+			$collection = new EmptyCollection();
 		}
 
 		if ($this->toAdd || $this->toRemove) {
@@ -218,7 +238,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 				unset($all[$hash]);
 			}
 
-			$collection = new ArrayCollection(array_values($all));
+			$collection = new ArrayCollection(array_values($all), $this->getTargetRepository());
 			$collection = $this->applyDefaultOrder($collection);
 		}
 
@@ -234,15 +254,14 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	{
 		$key = $this->metadata->name . '_' . $collectionName;
 		$cache = $this->parent->getRepository()->getMapper()->getCollectionCache();
-		if (isset($cache->$key)) {
-			return $cache->$key;
-		}
 
-		if ($collectionName !== NULL) {
-			$filterMethod = 'filter' . $collectionName;
-			$cache->$key = call_user_func([$this->parent, $filterMethod], $this->createCollection());
-		} else {
-			$cache->$key = $this->createCollection();
+		if (!isset($cache->$key)) {
+			if ($collectionName !== NULL) {
+				$filterMethod = 'filter' . $collectionName;
+				$cache->$key = call_user_func([$this->parent, $filterMethod], $this->createCollection());
+			} else {
+				$cache->$key = $this->createCollection();
+			}
 		}
 
 		if (!$collectionName) {
@@ -267,9 +286,6 @@ abstract class HasMany extends Object implements IRelationshipCollection
 			} elseif ($model = $this->parent->getModel(FALSE)) {
 				$repository = $model->getRepositoryForEntity($entity);
 				$repository->attach($entity);
-
-			} else {
-				throw new InvalidStateException('At least one entity has to be attached to IRepository.');
 			}
 
 			return $entity;
@@ -297,21 +313,38 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	protected function getTargetRepository()
 	{
 		if (!$this->targetRepository) {
-			$this->targetRepository = $this->parent->getModel()->getRepository($this->metadata->relationshipRepository);
+			$this->targetRepository = $this->parent->getModel()->getRepository($this->metadata->relationship->repository);
 		}
 
 		return $this->targetRepository;
 	}
 
 
+	protected function getRelationshipMapper()
+	{
+		if (!$this->relationshipMapper) {
+			$this->relationshipMapper = $this->createCollection()->getRelationshipMapper();
+		}
+
+		return $this->relationshipMapper;
+	}
+
+
 	protected function applyDefaultOrder(ICollection $collection)
 	{
-		if (isset($this->metadata->args->relationship['order'])) {
-			return $collection->orderBy($this->metadata->args->relationship['order'][0], $this->metadata->args->relationship['order'][1]);
+		if ($this->metadata->relationship->order !== NULL) {
+			return $collection->orderBy($this->metadata->relationship->order[0], $this->metadata->relationship->order[1]);
 		} else {
 			return $collection;
 		}
 	}
+
+
+	/**
+	 * Sets relationship (and entity) as modified.
+	 * @return void
+	 */
+	abstract protected function modify();
 
 
 	/**
@@ -324,6 +357,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	/**
 	 * Updates relationship change for the $entity.
 	 * @param  IEntity $entity
+	 * @return void
 	 */
 	abstract protected function updateRelationshipAdd(IEntity $entity);
 
@@ -331,6 +365,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	/**
 	 * Updates relationship change for the $entity.
 	 * @param  IEntity $entity
+	 * @return void
 	 */
 	abstract protected function updateRelationshipRemove(IEntity $entity);
 

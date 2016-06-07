@@ -1,0 +1,43 @@
+{block content}
+<div class="main-full-container">
+	<div n:foreach="$flashes as $flash" class="callout {$flash->type}">
+        {$flash->message}
+    </div>
+
+	<h1>Administrace</h1>
+
+	<h2>Přidat uživatele</h2>
+	{control addUserForm}
+
+	<h2>Přidat administrátora</h2>
+	{control addAdminForm}
+
+	<h2>Úprava FB skupin</h2>
+	<p class="alert">Pozor! Smazání skupiny vymaže i všechny příspěvky z této skupiny!</p>
+	<table>
+		<tbody>
+		{foreach $groups as $group}
+			<tr>
+				<td>{$group->id}</td>
+				<td>{$group->name}</td>
+
+				<td>
+				<a n:href="removeGroup!, $group->id" onclick="return confirm('Are you sure you want to delete this item?');"><i class="fa fa-remove"></i></a>
+				</td>
+			</tr>
+		{/foreach}
+		</tbody>
+    </table>
+    <table>
+    <tbody>
+		<tr>
+		{form addGroupForm}
+			<td>{label id /}{input id}</td>
+			<td>{label name /}{input name}</td>
+			<td>{input addGroup, class => 'button'}</td>
+		{/form}
+		</tr>
+	</tbody>
+	</table>
+</div>
+{/block}

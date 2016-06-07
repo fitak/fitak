@@ -1,19 +1,15 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
 
-use Tracy;
-
 
 /**
  * Red BlueScreen.
- *
- * @author     David Grudl
  */
 class BlueScreen
 {
@@ -24,7 +20,15 @@ class BlueScreen
 	private $panels = array();
 
 	/** @var string[] paths to be collapsed in stack trace (e.g. core libraries) */
-	public $collapsePaths = array(__DIR__);
+	public $collapsePaths = array();
+
+
+	public function __construct()
+	{
+		$this->collapsePaths[] = preg_match('#(.+/vendor)/tracy/tracy/src/Tracy$#', strtr(__DIR__, '\\', '/'), $m)
+			? $m[1]
+			: __DIR__;
+	}
 
 
 	/**
@@ -43,14 +47,23 @@ class BlueScreen
 
 	/**
 	 * Renders blue screen.
-	 * @param  \Exception
+	 * @param  \Exception|\Throwable
 	 * @return void
 	 */
-	public function render(\Exception $exception)
+	public function render($exception)
 	{
 		$panels = $this->panels;
 		$info = array_filter($this->info);
-		require __DIR__ . '/templates/bluescreen.phtml';
+		$source = Helpers::getSource();
+		$sourceIsUrl = preg_match('#^https?://#', $source);
+		$title = $exception instanceof \ErrorException
+			? Helpers::errorTypeToString($exception->getSeverity())
+			: Helpers::getClass($exception);
+		$skipError = $sourceIsUrl && $exception instanceof \ErrorException && !empty($exception->skippable)
+			? $source . (strpos($source, '?') ? '&' : '?') . '_tracy_skip_error'
+			: NULL;
+
+		require __DIR__ . '/assets/BlueScreen/bluescreen.phtml';
 	}
 
 
@@ -59,15 +72,15 @@ class BlueScreen
 	 * @param  string
 	 * @param  int
 	 * @param  int
-	 * @return string
+	 * @return string|NULL
 	 */
 	public static function highlightFile($file, $line, $lines = 15, array $vars = NULL)
 	{
-		$source = @file_get_contents($file); // intentionally @
+		$source = @file_get_contents($file); // @ file may not exist
 		if ($source) {
 			$source = static::highlightPhp($source, $line, $lines, $vars);
 			if ($editor = Helpers::editorUri($file, $line)) {
-				$source = substr_replace($source, ' data-tracy-href="' . htmlspecialchars($editor) . '"', 4, 0);
+				$source = substr_replace($source, ' data-tracy-href="' . htmlspecialchars($editor, ENT_QUOTES, 'UTF-8') . '"', 4, 0);
 			}
 			return $source;
 		}
@@ -98,13 +111,16 @@ class BlueScreen
 		$out .= static::highlightLine($source, $line, $lines);
 
 		if ($vars) {
-			$out = preg_replace_callback('#">\$(\w+)(&nbsp;)?</span>#', function($m) use ($vars) {
+			$out = preg_replace_callback('#">\$(\w+)(&nbsp;)?</span>#', function ($m) use ($vars) {
 				return array_key_exists($m[1], $vars)
-					? '" title="' . str_replace('"', '&quot;', trim(strip_tags(Dumper::toHtml($vars[$m[1]])))) . $m[0]
+					? '" title="'
+						. str_replace('"', '&quot;', trim(strip_tags(Dumper::toHtml($vars[$m[1]], array(Dumper::DEPTH => 1)))))
+						. $m[0]
 					: $m[0];
 			}, $out);
 		}
 
+		$out = str_replace('&nbsp;', ' ', $out);
 		return "<pre class='php'><div>$out</div></pre>";
 	}
 
@@ -119,7 +135,7 @@ class BlueScreen
 		$source = explode("\n", "\n" . str_replace("\r\n", "\n", $html));
 		$out = '';
 		$spans = 1;
-		$start = $i = max(1, $line - floor($lines * 2/3));
+		$start = $i = max(1, $line - floor($lines * 2 / 3));
 		while (--$i >= 1) { // find last highlighted block
 			if (preg_match('#.*(</?span[^>]*>)#', $source[$i], $m)) {
 				if ($m[1] !== '</span>') {
@@ -161,8 +177,10 @@ class BlueScreen
 	 */
 	public function isCollapsed($file)
 	{
+		$file = strtr($file, '\\', '/') . '/';
 		foreach ($this->collapsePaths as $path) {
-			if (strpos(strtr($file, '\\', '/'), strtr("$path/", '\\', '/')) === 0) {
+			$path = strtr($path, '\\', '/') . '/';
+			if (strncmp($file, $path, strlen($path)) === 0) {
 				return TRUE;
 			}
 		}

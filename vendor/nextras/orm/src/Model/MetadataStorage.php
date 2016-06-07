@@ -1,11 +1,9 @@
 <?php
 
 /**
- * This file is part of the Nextras\ORM library.
- *
+ * This file is part of the Nextras\Orm library.
  * @license    MIT
  * @link       https://github.com/nextras/orm
- * @author     Jan Skrasek
  */
 
 namespace Nextras\Orm\Model;
@@ -17,6 +15,7 @@ use Nextras\Orm\Entity\Reflection\AnnotationParser;
 use Nextras\Orm\Entity\Reflection\EntityMetadata;
 use Nextras\Orm\Entity\Reflection\MetadataValidator;
 use Nextras\Orm\InvalidArgumentException;
+use Nextras\Orm\InvalidStateException;
 
 
 class MetadataStorage extends Object
@@ -28,36 +27,32 @@ class MetadataStorage extends Object
 	public static function get($className)
 	{
 		if (!isset(static::$metadata[$className])) {
+			if (static::$metadata === NULL) {
+				throw new InvalidStateException("MetadataStorage::get() called too early. You have to instantiate your model first.");
+			}
 			throw new InvalidArgumentException("Entity metadata for '{$className}' does not exist.");
 		}
 		return static::$metadata[$className];
 	}
 
 
-	public function __construct(IStorage $cacheStorage, array $entityClasses, IModel $model)
+	public function __construct(IStorage $cacheStorage, array $entityClassesMap, IRepositoryLoader $repositoryLoader)
 	{
 		$cache = new Cache($cacheStorage, 'Nextras.Orm.metadata');
-		static::$metadata = $cache->load($entityClasses, function(& $dp) use ($entityClasses, $model) {
-			$metadata = $this->parseMetadata($entityClasses, $dp[Cache::FILES]);
+		static::$metadata = $cache->load($entityClassesMap, function(& $dp) use ($entityClassesMap, $repositoryLoader) {
+
+			$metadata = [];
+			$annotationParser = new AnnotationParser($entityClassesMap);
+			foreach (array_keys($entityClassesMap) as $className) {
+				$metadata[$className] = $annotationParser->parseMetadata($className, $dp[Cache::FILES]);
+			}
 
 			$validator = new MetadataValidator();
-			$validator->validate($metadata, $model);
+			$validator->validate($metadata, $repositoryLoader);
 
 			return $metadata;
+
 		});
-	}
-
-
-	private function parseMetadata($entityList, & $fileDependencies)
-	{
-		$cache = [];
-		$annotationParser = new AnnotationParser();
-
-		foreach ($entityList as $className) {
-			$cache[$className] = $annotationParser->parseMetadata($className, $fileDependencies);
-		}
-
-		return $cache;
 	}
 
 }

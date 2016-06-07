@@ -12,12 +12,9 @@ use Nette;
 
 /**
  * Passwords tools. Requires PHP >= 5.3.7.
- *
- * @author     David Grudl
  */
 class Passwords
 {
-	const PASSWORD_MAX_LENGTH = 4096;
 	const BCRYPT_COST = 10;
 
 
@@ -40,7 +37,6 @@ class Passwords
 			throw new Nette\InvalidArgumentException("Cost must be in range 4-31, $cost given.");
 		}
 
-		$password = substr($password, 0, self::PASSWORD_MAX_LENGTH);
 		$hash = crypt($password, '$2y$' . ($cost < 10 ? 0 : '') . $cost . '$' . $salt);
 		if (strlen($hash) < 60) {
 			throw new Nette\InvalidStateException('Hash returned by crypt is invalid.');
@@ -56,7 +52,7 @@ class Passwords
 	public static function verify($password, $hash)
 	{
 		return preg_match('#^\$2y\$(?P<cost>\d\d)\$(?P<salt>.{22})#', $hash, $m)
-			&& $m['cost'] > 3 && $m['cost'] < 31
+			&& $m['cost'] >= 4 && $m['cost'] <= 31
 			&& self::hash($password, $m) === $hash;
 	}
 

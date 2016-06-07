@@ -35,7 +35,7 @@ class SearchResponse extends Object implements IteratorAggregate
 	 */
 	public function __construct($topics, array $highlights, $total, Tags $tagParser)
 	{
-		$this->topics = array_values($topics);
+		$this->topics = $topics;
 		$this->highlights = $highlights;
 		$this->total = $total;
 		$this->tagParser = $tagParser;
@@ -59,8 +59,8 @@ class SearchResponse extends Object implements IteratorAggregate
 
 	public function getHighlight($row)
 	{
-		$msg = isset($this->highlights[$row['id']])
-			? $this->highlights[$row['id']]
+		$msg = isset($this->highlights[$row->id])
+			? $this->highlights[$row->id]
 			: $this->tagParser->separateMessage($row->message)[1];
 		return Strings::trim($msg);
 	}

@@ -2,10 +2,17 @@
 
 namespace Fitak;
 
-use Nextras\Orm;
+use Nextras\Orm\Repository\Repository;
 
 
-class PostsRepository extends Orm\Repository\Repository
+class PostsRepository extends Repository
 {
+    function getPost($id) {
+        $post = $this->getById($id);
+        while($post->parent !== NULL) {
+            $post = $post->parent;
+        }
 
+        return $post;
+    }
 }

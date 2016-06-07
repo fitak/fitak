@@ -2,26 +2,21 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi connection.
  *
- * @author     David Grudl
  * @package    dibi
  *
- * @property-read bool $connected
- * @property-read mixed $config
- * @property-read IDibiDriver $driver
  * @property-read int $affectedRows
  * @property-read int $insertId
- * @property-read DibiDatabaseInfo $databaseInfo
  */
 class DibiConnection extends DibiObject
 {
-	/** @var array of function(DibiEvent $event); Occurs after query is executed */
+	/** @var array of function (DibiEvent $event); Occurs after query is executed */
 	public $onEvent;
 
 	/** @var array  Current connection configuration */
@@ -80,19 +75,26 @@ class DibiConnection extends DibiObject
 			$config['driver'] = dibi::$defaultDriver;
 		}
 
-		$class = preg_replace(array('#\W#', '#sql#'), array('_', 'Sql'), ucfirst(strtolower($config['driver'])));
-		$class = "Dibi{$class}Driver";
-		if (!class_exists($class)) {
-			include_once dirname(__FILE__) . "/../drivers/$class.php";
+		if ($config['driver'] instanceof IDibiDriver) {
+			$this->driver = $config['driver'];
+			$config['driver'] = get_class($this->driver);
+		} elseif (PHP_VERSION_ID >= 50307 && is_subclass_of($config['driver'], 'IDibiDriver')) {
+			$this->driver = new $config['driver'];
+		} else {
+			$class = preg_replace(array('#\W#', '#sql#'), array('_', 'Sql'), ucfirst(strtolower($config['driver'])));
+			$class = "Dibi{$class}Driver";
+			if (!class_exists($class)) {
+				include_once dirname(__FILE__) . "/../drivers/$class.php";
 
-			if (!class_exists($class, FALSE)) {
-				throw new DibiException("Unable to create instance of dibi driver '$class'.");
+				if (!class_exists($class, FALSE)) {
+					throw new DibiException("Unable to create instance of dibi driver '$class'.");
+				}
 			}
+			$this->driver = new $class;
 		}
 
 		$config['name'] = $name;
 		$this->config = $config;
-		$this->driver = new $class;
 		$this->translator = new DibiTranslator($this);
 
 		// profiler
@@ -111,7 +113,7 @@ class DibiConnection extends DibiObject
 				$this->onEvent[] = array(new DibiFirePhpLogger($filter), 'logEvent');
 			}
 
-			if (!interface_exists('Tracy\IBarPanel') && (interface_exists('Nette\Diagnostics\IBarPanel') || interface_exists('IBarPanel'))) {
+			if (!interface_exists('Tracy\IBarPanel') && interface_exists('Nette\Diagnostics\IBarPanel') && class_exists('DibiNettePanel')) {
 				$panel = new DibiNettePanel(isset($profilerCfg['explain']) ? $profilerCfg['explain'] : TRUE, $filter);
 				$panel->register($this);
 			}

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Database\Drivers;
@@ -12,19 +12,26 @@ use Nette;
 
 /**
  * Supplemental SQL Server 2005 and later database driver.
- *
- * @author     David Grudl
- * @author     Miloslav Hůla
  */
 class SqlsrvDriver extends Nette\Object implements Nette\Database\ISupplementalDriver
 {
 	/** @var Nette\Database\Connection */
 	private $connection;
 
+	/** @var string */
+	private $version;
+
 
 	public function __construct(Nette\Database\Connection $connection, array $options)
 	{
 		$this->connection = $connection;
+		$this->version = $connection->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+	}
+
+
+	public function convertException(\PDOException $e)
+	{
+		return Nette\Database\DriverException::from($e);
 	}
 
 
@@ -36,7 +43,7 @@ class SqlsrvDriver extends Nette\Object implements Nette\Database\ISupplementalD
 	 */
 	public function delimite($name)
 	{
-		/** @see http://msdn.microsoft.com/en-us/library/ms176027.aspx */
+		/** @see https://msdn.microsoft.com/en-us/library/ms176027.aspx */
 		return '[' . str_replace(']', ']]', $name) . ']';
 	}
 
@@ -55,8 +62,17 @@ class SqlsrvDriver extends Nette\Object implements Nette\Database\ISupplementalD
 	 */
 	public function formatDateTime(/*\DateTimeInterface*/ $value)
 	{
-		/** @see http://msdn.microsoft.com/en-us/library/ms187819.aspx */
+		/** @see https://msdn.microsoft.com/en-us/library/ms187819.aspx */
 		return $value->format("'Y-m-d H:i:s'");
+	}
+
+
+	/**
+	 * Formats date-time interval for use in a SQL statement.
+	 */
+	public function formatDateInterval(\DateInterval $value)
+	{
+		throw new Nette\NotSupportedException;
 	}
 
 
@@ -65,7 +81,7 @@ class SqlsrvDriver extends Nette\Object implements Nette\Database\ISupplementalD
 	 */
 	public function formatLike($value, $pos)
 	{
-		/** @see http://msdn.microsoft.com/en-us/library/ms179859.aspx */
+		/** @see https://msdn.microsoft.com/en-us/library/ms179859.aspx */
 		$value = strtr($value, array("'" => "''", '%' => '[%]', '_' => '[_]', '[' => '[[]'));
 		return ($pos <= 0 ? "'%" : "'") . $value . ($pos >= 0 ? "%'" : "'");
 	}
@@ -76,15 +92,24 @@ class SqlsrvDriver extends Nette\Object implements Nette\Database\ISupplementalD
 	 */
 	public function applyLimit(& $sql, $limit, $offset)
 	{
-		if ($limit >= 0) {
-			$sql = preg_replace('#^\s*(SELECT|UPDATE|DELETE)#i', '$0 TOP ' . (int) $limit, $sql, 1, $count);
-			if (!$count) {
-				throw new Nette\InvalidArgumentException('SQL query must begin with SELECT, UPDATE or DELETE command.');
-			}
-		}
+		if ($limit < 0 || $offset < 0) {
+			throw new Nette\InvalidArgumentException('Negative offset or limit.');
 
-		if ($offset > 0) {
-			throw new Nette\NotSupportedException('Offset is not supported by this database.');
+		} elseif (version_compare($this->version, 11, '<')) { // 11 == SQL Server 2012
+			if ($offset) {
+				throw new Nette\NotSupportedException('Offset is not supported by this database.');
+
+			} elseif ($limit !== NULL) {
+				$sql = preg_replace('#^\s*(SELECT(\s+DISTINCT|\s+ALL)?|UPDATE|DELETE)#i', '$0 TOP ' . (int) $limit, $sql, 1, $count);
+				if (!$count) {
+					throw new Nette\InvalidArgumentException('SQL query must begin with SELECT, UPDATE or DELETE command.');
+				}
+			}
+
+		} elseif ($limit !== NULL || $offset) {
+			// requires ORDER BY, see https://technet.microsoft.com/en-us/library/gg699618(v=sql.110).aspx
+			$sql .= ' OFFSET ' . (int) $offset . ' ROWS '
+				. 'FETCH NEXT ' . (int) $limit . ' ROWS ONLY';
 		}
 	}
 

@@ -1,18 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Bridges\ApplicationLatte;
 
-use Nette,
-	Latte,
-	Latte\MacroNode,
-	Latte\PhpWriter,
-	Latte\CompileException,
-	Nette\Utils\Strings;
+use Nette;
+use Latte;
+use Latte\MacroNode;
+use Latte\PhpWriter;
+use Latte\CompileException;
+use Nette\Utils\Strings;
 
 
 /**
@@ -21,8 +21,6 @@ use Nette,
  * - {link destination ...} control link
  * - {plink destination ...} presenter link
  * - {snippet ?} ... {/snippet ?} control snippet
- *
- * @author     David Grudl
  */
 class UIMacros extends Latte\Macros\MacroSet
 {
@@ -32,7 +30,7 @@ class UIMacros extends Latte\Macros\MacroSet
 		$me = new static($compiler);
 		$me->addMacro('control', array($me, 'macroControl'));
 
-		$me->addMacro('href', NULL, NULL, function(MacroNode $node, PhpWriter $writer) use ($me) {
+		$me->addMacro('href', NULL, NULL, function (MacroNode $node, PhpWriter $writer) use ($me) {
 			return ' ?> href="<?php ' . $me->macroLink($node, $writer) . ' ?>"<?php ';
 		});
 		$me->addMacro('plink', array($me, 'macroLink'));
@@ -50,7 +48,7 @@ class UIMacros extends Latte\Macros\MacroSet
 		$prolog = '
 // snippets support
 if (empty($_l->extends) && !empty($_control->snippetMode)) {
-	return Nette\Bridges\ApplicationLatte\UIMacros::renderSnippets($_control, $_b, get_defined_vars());
+	return Nette\Bridges\ApplicationLatte\UIRuntime::renderSnippets($_control, $_b, get_defined_vars());
 }';
 		return array($prolog, '');
 	}
@@ -73,7 +71,7 @@ if (empty($_l->extends) && !empty($_control->snippetMode)) {
 		$method = Strings::match($method, '#^\w*\z#') ? "render$method" : "{\"render$method\"}";
 		$param = $writer->formatArray();
 		if (!Strings::contains($node->args, '=>')) {
-			$param = substr($param, 6, -1); // removes array()
+			$param = substr($param, $param[0] === '[' ? 1 : 6, -1); // removes array() or []
 		}
 		return ($name[0] === '$' ? "if (is_object($name)) \$_l->tmp = $name; else " : '')
 			. '$_l->tmp = $_control->getComponent(' . $name . '); '
@@ -100,52 +98,20 @@ if (empty($_l->extends) && !empty($_control->snippetMode)) {
 	 */
 	public function macroIfCurrent(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write(($node->args ? 'try { $_presenter->link(%node.word, %node.array?); } catch (Nette\Application\UI\InvalidLinkException $e) {}' : '')
-			. '; if ($_presenter->getLastCreatedRequestFlag("current")) {');
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+		return $writer->write($node->args
+			? 'if ($_presenter->isLinkCurrent(%node.word, %node.array?)) {'
+			: 'if ($_presenter->getLastCreatedRequestFlag("current")) {'
+		);
 	}
 
 
-	/********************* run-time helpers ****************d*g**/
-
-
+	/** @deprecated */
 	public static function renderSnippets(Nette\Application\UI\Control $control, \stdClass $local, array $params)
 	{
-		$control->snippetMode = FALSE;
-		$payload = $control->getPresenter()->getPayload();
-		if (isset($local->blocks)) {
-			foreach ($local->blocks as $name => $function) {
-				if ($name[0] !== '_' || !$control->isControlInvalid(substr($name, 1))) {
-					continue;
-				}
-				ob_start();
-				$function = reset($function);
-				$snippets = $function($local, $params + array('_snippetMode' => TRUE));
-				$payload->snippets[$id = $control->getSnippetId(substr($name, 1))] = ob_get_clean();
-				if ($snippets !== NULL) { // pass FALSE from snippetArea
-					if ($snippets) {
-						$payload->snippets += $snippets;
-					}
-					unset($payload->snippets[$id]);
-				}
-			}
-		}
-		$control->snippetMode = TRUE;
-		if ($control instanceof Nette\Application\UI\IRenderable) {
-			$queue = array($control);
-			do {
-				foreach (array_shift($queue)->getComponents() as $child) {
-					if ($child instanceof Nette\Application\UI\IRenderable) {
-						if ($child->isControlInvalid()) {
-							$child->snippetMode = TRUE;
-							$child->render();
-							$child->snippetMode = FALSE;
-						}
-					} elseif ($child instanceof Nette\ComponentModel\IContainer) {
-						$queue[] = $child;
-					}
-				}
-			} while ($queue);
-		}
+		UIRuntime::renderSnippets($control, $local, $params);
 	}
 
 }

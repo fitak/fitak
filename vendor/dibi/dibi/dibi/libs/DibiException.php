@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi common exception.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiException extends Exception
@@ -54,7 +53,6 @@ class DibiException extends Exception
 /**
  * database server exception.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiDriverException extends DibiException
@@ -114,11 +112,10 @@ class DibiDriverException extends DibiException
 /**
  * PCRE exception.
  *
- * @author     David Grudl
  * @package    dibi
  */
-class DibiPcreException extends Exception {
-
+class DibiPcreException extends Exception
+{
 	public function __construct($message = '%msg.')
 	{
 		static $messages = array(

@@ -1,15 +1,16 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Templating;
 
-use Nette,
-	Nette\Caching,
-	Latte;
+use Latte\CompileException;
+use Nette;
+use Nette\Caching;
+use Latte;
 
 
 /**
@@ -100,7 +101,7 @@ class FileTemplate extends Template implements IFileTemplate
 			try {
 				$compiled = "<?php\n\n// source file: $this->file\n\n?>" . $this->compile();
 
-			} catch (FilterException $e) {
+			} catch (CompileException $e) {
 				throw $e->setSource(file_get_contents($this->file), $e->sourceLine, $this->file);
 			}
 
